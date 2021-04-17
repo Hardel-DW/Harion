@@ -6,7 +6,7 @@ using UnhollowerBaseLib;
 using UnityEngine;
 
 namespace HardelAPI.Utility {
-    class HelperSprite {
+    public class HelperSprite {
         public static Sprite LoadSpriteFromEmbeddedResources(string resource, float PixelPerUnit) {
             try {
                 Assembly myAssembly = Assembly.GetExecutingAssembly();
@@ -22,7 +22,7 @@ namespace HardelAPI.Utility {
 
         public static Sprite LoadHatSprite(string resource) {
             try {
-                System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                Assembly assembly = Assembly.GetExecutingAssembly();
                 Texture2D tex = GUIExtensions.CreateEmptyTexture();
                 Stream imageStream = assembly.GetManifestResourceStream(resource);
                 byte[] img = imageStream.ReadFully();
