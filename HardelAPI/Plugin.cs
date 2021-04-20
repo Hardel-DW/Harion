@@ -22,7 +22,6 @@ namespace HardelAPI {
         public override void Load() {
             Logger = Log;
             Harmony.PatchAll();
-            RegisterInCustomRolesAttribute.Register();
         }
     }
 }

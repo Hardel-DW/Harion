@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 
 namespace HardelAPI.Utility {
-    class RandomPosition {
+    public class RandomPosition {
         public static Dictionary<MapType, Vector2[]> MapLocations = new Dictionary<MapType, Vector2[]>() {
             { MapType.Skeld, new Vector2[] {
                 new Vector2(-12.594f, -4.179f),

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace HardelAPI.Utility {
 
     [RegisterInIl2Cpp]
-    class MinimapToMap : MonoBehaviour {
+    public class MinimapToMap : MonoBehaviour {
         public MinimapToMap(IntPtr ptr) : base(ptr) { }
         public static MinimapToMap Instance;
         private MapBehaviour Map = null;

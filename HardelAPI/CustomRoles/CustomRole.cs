@@ -11,10 +11,6 @@
                     return instance ??= new T();
                 }
             }
-
-            set {
-                instance = value;
-            }
         }
 
         public T SetIntance {
@@ -22,7 +18,6 @@
                 instance = value;
             }
         }
-
 
         protected CustomRole() : base(typeof(T)) { }
     }

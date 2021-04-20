@@ -6,6 +6,7 @@ namespace HardelAPI.Utility.CustomRoles.Patch {
     public static class ShipStatusStart {
         public static void Postfix(ShipStatus __instance) {
             foreach (var Role in RoleManager.AllRoles) {
+                if (Role.TaskAreRemove)
                 Role.TaskAreRemove = false;
                 Role.WhiteListKill = null;
                 Role.OnGameStart();

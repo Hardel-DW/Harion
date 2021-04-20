@@ -2,7 +2,7 @@
 using UnityEngine;
 
 namespace HardelAPI.Utility {
-    class Animation {
+    public class Animation {
 		public static IEnumerator FadeOut(float speed, GameObject gameObject, bool destroyAtEnd) {
 			float alpha = 1f;
 			SpriteRenderer renderer = null;

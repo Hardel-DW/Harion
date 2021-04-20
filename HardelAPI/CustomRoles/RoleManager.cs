@@ -18,6 +18,7 @@ namespace HardelAPI.Utility.CustomRoles {
         public int PercentApparition = 100;
         public bool ShowIntroCutScene = true;
         public bool CanHasOtherRole = false;
+        public bool TaskAreRemove = false;
         public bool RoleActive = true;
         public bool HasTask = true;
         public bool CanVent = false;
@@ -29,8 +30,7 @@ namespace HardelAPI.Utility.CustomRoles {
         public PlayerSide VisibleBy = PlayerSide.Self;
         public Moment GiveTasksAt = Moment.StartGame;
         public Moment GiveRoleAt = Moment.StartGame;
-        private Type ClassType;
-        public bool TaskAreRemove = false;
+        private readonly Type ClassType;
 
         public virtual List<IAbility> Abilities { get; set; } = null;
 
@@ -175,8 +175,7 @@ namespace HardelAPI.Utility.CustomRoles {
         public virtual void DefineKillWhiteList() {
             List<PlayerControl> AllPlayer = PlayerControl.AllPlayerControls.ToArray().ToList();
 
-            WhiteListKill = CanKill switch
-            {
+            WhiteListKill = CanKill switch {
                 PlayerSide.Everyone => AllPlayer,
                 PlayerSide.Impostor => AllPlayer.FindAll(p => p.Data.IsImpostor),
                 PlayerSide.Crewmate => AllPlayer.FindAll(p => !p.Data.IsImpostor),
@@ -201,6 +200,10 @@ namespace HardelAPI.Utility.CustomRoles {
         public PlayerControl GetClosestTarget(PlayerControl PlayerReference) {
             double distance = double.MaxValue;
             PlayerControl result = null;
+
+            if (WhiteListKill == null) {
+                Plugin.Logger.LogError("GetClosestTarget => WhiteListKill is null");
+            }
 
             foreach (var player in WhiteListKill) {
                 float distanceBeetween = Vector2.Distance(player.transform.position, PlayerReference.transform.position);

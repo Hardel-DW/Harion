@@ -15,11 +15,11 @@ namespace HardelAPI.Utility.CustomRoles.Patch {
 
                 float maxFloat = float.MaxValue;
                 PlayerControl player = playerInfo.Object;
-                tempCouldUse = playerInfo.IsImpostor || Role.HasRole(playerInfo.PlayerId) && !playerInfo.IsDead && (player.CanMove || player.inVent);
+                tempCouldUse = (playerInfo.IsImpostor || Role.HasRole(playerInfo.PlayerId)) && !playerInfo.IsDead && (player.CanMove || player.inVent);
                 tempCanUse = tempCouldUse;
                 if (tempCanUse) {
                     maxFloat = Vector2.Distance(player.GetTruePosition(), __instance.transform.position);
-                    tempCanUse &= maxFloat <= __instance.UsableDistance;
+                    tempCanUse &= maxFloat <= __instance.UsableDistance && !PhysicsHelpers.AnythingBetween(player.GetTruePosition(), __instance.transform.position, Constants.ShipAndObjectsMask, false);
                 }
 
                 __result = maxFloat;

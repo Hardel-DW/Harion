@@ -14,36 +14,36 @@ namespace HardelAPI.Utility.CustomRoles.Patch {
             
             foreach (var Role in RoleManager.AllRoles) {
                 if (PlayerControl.LocalPlayer == null || PlayerControl.AllPlayerControls == null)
-                    return;
+                    break;
 
                 if (PlayerControl.LocalPlayer.Data == null || !(PlayerControl.AllPlayerControls.Count > 1))
-                    return;
+                    break;
 
-                if (Role.WhiteListKill == null) {
-                    if (Role.CanKill != Enumerations.PlayerSide.Nobody || PlayerControl.LocalPlayer.Data.IsImpostor) {
+                if (Role.WhiteListKill == null)
+                    if (Role.CanKill != Enumerations.PlayerSide.Nobody || PlayerControl.LocalPlayer.Data.IsImpostor)
                         Role.DefineKillWhiteList();
-                    }
 
-                    continue;
-                }
+                if (Role.KillCooldown == 0f && PlayerControl.LocalPlayer.Data.IsImpostor)
+                    Role.KillCooldown = PlayerControl.GameOptions.KillCooldown;
 
-                PlayerControl ClosestPlayer = Role.GetClosestTarget(PlayerControl.LocalPlayer);
                 if ((AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Started) || (AmongUsClient.Instance.GameMode == GameModes.FreePlay)) {
-                    if (Role.HasRole(PlayerControl.LocalPlayer)) {
+                    if (Role.HasRole(PlayerControl.LocalPlayer) && Role.WhiteListKill != null) {
+                        PlayerControl ClosestPlayer = Role.GetClosestTarget(PlayerControl.LocalPlayer);
+                        
                         if (PlayerControl.LocalPlayer.Data.IsDead) {
                             KillButton.gameObject.SetActive(false);
                             KillButton.isActive = false;
                         } else {
                             KillButton.gameObject.SetActive(!MeetingHud.Instance);
                             KillButton.isActive = !MeetingHud.Instance;
-                            KillButton.SetCoolDown(Role.KillTimer(), Role.KillCooldown + 15f);
+                            KillButton.SetCoolDown(Role.KillTimer(), Role.KillCooldown);
 
                             if (Input.GetKeyDown(KeyCode.Q))
                                 KillButton.PerformKill();
                             
                             float distBetweenPlayers = Vector3.Distance(PlayerControl.LocalPlayer.transform.position, ClosestPlayer.transform.position);
 
-                            if (distBetweenPlayers < GameOptionsData.KillDistances[PlayerControl.GameOptions.KillDistance] && KillButton.enabled)
+                            if ((distBetweenPlayers < GameOptionsData.KillDistances[PlayerControl.GameOptions.KillDistance]) && KillButton.enabled)
                                 KillButton.SetTarget(ClosestPlayer);
                         }
 
@@ -51,6 +51,8 @@ namespace HardelAPI.Utility.CustomRoles.Patch {
                     } else if (PlayerControl.LocalPlayer.Data.IsImpostor && !PlayerControl.LocalPlayer.Data.IsDead) {
                         __instance.KillButton.gameObject.SetActive(!MeetingHud.Instance);
                         __instance.KillButton.isActive = !MeetingHud.Instance;
+
+                        break;
                     } else {
                         KillButton.gameObject.SetActive(false);
                         KillButton.isActive = false;

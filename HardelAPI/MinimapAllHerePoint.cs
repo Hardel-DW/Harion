@@ -8,7 +8,7 @@ using UnityEngine;
 namespace HardelAPI.Utility {
 
     [RegisterInIl2Cpp]
-    class MinimapAllHerePoint : MonoBehaviour {
+    public class MinimapAllHerePoint : MonoBehaviour {
         public MinimapAllHerePoint(IntPtr ptr) : base(ptr) { }
         public static MinimapAllHerePoint Instance;
         private MapBehaviour Map = null;

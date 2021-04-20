@@ -10,23 +10,23 @@ namespace HardelAPI.Utility.CustomRoles.Patch {
 
         [HarmonyPriority(Priority.First)]
         private static bool Prefix(KillButtonManager __instance) {
+            if (!PlayerControl.LocalPlayer.CanMove || PlayerControl.LocalPlayer.Data.IsDead)
+                return false;
+
+            if (PlayerControl.LocalPlayer.Data.IsImpostor)
+                return true;
+
             foreach (var Role in RoleManager.AllRoles) {
-                if (Role.WhiteListKill == null)
+                if (Role.WhiteListKill == null || !Role.HasRole(PlayerControl.LocalPlayer) || Role.WhiteListKill == null)
                     continue;
 
                 PlayerControl ClosestPlayer = Role.GetClosestTarget(PlayerControl.LocalPlayer);
-                if (__instance != DestroyableSingleton<HudManager>.Instance.KillButton || !Role.HasRole(PlayerControl.LocalPlayer))
-                    return true;
-
-                if (!PlayerControl.LocalPlayer.CanMove || PlayerControl.LocalPlayer.Data.IsDead || Role.KillTimer() != 0f || !__instance.enabled)
-                    return false;
-
-                if (!(Vector2.Distance(PlayerControl.LocalPlayer.transform.position, ClosestPlayer.transform.position) < GameOptionsData.KillDistances[PlayerControl.GameOptions.KillDistance]))
-                    return false;
-
-                Role.OnLocalAttempKill(PlayerControl.LocalPlayer, ClosestPlayer);
-                Role.LastKilled = DateTime.UtcNow;
-                return false;
+                bool CanKill = Vector2.Distance(PlayerControl.LocalPlayer.transform.position, ClosestPlayer.transform.position) < GameOptionsData.KillDistances[PlayerControl.GameOptions.KillDistance];
+                
+                if (Role.KillTimer() == 0f && __instance.enabled && CanKill) {
+                    Role.OnLocalAttempKill(PlayerControl.LocalPlayer, ClosestPlayer);
+                    Role.LastKilled = DateTime.UtcNow;
+                }
             }
 
             return false;
