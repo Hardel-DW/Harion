@@ -8,9 +8,10 @@
         <Description>Hardel API</Description>
         <Authors>Hardel</Authors>
     </PropertyGroup>
-
+  
     <ItemGroup>
-        <Deobfuscate Include="$(AmongUs)\BepInEx\plugins\Reactor-$(GameVersion).dll" />      
+        <Deobfuscate Include="$(AmongUs)\BepInEx\plugins\Reactor-$(GameVersion).dll" />
+        <EmbeddedResource Include="Resources\*" />      
         <PackageReference Include="Reactor.OxygenFilter.MSBuild" Version="0.3.0" />
     </ItemGroup>
 

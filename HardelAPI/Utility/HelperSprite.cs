@@ -7,6 +7,15 @@ using UnityEngine;
 
 namespace HardelAPI.Utility {
     public class HelperSprite {
+        public static Sprite LoadSpriteFromByte(byte[] resource, float PixelPerUnit) {
+            try {
+                Texture2D myTexture = new Texture2D(2, 2, TextureFormat.ARGB32, true);
+                LoadImage(myTexture, resource, true);
+                return Sprite.Create(myTexture, new Rect(0, 0, myTexture.width, myTexture.height), new Vector2(0.5f, 0.5f), PixelPerUnit);
+            } catch { }
+            return null;
+        }
+
         public static Sprite LoadSpriteFromEmbeddedResources(string resource, float PixelPerUnit) {
             try {
                 Assembly myAssembly = Assembly.GetExecutingAssembly();

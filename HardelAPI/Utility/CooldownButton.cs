@@ -59,6 +59,69 @@ namespace HardelAPI.Utility {
             Start();
         }
 
+        public CooldownButton(Action OnClick, float Cooldown, byte[] resource, float pixelPerUnit, Vector2 PositionOffset, HudManager hudManager, float EffectDuration, Action OnEffectEnd, Action OnUpdate) {
+            this.hudManager = hudManager;
+            this.OnClick = OnClick;
+            this.OnEffectEnd = OnEffectEnd;
+            this.OnUpdate = OnUpdate;
+            this.PositionOffset = PositionOffset;
+            this.EffectDuration = EffectDuration;
+            this.pixelPerUnit = pixelPerUnit;
+            this.sprite = HelperSprite.LoadSpriteFromByte(resource, pixelPerUnit);
+            MaxTimer = Cooldown;
+            Timer = MaxTimer;
+            hasEffectDuration = true;
+            isEffectActive = false;
+            buttons.Add(this);
+            Start();
+        }
+
+        public CooldownButton(Action OnClick, float Cooldown, byte[] resource, float pixelPerUnit, Vector2 PositionOffset, HudManager hudManager, Action OnUpdate) {
+            this.hudManager = hudManager;
+            this.OnClick = OnClick;
+            this.OnUpdate = OnUpdate;
+            this.PositionOffset = PositionOffset;
+            this.pixelPerUnit = pixelPerUnit;
+            this.sprite = HelperSprite.LoadSpriteFromByte(resource, pixelPerUnit);
+            MaxTimer = Cooldown;
+            Timer = MaxTimer;
+            hasEffectDuration = false;
+            buttons.Add(this);
+            Start();
+        }
+
+        public CooldownButton(Action OnClick, float Cooldown, Sprite resource, float pixelPerUnit, Vector2 PositionOffset, HudManager hudManager, float EffectDuration, Action OnEffectEnd, Action OnUpdate) {
+            this.hudManager = hudManager;
+            this.OnClick = OnClick;
+            this.OnEffectEnd = OnEffectEnd;
+            this.OnUpdate = OnUpdate;
+            this.PositionOffset = PositionOffset;
+            this.EffectDuration = EffectDuration;
+            this.pixelPerUnit = pixelPerUnit;
+            this.sprite = resource;
+            MaxTimer = Cooldown;
+            Timer = MaxTimer;
+            hasEffectDuration = true;
+            isEffectActive = false;
+            buttons.Add(this);
+            Start();
+        }
+
+        public CooldownButton(Action OnClick, float Cooldown, Sprite resource, float pixelPerUnit, Vector2 PositionOffset, HudManager hudManager, Action OnUpdate) {
+            this.hudManager = hudManager;
+            this.OnClick = OnClick;
+            this.OnUpdate = OnUpdate;
+            this.PositionOffset = PositionOffset;
+            this.pixelPerUnit = pixelPerUnit;
+            this.sprite = resource;
+            MaxTimer = Cooldown;
+            Timer = MaxTimer;
+            hasEffectDuration = false;
+            buttons.Add(this);
+            Start();
+        }
+
+
         private void Start() {
             killButtonManager = UnityEngine.Object.Instantiate(hudManager.KillButton, hudManager.transform);
             startColorButton = killButtonManager.renderer.color;
@@ -89,6 +152,9 @@ namespace HardelAPI.Utility {
         public static void HudUpdate() {
             buttons.RemoveAll(item => item.killButtonManager == null);
             for (int i = 0; i < buttons.Count; i++) {
+                if (!UsableButton)
+                    buttons[i].SetCanUse(false);
+
                 buttons[i].killButtonManager.renderer.sprite = buttons[i].sprite;
                 buttons[i].OnUpdate();
                 buttons[i].Update();

@@ -3,17 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using HarmonyLib;
 using System.Linq;
-using Reactor.Extensions;
+using TMPro;
 
 namespace HardelAPI.Utility {
     public class PlayerButton {
         public static List<PlayerButton> buttons = new List<PlayerButton>();
+        public static Action OnClose;
         public KillButtonManager killButtonManager;
         public Vector2 PositionOffset = Vector2.zero;
         public Action OnClick;
         private HudManager hudManager;
         private SpriteRenderer herePoint;
-        private TextRenderer TextPlaynerName;
+        private GameObject TextPlaynerName;
+        private TextMeshPro TMPPlaynerName;
         private PlayerControl Player;
         private List<PlayerControl> BlackList = new List<PlayerControl>();
         private bool showDead;
@@ -65,14 +67,9 @@ namespace HardelAPI.Utility {
                 killButtonManager.transform.localPosition = new Vector3((killButtonManager.transform.localPosition.x + 1.3f) * -1, killButtonManager.transform.localPosition.y, killButtonManager.transform.localPosition.z) + new Vector3(PositionOffset.x, PositionOffset.y);
 
             // Create Text for Button.
-            TextPlaynerName = TextRendererExtensions.AddTextRenderer(new GameObject("PlayerName"));
-            TextPlaynerName.Text = Player.Data.PlayerName;
-            TextPlaynerName.Color = Palette.PlayerColors[Player.Data.ColorId];
-            TextPlaynerName.transform.SetParent(killButtonManager.transform);
-            TextPlaynerName.transform.localPosition = new Vector2(0, -0.25f);
-            TextPlaynerName.transform.localScale = new Vector3(0.8f, 0.8f, 1f);
-            TextPlaynerName.Centered = true;
-            TextPlaynerName.GetComponent<MeshRenderer>().sortingOrder = 100;
+            TextPlaynerName = killButtonManager.gameObject.CreateTMP(Player.Data.PlayerName, new Vector2(0, -0.4f), Palette.PlayerColors[Player.Data.ColorId], 2);
+            TMPPlaynerName = TextPlaynerName.GetComponent<TextMeshPro>();
+            TMPPlaynerName.alignment = TextAlignmentOptions.Center;
 
             // PlayerIcon
             herePoint.gameObject.transform.SetParent(killButtonManager.transform);
@@ -81,7 +78,7 @@ namespace HardelAPI.Utility {
 
             // If Player is dead, and you don't want to show dead.
             if ((!showDead && Player.Data.IsDead) || BlackList.Any(item => item.PlayerId == Player.PlayerId)) {
-                TextPlaynerName.Color = new Color(TextPlaynerName.Color.r, TextPlaynerName.Color.g, TextPlaynerName.Color.b, 0.3f);
+                TMPPlaynerName.color = new Color(TMPPlaynerName.color.r, TMPPlaynerName.color.g, TMPPlaynerName.color.b, 0.3f);
                 herePoint.color = new Color(herePoint.color.r, herePoint.color.g, herePoint.color.b, 0.3f);
             }
         }
@@ -101,11 +98,13 @@ namespace HardelAPI.Utility {
             if ((!showDead && Player.Data.IsDead) || BlackList.Any(item => item.PlayerId == Player.PlayerId)) alpha = 0.3f;
             else alpha = 1f;
 
-            TextPlaynerName.Color = new Color(TextPlaynerName.Color.r, TextPlaynerName.Color.g, TextPlaynerName.Color.b, alpha);
+            TMPPlaynerName.color = new Color(TMPPlaynerName.color.r, TMPPlaynerName.color.g, TMPPlaynerName.color.b, alpha);
             herePoint.color = new Color(herePoint.color.r, herePoint.color.g, herePoint.color.b, alpha);
 
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (Input.GetKeyDown(KeyCode.Escape)) {
                 StopPlayerSelection();
+                OnClose();
+            }
         }
 
         public static void UpdateBlacklist(List<PlayerControl> BlackList) {
@@ -129,12 +128,18 @@ namespace HardelAPI.Utility {
             buttons.RemoveAll(item => item.killButtonManager == null);
         }
 
-        public static void InitPlayerButton(Action<PlayerControl> action, bool showDead, List<PlayerControl> BlackList) {
+        public static void CheckEspace(Action onClose) {
+            OnClose = onClose;
+        }
+
+        public static void InitPlayerButton(bool showDead, List<PlayerControl> BlackList, Action<PlayerControl> action, Action OnClose) {
             CooldownButton.UsableButton = false;
             DestroyableSingleton<HudManager>.Instance.ShowMap((Action<MapBehaviour>) (map => {
                 map.gameObject.SetActive(false);
                 map.HerePoint.enabled = true;
             }));
+
+            CheckEspace(() => OnClose());
 
             for (int i = 0; i < PlayerControl.AllPlayerControls.Count; i++) {
                 PlayerControl currentPlayer = PlayerControl.AllPlayerControls[i];

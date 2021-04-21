@@ -21,6 +21,7 @@ namespace HardelAPI {
 
         public override void Load() {
             Logger = Log;
+            RegisterInIl2CppAttribute.Register();
             Harmony.PatchAll();
         }
     }
