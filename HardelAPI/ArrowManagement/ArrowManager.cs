@@ -1,6 +1,4 @@
 ﻿using HardelAPI.Utility;
-using Reactor;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -40,27 +38,10 @@ namespace HardelAPI.ArrowManagement {
             ArrowComponent.image = Renderer;
             ArrowComponent.target = Parent.transform.position;
             Renderer.sprite = HelperSprite.LoadSpriteFromEmbeddedResources("HardelAPI.Resources.Arrow.png", 150f);
-
-            if (Time <= 0f && IsDynamic) {
-                Arrow.AddComponent<UpdateComponent>();
-            } else {
-                if (Arrow.GetComponent<UpdateComponent>())
-                    Object.Destroy(Arrow.GetComponent<UpdateComponent>());
-                Coroutines.Start(UpdateTarget());
-            }
+            Arrow.AddComponent<UpdateComponent>().period = Time;
 
             allArrow.Add(this);
             Arrow.SetActive(true);
-        }
-
-        private IEnumerator UpdateTarget() {
-            for (;;) {
-                if (UpdateInterval <= 0f)
-                    break;
-
-                yield return new WaitForSeconds(UpdateInterval);
-                ArrowComponent.target = Parent.transform.parent.position;
-            }
         }
 
         public Vector2 GetArrowPosition() {

@@ -16,8 +16,8 @@ namespace HardelAPI.Utility {
             public string author;
         }
 
-        private static List<uint> TallIds = new List<uint>();
         private static List<HatData> allHatsData = new List<HatData>();
+        public static List<uint> TallIds = new List<uint>();
         protected internal static Dictionary<uint, HatData> IdToData = new Dictionary<uint, HatData>();
 
         public static void CreateHats(HatData hat) {

@@ -16,6 +16,8 @@ namespace HardelAPI.Utility.CustomRoles {
         public string IntroDescription = "You can defined the role in the class";
         public int NumberPlayers = 1;
         public int PercentApparition = 100;
+        public bool ForceUnshowAllRolesOnMeeting = false;
+        public bool ForceExiledReveal = false;
         public bool ShowIntroCutScene = true;
         public bool CanHasOtherRole = false;
         public bool TaskAreRemove = false;
@@ -54,8 +56,61 @@ namespace HardelAPI.Utility.CustomRoles {
             }
         }
 
+        public static string NameTextVanilla(PlayerControl Player, PlayerVoteArea playerVoteArea = null) {
+            if (Player == null)
+                return "";
+
+            if (!Plugin.ShowRoleInName.GetValue())
+                return Player.name;
+
+            if (playerVoteArea != null && (MeetingHud.Instance.state == MeetingHud.VoteStates.Proceeding || MeetingHud.Instance.state == MeetingHud.VoteStates.Results))
+                return Player.name;
+
+            Player.nameText.transform.localPosition = new Vector3(
+                0f,
+                (Player.Data.HatId == 0U) ? 1.05f :
+                HatsCreator.TallIds.Contains(Player.Data.HatId) ? 1.6f : 1.4f,
+                -0.5f
+            );
+
+            if (Player.Data.IsImpostor)
+                return $"{Player.name}\nImpostor";
+            else
+                return $"{Player.name}\nCrewmate";
+        }
+
+        public virtual string NameText(PlayerControl Player, PlayerVoteArea playerVoteArea = null) {
+            if (Player == null)
+                return "";
+
+            if (!Plugin.ShowRoleInName.GetValue())
+                return Player.name;
+
+            if (playerVoteArea != null && (MeetingHud.Instance.state == MeetingHud.VoteStates.Proceeding || MeetingHud.Instance.state == MeetingHud.VoteStates.Results))
+                return Player.name;
+
+            Player.nameText.transform.localPosition = new Vector3(
+                0f,
+                (Player.Data.HatId == 0U) ? 1.05f :
+                HatsCreator.TallIds.Contains(Player.Data.HatId) ? 1.6f : 1.4f,
+                -0.5f
+            );
+            return Player.name + "\n" + Name;
+        }
+
         public static RoleManager GerRoleById(byte RoleId) {
             return AllRoles.FirstOrDefault(r => r.RoleId == RoleId);
+        }
+
+        public static List<RoleManager> GetAllRoles(PlayerControl PlayerToCheck) {
+            List<RoleManager> listRole = new List<RoleManager>();
+
+            foreach (var Role in AllRoles)
+                foreach (var Player in Role.AllPlayers)
+                    if (Player.PlayerId == PlayerToCheck.PlayerId)
+                        listRole.Add(Role);
+
+            return listRole;
         }
 
         public void RefreshTask(string newTasks, PlayerControl player) {
@@ -227,6 +282,8 @@ namespace HardelAPI.Utility.CustomRoles {
         public virtual void OnMeetingEnd() { }
 
         public virtual void OnInfectedStart() { }
+
+        public virtual void OnExiledPlayer(PlayerControl PlayerExiled) { }
 
         public virtual void OnLocalAttempKill(PlayerControl killer, PlayerControl target) {
             killer.RpcMurderPlayer(target);

@@ -19,7 +19,7 @@ namespace HardelAPI.Utility.CustomRoles.Patch {
                         if (!(AmongUsClient.Instance.GameMode == GameModes.FreePlay)) {
                             var toRemove = new List<PlayerTask>();
                             foreach (PlayerTask task in player.myTasks)
-                                if (task.TaskType != TaskTypes.StartReactor && task.TaskType != TaskTypes.FixComms && task.TaskType != TaskTypes.FixLights && task.TaskType != TaskTypes.ResetReactor && task.TaskType != TaskTypes.ResetSeismic && task.TaskType != TaskTypes.RestoreOxy && task.name != "DebileTasks" && task.name != "_Player")
+                                if (task.TaskType != TaskTypes.StartReactor && task.TaskType != TaskTypes.FixComms && task.TaskType != TaskTypes.FixLights && task.TaskType != TaskTypes.ResetReactor && task.TaskType != TaskTypes.ResetSeismic && task.TaskType != TaskTypes.RestoreOxy && task.name != "RolesTasks" && task.name != "_Player")
                                     toRemove.Add(task);
 
                             foreach (PlayerTask task in toRemove)

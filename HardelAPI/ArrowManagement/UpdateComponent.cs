@@ -6,8 +6,9 @@ namespace HardelAPI.ArrowManagement {
 
     [RegisterInIl2Cpp]
     public class UpdateComponent : MonoBehaviour {
-
         public ArrowBehaviour ArrowComponent;
+        private float nextActionTime = 0.0f;
+        public float period = 5f;
 
         public UpdateComponent(IntPtr ptr) : base(ptr) { }
 
@@ -16,6 +17,17 @@ namespace HardelAPI.ArrowManagement {
         }
 
         void Update() {
+            if (period > 0f) {
+                if (Time.time > nextActionTime) {
+                    nextActionTime = Time.time + period;
+                    ChangePositon();
+                }
+            } else {
+                ChangePositon();
+            }
+        }
+
+        void ChangePositon() {
             ArrowComponent.target = gameObject.transform.parent.position;
         }
     }

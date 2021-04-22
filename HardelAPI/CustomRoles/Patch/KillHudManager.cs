@@ -1,12 +1,11 @@
 ﻿using HarmonyLib;
 using InnerNet;
-using HardelAPI.Utility;
 using UnityEngine;
 
 namespace HardelAPI.Utility.CustomRoles.Patch {
 
     [HarmonyPatch(typeof(HudManager), nameof(HudManager.Update))]
-    public class HudManagerPatch {
+    public class KillHudManager {
         private static KillButtonManager KillButton;
 
         public static void Postfix(HudManager __instance) {
