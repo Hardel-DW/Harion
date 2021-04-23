@@ -315,8 +315,15 @@ namespace HardelAPI.CustomRoles {
             return false;
         }
 
-        public void ForceEndGame() {
+        public void ForceEndGame(List<PlayerControl> playersWin = null) {
+            WinPlayer = playersWin;
             OnRoleWin();
+
+            if (WinPlayer == null) {
+                Plugin.Logger.LogError("'ForceEndGame' is call, but no win players is defined, you can defined in the method argument or with override 'OnRoleWin'");
+                return;
+            }
+
             HasWin = true;
 
             // Set PlayerWin

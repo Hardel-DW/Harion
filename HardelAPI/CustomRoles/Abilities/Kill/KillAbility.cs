@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace HardelAPI.CustomRoles.Abilities.Kill {
     
-    class KillAbility : Ability {
+    public class KillAbility : Ability {
         public List<PlayerControl> WhiteListKill = null;
         public float KillCooldown = 0f;
         public DateTime LastKilled;
