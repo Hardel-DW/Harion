@@ -1,4 +1,4 @@
-﻿namespace HardelAPI.Utility.Enumerations {
+﻿namespace HardelAPI.Enumerations {
     public enum DeathReason
     {
         Exile = 0,

@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using UnityEngine;
 
-namespace HardelAPI.Utility.CustomRoles.Patch {
+namespace HardelAPI.CustomRoles.Patch {
 
     [HarmonyPatch(typeof(IntroCutscene.Nested_0), nameof(IntroCutscene.Nested_0.MoveNext))]
     public static class IntroCutScenePatch {

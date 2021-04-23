@@ -1,10 +1,7 @@
 ﻿using HarmonyLib;
-using System;
 using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
 
-namespace HardelAPI.Utility.CustomRoles.Patch {
+namespace HardelAPI.CustomRoles.Patch {
 
     [HarmonyPatch(typeof(HudManager), nameof(HudManager.Update))]
     public static class RemoveTasksPatch {

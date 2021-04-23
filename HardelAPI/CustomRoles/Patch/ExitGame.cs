@@ -1,12 +1,11 @@
 ﻿using HarmonyLib;
 
-namespace HardelAPI.Utility.CustomRoles.Patch {
+namespace HardelAPI.CustomRoles.Patch {
 
     [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.ExitGame))]
     public static class EndGamePatch {
         public static void Prefix(AmongUsClient __instance) {
             foreach (var Role in RoleManager.AllRoles) {
-                Role.WhiteListKill = null;
                 Role.ClearRole();
                 Role.OnGameEnded();
             }

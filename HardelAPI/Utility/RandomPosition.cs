@@ -1,4 +1,4 @@
-﻿using HardelAPI.Utility.Enumerations;
+﻿using HardelAPI.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Linq;

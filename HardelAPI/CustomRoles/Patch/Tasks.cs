@@ -1,8 +1,7 @@
 ﻿using HarmonyLib;
-using HardelAPI.Utility.Enumerations;
-using UnityEngine;
+using HardelAPI.Enumerations;
 
-namespace HardelAPI.Utility.CustomRoles.Patch {
+namespace HardelAPI.CustomRoles.Patch {
 
     [HarmonyPatch(typeof(PlayerControl._CoSetTasks_d__78), nameof(PlayerControl._CoSetTasks_d__78.MoveNext))]
     public static class TasksPatch {

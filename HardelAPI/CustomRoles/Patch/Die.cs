@@ -1,14 +1,17 @@
 ﻿using HarmonyLib;
-using HardelAPI.Utility.Enumerations;
-using UnityEngine;
+using HardelAPI.Enumerations;
 
-namespace HardelAPI.Utility.CustomRoles.Patch {
+namespace HardelAPI.CustomRoles.Patch {
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.Die))]
     class DiePatch {
         public static void Prefix(PlayerControl __instance) {
             foreach (var Role in RoleManager.AllRoles) {
-                Role.OnDie(__instance);
+                Role.OnPlayerDie(__instance);
+
+                if (__instance.PlayerId == PlayerControl.LocalPlayer.PlayerId)
+                    Role.OnLocalDie(__instance);
+
                 if (Role.HasRole(__instance.PlayerId)) {
                     if (Role.GiveRoleAt == Moment.OnDie) { }
 

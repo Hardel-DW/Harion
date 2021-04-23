@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
 
-namespace HardelAPI.Utility.CustomRoles {
+namespace HardelAPI.CustomRoles {
 
     [AttributeUsage(AttributeTargets.Class)]
     public class RegisterInCustomRolesAttribute : Attribute {

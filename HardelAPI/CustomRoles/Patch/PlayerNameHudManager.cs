@@ -1,9 +1,10 @@
-﻿using HarmonyLib;
+﻿using HardelAPI.Utility;
+using HarmonyLib;
 using InnerNet;
 using System.Linq;
 using UnityEngine;
 
-namespace HardelAPI.Utility.CustomRoles.Patch {
+namespace HardelAPI.CustomRoles.Patch {
 
     [HarmonyPatch(typeof(HudManager), nameof(HudManager.Update))]
     public static class HudUpdatePatch {

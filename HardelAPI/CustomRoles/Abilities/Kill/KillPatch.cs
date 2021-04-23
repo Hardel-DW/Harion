@@ -1,9 +1,8 @@
 ﻿using System;
 using HarmonyLib;
-using HardelAPI.Utility;
 using UnityEngine;
 
-namespace HardelAPI.Utility.CustomRoles.Patch {
+namespace HardelAPI.CustomRoles.Abilities.Kill {
 
     [HarmonyPatch(typeof(KillButtonManager), nameof(KillButtonManager.PerformKill))]
     public static class KillPatch {
@@ -17,15 +16,19 @@ namespace HardelAPI.Utility.CustomRoles.Patch {
                 return true;
 
             foreach (var Role in RoleManager.AllRoles) {
-                if (Role.WhiteListKill == null || !Role.HasRole(PlayerControl.LocalPlayer) || Role.WhiteListKill == null)
+                KillAbility KillAbility = Role.GetAbility<KillAbility>();
+                if (KillAbility == null)
                     continue;
 
-                PlayerControl ClosestPlayer = Role.GetClosestTarget(PlayerControl.LocalPlayer);
+                if (KillAbility.WhiteListKill == null || !Role.HasRole(PlayerControl.LocalPlayer) || KillAbility.WhiteListKill == null)
+                    continue;
+
+                PlayerControl ClosestPlayer = KillAbility.GetClosestTarget(PlayerControl.LocalPlayer);
                 bool CanKill = Vector2.Distance(PlayerControl.LocalPlayer.transform.position, ClosestPlayer.transform.position) < GameOptionsData.KillDistances[PlayerControl.GameOptions.KillDistance];
                 
-                if (Role.KillTimer() == 0f && __instance.enabled && CanKill) {
+                if (KillAbility.KillTimer() == 0f && __instance.enabled && CanKill) {
                     Role.OnLocalAttempKill(PlayerControl.LocalPlayer, ClosestPlayer);
-                    Role.LastKilled = DateTime.UtcNow;
+                    KillAbility.LastKilled = DateTime.UtcNow;
                 }
             }
 

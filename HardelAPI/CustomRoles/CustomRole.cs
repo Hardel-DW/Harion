@@ -1,4 +1,4 @@
-﻿namespace HardelAPI.Utility.CustomRoles {
+﻿namespace HardelAPI.CustomRoles {
 
     public abstract class CustomRole<T> : RoleManager where T : CustomRole<T>, new() {
         private static T instance = null;

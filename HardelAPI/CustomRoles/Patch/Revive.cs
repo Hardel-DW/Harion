@@ -1,19 +1,21 @@
 ﻿using HarmonyLib;
-using HardelAPI.Utility.Enumerations;
-using UnityEngine;
+using HardelAPI.Enumerations;
 
-namespace HardelAPI.Utility.CustomRoles.Patch {
+namespace HardelAPI.CustomRoles.Patch {
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.Revive))]
     class RevivePatch {
         public static void Prefix(PlayerControl __instance) {
             foreach (var Role in RoleManager.AllRoles) {
-                Role.OnRevive(__instance);
+                Role.OnPlayerRevive(__instance);
+
+                if (__instance.PlayerId == PlayerControl.LocalPlayer.PlayerId)
+                    Role.OnLocalRevive(__instance);
 
                 if (Role.HasRole(__instance.PlayerId)) {
                     if (Role.GiveRoleAt == Moment.OnRevive) { }
 
-                    if (Role.GiveTasksAt == Moment.OnDie)
+                    if (Role.GiveTasksAt == Moment.OnRevive)
                         Role.AddImportantTasks(__instance);
                 }
             }

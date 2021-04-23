@@ -1,12 +1,14 @@
 ﻿using HarmonyLib;
 using Hazel;
-using HardelAPI.Utility.Enumerations;
+using HardelAPI.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnhollowerBaseLib;
 
-namespace HardelAPI.Utility.CustomRoles.Patch {
+namespace HardelAPI.CustomRoles.Patch {
+
+    [HarmonyPriority(Priority.First)]
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.RpcSetInfected))]
     public static class SetInfectedPatch {
         public static void Postfix([HarmonyArgument(0)] Il2CppReferenceArray<GameData.PlayerInfo> infected) {
@@ -49,8 +51,6 @@ namespace HardelAPI.Utility.CustomRoles.Patch {
                     messageWriter.WriteBytesAndSize(playerSelected.ToArray());
                     AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
                 }
-
-                Role.WhiteListKill = null;
             }
         }
     }

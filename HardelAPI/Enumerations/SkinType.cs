@@ -1,4 +1,4 @@
-﻿namespace HardelAPI.Utility.Enumerations {
+﻿namespace HardelAPI.Enumerations {
     public enum SkinType : byte
     {
         None = 0,

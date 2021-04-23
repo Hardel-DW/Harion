@@ -1,9 +1,10 @@
-﻿using HarmonyLib;
+﻿using HardelAPI.Utility;
+using HarmonyLib;
 using Hazel;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HardelAPI.Utility.CustomRoles.Patch {
+namespace HardelAPI.CustomRoles.Patch {
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.HandleRpc))]
     public static class HandleRpcPatch {

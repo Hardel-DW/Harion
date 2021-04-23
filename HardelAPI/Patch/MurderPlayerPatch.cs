@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace HardelAPI.Utility.CustomRoles.Patch {
+namespace HardelAPI.Patch {
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.MurderPlayer))]
     static class MurderPlayerPatch {
@@ -16,9 +16,6 @@ namespace HardelAPI.Utility.CustomRoles.Patch {
         static void Postfix(ref PlayerControl __instance, [HarmonyArgument(0)] ref PlayerControl target) {
             if (!trueImpostorIntance)
                 __instance.Data.IsImpostor = false;
-
-            foreach (var Role in RoleManager.AllRoles)
-                Role.OnMurderKill(__instance, target);
         }
     }
 }

@@ -1,43 +1,44 @@
-﻿using HardelAPI.Utility.Enumerations;
+﻿using HardelAPI.CustomRoles.Abilities;
+using HardelAPI.Enumerations;
+using HardelAPI.Utility;
+using InnerNet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace HardelAPI.Utility.CustomRoles {
+namespace HardelAPI.CustomRoles {
 
     public class RoleManager {
         public static List<RoleManager> AllRoles = new List<RoleManager>();
+        public static List<PlayerControl> WinPlayer = new List<PlayerControl>();
         public List<PlayerControl> AllPlayers = new List<PlayerControl>();
-        public List<PlayerControl> WhiteListKill = null;
         public byte RoleId;
         public string Name = "Not Defined";
-        public string TasksDescription = "You can defined the role in the class.";
+        public string TasksDescription = "You can defined the role in the class";
         public string IntroDescription = "You can defined the role in the class";
+        public string OutroDescription = "You can defined the role in the class";
         public int NumberPlayers = 1;
         public int PercentApparition = 100;
         public bool ForceUnshowAllRolesOnMeeting = false;
         public bool ForceExiledReveal = false;
         public bool ShowIntroCutScene = true;
-        public bool CanHasOtherRole = false;
         public bool TaskAreRemove = false;
+        public bool IsMainRole = true;
         public bool RoleActive = true;
         public bool HasTask = true;
-        public bool CanVent = false;
-        public float KillCooldown = 0f;
-        public DateTime LastKilled;
         public Color Color = new Color(1f, 0f, 0f, 1f);
         public PlayerSide Side = PlayerSide.Crewmate;
-        public PlayerSide CanKill = PlayerSide.Nobody;
         public PlayerSide VisibleBy = PlayerSide.Self;
         public Moment GiveTasksAt = Moment.StartGame;
         public Moment GiveRoleAt = Moment.StartGame;
+
         private readonly Type ClassType;
 
-        public virtual List<IAbility> Abilities { get; set; } = null;
-
+        public virtual List<Ability> Abilities { get; set; } = null;
         public virtual List<CooldownButton> Button { get; set; } = null;
 
+        // Constructor
         protected RoleManager(Type type) {
             ClassType = type;
             RoleId = GetAvailableRoleId();
@@ -45,6 +46,7 @@ namespace HardelAPI.Utility.CustomRoles {
             Plugin.Logger.LogInfo($"Role: {type.Name} Loaded, RoleID: {RoleId}");
         }
 
+        // Utils method
         private byte GetAvailableRoleId() {
             byte id = 0;
 
@@ -102,6 +104,13 @@ namespace HardelAPI.Utility.CustomRoles {
             return AllRoles.FirstOrDefault(r => r.RoleId == RoleId);
         }
 
+        public static RoleManager GetMainRole(PlayerControl PlayerToCheck) {
+            if (GetAllRoles(PlayerToCheck).Count > 0)
+                return GetAllRoles(PlayerToCheck).FirstOrDefault(role => role.IsMainRole);
+            else
+                return null;
+        }
+
         public static List<RoleManager> GetAllRoles(PlayerControl PlayerToCheck) {
             List<RoleManager> listRole = new List<RoleManager>();
 
@@ -113,6 +122,13 @@ namespace HardelAPI.Utility.CustomRoles {
             return listRole;
         }
 
+        public void AddImportantTasks(PlayerControl Player) {
+            ImportantTextTask ImportantTasks = new GameObject("RolesTasks").AddComponent<ImportantTextTask>();
+            ImportantTasks.transform.SetParent(Player.transform, false);
+            ImportantTasks.Text = TasksDescription;
+            Player.myTasks.Insert(0, ImportantTasks);
+        }
+
         public void RefreshTask(string newTasks, PlayerControl player) {
             foreach (PlayerTask task in player.myTasks)
                 if (task.name != "RolesTasks")
@@ -122,6 +138,22 @@ namespace HardelAPI.Utility.CustomRoles {
             ImportantTasks.transform.SetParent(player.transform, false);
             ImportantTasks.Text = newTasks;
             player.myTasks.Insert(0, ImportantTasks);
+        }
+
+        public bool ContainsAbility(string ability) {
+            return Abilities.Any(s => s.Name == ability);
+        }
+
+        public bool ContainsAbility(Ability ability) {
+            return Abilities.Any(s => s.GetType().ToString() == ability.GetType().ToString());
+        }
+
+        public T GetAbility<T>() where T : Ability {
+            foreach (var ability in Abilities)
+                if (ability.Name == typeof(T).Name)
+                    return (T) ability;
+
+            return null;
         }
 
         // Clear the list of all roles
@@ -158,6 +190,35 @@ namespace HardelAPI.Utility.CustomRoles {
             return HasRoles;
         }
 
+        // Operator
+        public static bool operator == (RoleManager a, RoleManager b) {
+            if (a is null && b is null) return true;
+            if (a is null || b is null) return false;
+            return a.RoleId == b.RoleId;
+        }
+
+        public static bool operator != (RoleManager a, RoleManager b) {
+            return !(a == b);
+        }
+
+        private bool Equals(RoleManager other) {
+            return other.RoleId == RoleId;
+        }
+
+        public override bool Equals(object obj) {
+            if (ReferenceEquals(null, obj))
+                return false;
+            if (ReferenceEquals(this, obj))
+                return true;
+            if (obj.GetType() != typeof(RoleManager))
+                return false;
+            return Equals((RoleManager) obj);
+        }
+
+        public override int GetHashCode() {
+            return HashCode.Combine(RoleId);
+        }
+
         // Player List
         public void ClearRole() {
             AllPlayers.Clear();
@@ -188,98 +249,39 @@ namespace HardelAPI.Utility.CustomRoles {
             AllPlayers.Remove(AllPlayers.FirstOrDefault(p => p.PlayerId == Player.PlayerId));
         }
 
-        // Kill WhiteList
-        public void AddPlayerTokillWhiteLisT(PlayerControl Player) {
-            WhiteListKill.Add(Player);
-        }
-
-        public void AddPlayerTokillWhiteLisT(byte PlayerId) {
-            WhiteListKill.Add(PlayerControlUtils.FromPlayerId(PlayerId));
-        }
-
-        public void AddPlayerRangeTokillWhiteLisT(List<byte> PlayersId) {
-            foreach (var PlayerId in PlayersId)
-                WhiteListKill.Add(PlayerControlUtils.FromPlayerId(PlayerId));
-        }
-
-        public void AddPlayerRangeTokillWhiteLisT(List<PlayerControl> Players) {
-            WhiteListKill.AddRange(Players);
-        }
-
-        public void RemovePlayerTokillWhiteLisT(byte PlayerId) {
-            WhiteListKill.Remove(WhiteListKill.FirstOrDefault(p => p.PlayerId == PlayerId));
-        }
-
-        public void RemovePlayerTokillWhiteLisT(PlayerControl Player) {
-            WhiteListKill.Remove(WhiteListKill.FirstOrDefault(p => p.PlayerId == Player.PlayerId));
-        }
-
-        public void ClearKillWhiteList() {
-            WhiteListKill.Clear();
-        }
-
-        // Add tasks to player
-        public void AddImportantTasks(PlayerControl Player) {
-            ImportantTextTask ImportantTasks = new GameObject("RolesTasks").AddComponent<ImportantTextTask>();
-            ImportantTasks.transform.SetParent(Player.transform, false);
-            ImportantTasks.Text = TasksDescription;
-            Player.myTasks.Insert(0, ImportantTasks);
-        }
-
-        // Kill Ability
-        public virtual void DefineKillWhiteList() {
-            List<PlayerControl> AllPlayer = PlayerControl.AllPlayerControls.ToArray().ToList();
-
-            WhiteListKill = CanKill switch {
-                PlayerSide.Everyone => AllPlayer,
-                PlayerSide.Impostor => AllPlayer.FindAll(p => p.Data.IsImpostor),
-                PlayerSide.Crewmate => AllPlayer.FindAll(p => !p.Data.IsImpostor),
-                PlayerSide.SameRole => AllPlayer.FindAll(p => HasRole(p)),
-                _ => null
-            };
-
-            if (CanKill == PlayerSide.Nobody && WhiteListKill == null && PlayerControl.LocalPlayer.Data.IsImpostor)
-                WhiteListKill = AllPlayer.FindAll(p => !p.Data.IsImpostor);
-        }
-
-        public float KillTimer() {
-            var utcNow = DateTime.UtcNow;
-            var timeSpan = utcNow - LastKilled;
-            var cooldown = KillCooldown * 1000f;
-            if (cooldown - (float) timeSpan.TotalMilliseconds < 0f)
-                return 0;
-
-            return (cooldown - (float) timeSpan.TotalMilliseconds) / 1000f;
-        }
-
-        public PlayerControl GetClosestTarget(PlayerControl PlayerReference) {
-            double distance = double.MaxValue;
-            PlayerControl result = null;
-
-            if (WhiteListKill == null) {
-                Plugin.Logger.LogError("GetClosestTarget => WhiteListKill is null");
-            }
-
-            foreach (var player in WhiteListKill) {
-                float distanceBeetween = Vector2.Distance(player.transform.position, PlayerReference.transform.position);
-                if (player.Data.IsDead || player.PlayerId == PlayerReference.PlayerId || distance < distanceBeetween)
-                    continue;
-
-                distance = distanceBeetween;
-                result = player;
-            }
-
-            return result;
-        }
-
         // Event
-        public virtual void OnGameStart() { }
+        public virtual void OnGameStarted() { }
 
         public virtual void OnGameEnded() { }
 
-        public virtual void OnMeetingStart() { }
+        public virtual void OnMinimapOpen(PlayerControl Player, MapBehaviour Minimap) { }
 
-        public virtual void OnMeetingEnd() { }
+        public virtual void OnMinimapUpdate(PlayerControl Player, MapBehaviour Minimap) { }
+        
+        public virtual void OnMinimapClose(PlayerControl Player, MapBehaviour Minimap) { }
+
+        public virtual void OnShipStatusStart(ShipStatus Map) { }
+
+        // TODO
+        public virtual void OnPlayerDisconnect(PlayerControl Player, DisconnectReasons reason) { }
+
+        // TODO
+        public virtual void OnTaskComplete(PlayerControl Player) { }
+
+        // TODO
+        public virtual void OnAllTaskComplete(PlayerControl Player) { }
+
+        public virtual void OnEnterVent(Vent vent, PlayerControl Player) { }
+
+        public virtual void OnExitVent(Vent vent, PlayerControl Player) { }
+
+        public virtual void OnBodyReport(PlayerControl Reporter, PlayerControl ReportBody) { }
+
+        public virtual void OnMeetingStart(MeetingHud instance) { }
+
+        public virtual void OnMeetingUpdate(MeetingHud instance) { }
+
+        public virtual void OnMeetingEnd(MeetingHud instance) { }
 
         public virtual void OnInfectedStart() { }
 
@@ -291,10 +293,31 @@ namespace HardelAPI.Utility.CustomRoles {
 
         public virtual void OnMurderKill(PlayerControl killer, PlayerControl target) { }
 
-        public virtual void OnUpdate(PlayerControl __instance) { }
+        public virtual void OnUpdate(PlayerControl Player) { }
 
-        public virtual void OnDie(PlayerControl __instance) { }
+        public virtual void OnLocalDie(PlayerControl Player) { }
+        
+        public virtual void OnPlayerDie(PlayerControl Player) { }
 
-        public virtual void OnRevive(PlayerControl __instance) { }
+        public virtual void OnLocalRevive(PlayerControl Player) { }
+
+        public virtual void OnPlayerRevive(PlayerControl Player) { }
+
+        public virtual void OnRoleWin() { }
+
+        // End Game Management
+        public virtual bool AddEndCriteria() {
+            return false;
+        }
+
+        public bool WinCriteria(bool GameIsWin) {
+            return false;
+        }
+
+        public void ForceEndGame() {
+            OnRoleWin();
+
+
+        }
     }
 }

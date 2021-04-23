@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace HardelAPI.Utility.CustomRoles.Patch {
+namespace HardelAPI.CustomRoles.Patch {
 
     [HarmonyPatch(typeof(ShipStatus), nameof(ShipStatus.Start))]
     public static class ShipStatusStart {
@@ -10,8 +10,7 @@ namespace HardelAPI.Utility.CustomRoles.Patch {
                     Role.TaskAreRemove = false;
 
                 HudUpdatePatch.MeetingIsPassed = false;
-                Role.WhiteListKill = null;
-                Role.OnGameStart();
+                Role.OnGameStarted();
             }
         }
     }

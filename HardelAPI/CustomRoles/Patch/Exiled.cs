@@ -1,6 +1,4 @@
-﻿using HardelAPI.Utility.CustomRoles;
-using HarmonyLib;
-using Hazel;
+﻿using HarmonyLib;
 using System.Linq;
 
 namespace HardelAPI.CustomRoles.Patch {
