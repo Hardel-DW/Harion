@@ -27,6 +27,7 @@ namespace HardelAPI.CustomRoles {
         public bool IsMainRole = true;
         public bool RoleActive = true;
         public bool HasTask = true;
+        public bool HasWin = false;
         public Color Color = new Color(1f, 0f, 0f, 1f);
         public PlayerSide Side = PlayerSide.Crewmate;
         public PlayerSide VisibleBy = PlayerSide.Self;
@@ -310,14 +311,34 @@ namespace HardelAPI.CustomRoles {
             return false;
         }
 
-        public bool WinCriteria(bool GameIsWin) {
+        public virtual bool WinCriteria() {
             return false;
         }
 
         public void ForceEndGame() {
             OnRoleWin();
+            HasWin = true;
 
+            // Set PlayerWin
+            foreach (var player in AllPlayers) {
+                player.Revive();
+                player.Data.IsDead = false;
+                player.Data.IsImpostor = true;
+            }
 
+            // Set PlayerLose
+            List<PlayerControl> playerLose = PlayerControl.AllPlayerControls.ToArray().ToList();
+            AllPlayers.ForEach(p => {
+                PlayerControl playerToRemove = playerLose.Single(r => r.PlayerId == p.PlayerId);
+                playerLose.Remove(playerToRemove);
+            });
+
+            foreach (var player in playerLose) {
+                player.RemoveInfected();
+                player.Die(DeathReason.Exile);
+                player.Data.IsDead = true;
+                player.Data.IsImpostor = false;
+            }
         }
     }
 }

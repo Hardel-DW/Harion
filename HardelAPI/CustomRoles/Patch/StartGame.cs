@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using System.Collections.Generic;
 
 namespace HardelAPI.CustomRoles.Patch {
 
@@ -9,6 +10,8 @@ namespace HardelAPI.CustomRoles.Patch {
                 if (Role.TaskAreRemove)
                     Role.TaskAreRemove = false;
 
+                Role.HasWin = false;
+                RoleManager.WinPlayer = new List<PlayerControl>();
                 HudUpdatePatch.MeetingIsPassed = false;
                 Role.OnGameStarted();
             }
