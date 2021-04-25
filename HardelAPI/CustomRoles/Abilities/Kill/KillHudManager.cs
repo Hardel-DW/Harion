@@ -11,14 +11,13 @@ namespace HardelAPI.CustomRoles.Abilities.Kill {
 
         public static void Postfix(HudManager __instance) {
             KillButton = __instance.KillButton;
+            if (PlayerControl.LocalPlayer == null || PlayerControl.AllPlayerControls == null)
+                return;
+
+            if (PlayerControl.LocalPlayer.Data == null || !(PlayerControl.AllPlayerControls.Count > 1))
+                return;
             
             foreach (var Role in RoleManager.AllRoles) {
-                if (PlayerControl.LocalPlayer == null || PlayerControl.AllPlayerControls == null)
-                    break;
-
-                if (PlayerControl.LocalPlayer.Data == null || !(PlayerControl.AllPlayerControls.Count > 1))
-                    break;
-
                 KillAbility KillAbility = Role.GetAbility<KillAbility>();
                 if (KillAbility == null)
                     continue;

@@ -1,6 +1,8 @@
 ﻿using HardelAPI.CustomRoles.Abilities;
+using HardelAPI.CustomRoles.Abilities.Kill;
 using HardelAPI.Enumerations;
 using HardelAPI.Utility;
+using Hazel;
 using InnerNet;
 using System;
 using System.Collections.Generic;
@@ -15,9 +17,9 @@ namespace HardelAPI.CustomRoles {
         public List<PlayerControl> AllPlayers = new List<PlayerControl>();
         public byte RoleId;
         public string Name = "Not Defined";
-        public string TasksDescription = "You can defined the role in the class";
-        public string IntroDescription = "You can defined the role in the class";
-        public string OutroDescription = "You can defined the role in the class";
+        public string TasksDescription = "Task Description is not defined go to\n your class and defined 'TasksDescription'.";
+        public string IntroDescription = "Intro Description is not defined";
+        public string OutroDescription = "Outro Description is not defined";
         public int NumberPlayers = 1;
         public int PercentApparition = 100;
         public bool ForceUnshowAllRolesOnMeeting = false;
@@ -141,18 +143,21 @@ namespace HardelAPI.CustomRoles {
             player.myTasks.Insert(0, ImportantTasks);
         }
 
-        public bool ContainsAbility(string ability) {
-            return Abilities.Any(s => s.Name == ability);
-        }
+        public bool ContainsAbility<T>() where T : Ability => Abilities.Any(s => s.Name == typeof(T).Name);
 
         public bool ContainsAbility(Ability ability) {
             return Abilities.Any(s => s.GetType().ToString() == ability.GetType().ToString());
         }
 
         public T GetAbility<T>() where T : Ability {
-            foreach (var ability in Abilities)
-                if (ability.Name == typeof(T).Name)
+            if (Abilities == null || Abilities.Count == 0)
+                return null;
+
+            foreach (var ability in Abilities) {
+                if (ability.Name == typeof(T).Name) {
                     return (T) ability;
+                }
+            }
 
             return null;
         }
@@ -316,36 +321,46 @@ namespace HardelAPI.CustomRoles {
         }
 
         public void ForceEndGame(List<PlayerControl> playersWin = null) {
+            if (!AmongUsClient.Instance.AmHost)
+                return;
+
             WinPlayer = playersWin;
             OnRoleWin();
+
+            MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.ForceEndGame, SendOption.Reliable, -1);
+            messageWriter.Write(RoleId);
+            messageWriter.WriteBytesAndSize(PlayerControlUtils.PlayerControlListToIdList(WinPlayer).ToArray());
+            AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
 
             if (WinPlayer == null) {
                 Plugin.Logger.LogError("'ForceEndGame' is call, but no win players is defined, you can defined in the method argument or with override 'OnRoleWin'");
                 return;
             }
 
-            HasWin = true;
+            // Define loses players
+            var playerLoses = PlayerControl.AllPlayerControls;
+            foreach (var playerLose in playerLoses.ToArray().ToList())
+                foreach (var Player in WinPlayer)
+                    if (playerLose.PlayerId == Player.PlayerId)
+                        playerLoses.Remove(playerLose);
 
             // Set PlayerWin
-            foreach (var player in AllPlayers) {
+            foreach (var player in WinPlayer) {
                 player.Revive();
                 player.Data.IsDead = false;
                 player.Data.IsImpostor = true;
             }
 
             // Set PlayerLose
-            List<PlayerControl> playerLose = PlayerControl.AllPlayerControls.ToArray().ToList();
-            AllPlayers.ForEach(p => {
-                PlayerControl playerToRemove = playerLose.Single(r => r.PlayerId == p.PlayerId);
-                playerLose.Remove(playerToRemove);
-            });
-
-            foreach (var player in playerLose) {
+            foreach (var player in PlayerControl.AllPlayerControls) {
                 player.RemoveInfected();
                 player.Die(DeathReason.Exile);
                 player.Data.IsDead = true;
                 player.Data.IsImpostor = false;
             }
+
+            HasWin = true;
+            ShipStatus.RpcEndGame(GameOverReason.ImpostorByKill, false);
         }
     }
 }

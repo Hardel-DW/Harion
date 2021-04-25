@@ -2,7 +2,7 @@
 
     public abstract class Ability {
         public string Name { 
-            get => GetType().ToString(); 
+            get => GetType().Name; 
         }
 
         public RoleManager Role { get; set; }

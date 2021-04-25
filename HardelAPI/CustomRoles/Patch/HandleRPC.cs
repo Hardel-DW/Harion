@@ -20,6 +20,36 @@ namespace HardelAPI.CustomRoles.Patch {
                 return false;
             }
 
+            if (callId == (byte) CustomRPC.ForceEndGame) {
+                RoleManager Role = RoleManager.GerRoleById(reader.ReadByte());
+                List<byte> selectedPlayers = reader.ReadBytesAndSize().ToList();
+                List<PlayerControl> WinPlayer = PlayerControlUtils.IdListToPlayerControlList(selectedPlayers);
+
+                var playerLoses = PlayerControl.AllPlayerControls;
+                foreach (var playerLose in playerLoses.ToArray().ToList())
+                    foreach (var Player in WinPlayer)
+                        if (playerLose.PlayerId == Player.PlayerId)
+                            playerLoses.Remove(playerLose);
+
+                // Set PlayerWin
+                foreach (var player in WinPlayer) {
+                    player.Revive();
+                    player.Data.IsDead = false;
+                    player.Data.IsImpostor = true;
+                }
+
+                // Set PlayerLose
+                foreach (var player in PlayerControl.AllPlayerControls) {
+                    player.RemoveInfected();
+                    player.Die(DeathReason.Exile);
+                    player.Data.IsDead = true;
+                    player.Data.IsImpostor = false;
+                }
+
+                Role.HasWin = true;
+                return false;
+            }
+
             return true;
         }
     }

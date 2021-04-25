@@ -13,51 +13,54 @@ namespace HardelAPI.CustomRoles.Patch {
         private static Vector3 oldPosition = Vector3.zero;
 
         public static void Postfix(HudManager __instance) {
-            if ((AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Started) || (AmongUsClient.Instance.GameMode == GameModes.FreePlay)) { 
-                foreach (var Role in RoleManager.AllRoles) {
-                    if (PlayerControl.LocalPlayer != null || (PlayerControl.AllPlayerControls != null && PlayerControl.AllPlayerControls.Count > 0) || (Role.AllPlayers != null && Role.AllPlayers.Count > 0)) {
+            if ((AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Started) || (AmongUsClient.Instance.GameMode == GameModes.FreePlay)) {
+                if (PlayerControl.LocalPlayer == null || PlayerControl.AllPlayerControls == null || PlayerControl.AllPlayerControls.Count == 0)
+                    return;
 
-                        if (MeetingHud.Instance != null) 
-                            UpdateMeetingHUD(MeetingHud.Instance, Role);
+                    foreach (var Role in RoleManager.AllRoles) {
+                    if (Role.AllPlayers == null || Role.AllPlayers.Count == 0)
+                        continue;
 
-                        foreach (var PlayerHasRole in Role.AllPlayers) {
-                            if (!Role.HasRole(PlayerHasRole))
-                                continue;
+                    if (MeetingHud.Instance != null) 
+                        UpdateMeetingHUD(MeetingHud.Instance, Role);
 
-                            string NamePlayer = Role.NameText(PlayerHasRole);
-                            switch (Role.VisibleBy) {
-                                case Enumerations.PlayerSide.Self:
-                                    if (PlayerHasRole.PlayerId == PlayerControl.LocalPlayer.PlayerId)
-                                        DefineName(PlayerHasRole, Role.Color, NamePlayer);
-                                break;
-                                case Enumerations.PlayerSide.Impostor:
-                                    if (PlayerControl.LocalPlayer.Data.IsImpostor)
-                                        DefineName(PlayerHasRole, Role.Color, NamePlayer);
-                                break;
-                                case Enumerations.PlayerSide.Crewmate:
-                                    if (!PlayerControl.LocalPlayer.Data.IsImpostor)
-                                        DefineName(PlayerHasRole, Role.Color, NamePlayer);
-                                break;
-                                case Enumerations.PlayerSide.Everyone:
-                                        DefineName(PlayerHasRole, Role.Color, NamePlayer);
-                                break;
-                                case Enumerations.PlayerSide.Dead:
-                                    if (PlayerControl.LocalPlayer.Data.IsDead)
-                                        DefineName(PlayerHasRole, Role.Color, NamePlayer);
-                                break;
-                                case Enumerations.PlayerSide.DeadCrewmate:
-                                    if (PlayerControl.LocalPlayer.Data.IsDead && !PlayerControl.LocalPlayer.Data.IsImpostor)
-                                        DefineName(PlayerHasRole, Role.Color, NamePlayer);
-                                break;
-                                case Enumerations.PlayerSide.DeadImpostor:
-                                    if (PlayerControl.LocalPlayer.Data.IsDead && PlayerControl.LocalPlayer.Data.IsImpostor)
-                                        DefineName(PlayerHasRole, Role.Color, NamePlayer);
-                                break;
-                                case Enumerations.PlayerSide.SameRole:
-                                    if (Role.HasRole(PlayerControl.LocalPlayer.PlayerId))
-                                        DefineName(PlayerHasRole, Role.Color, NamePlayer);
-                                break;
-                            }
+                    foreach (var PlayerHasRole in Role.AllPlayers) {
+                        if (!Role.HasRole(PlayerHasRole))
+                            continue;
+
+                        string NamePlayer = Role.NameText(PlayerHasRole);
+                        switch (Role.VisibleBy) {
+                            case Enumerations.PlayerSide.Self:
+                                if (PlayerHasRole.PlayerId == PlayerControl.LocalPlayer.PlayerId)
+                                    DefineName(PlayerHasRole, Role.Color, NamePlayer);
+                            break;
+                            case Enumerations.PlayerSide.Impostor:
+                                if (PlayerControl.LocalPlayer.Data.IsImpostor)
+                                    DefineName(PlayerHasRole, Role.Color, NamePlayer);
+                            break;
+                            case Enumerations.PlayerSide.Crewmate:
+                                if (!PlayerControl.LocalPlayer.Data.IsImpostor)
+                                    DefineName(PlayerHasRole, Role.Color, NamePlayer);
+                            break;
+                            case Enumerations.PlayerSide.Everyone:
+                                    DefineName(PlayerHasRole, Role.Color, NamePlayer);
+                            break;
+                            case Enumerations.PlayerSide.Dead:
+                                if (PlayerControl.LocalPlayer.Data.IsDead)
+                                    DefineName(PlayerHasRole, Role.Color, NamePlayer);
+                            break;
+                            case Enumerations.PlayerSide.DeadCrewmate:
+                                if (PlayerControl.LocalPlayer.Data.IsDead && !PlayerControl.LocalPlayer.Data.IsImpostor)
+                                    DefineName(PlayerHasRole, Role.Color, NamePlayer);
+                            break;
+                            case Enumerations.PlayerSide.DeadImpostor:
+                                if (PlayerControl.LocalPlayer.Data.IsDead && PlayerControl.LocalPlayer.Data.IsImpostor)
+                                    DefineName(PlayerHasRole, Role.Color, NamePlayer);
+                            break;
+                            case Enumerations.PlayerSide.SameRole:
+                                if (Role.HasRole(PlayerControl.LocalPlayer.PlayerId))
+                                    DefineName(PlayerHasRole, Role.Color, NamePlayer);
+                            break;
                         }
                     }
                 }

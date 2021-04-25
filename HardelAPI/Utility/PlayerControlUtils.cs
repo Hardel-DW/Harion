@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace HardelAPI.Utility {
     public class PlayerControlUtils {
@@ -25,6 +26,24 @@ namespace HardelAPI.Utility {
                     return PlayerControl.AllPlayerControls[i];
 
             return null;
+        }
+
+        public static List<byte> PlayerControlListToIdList(List<PlayerControl> players) {
+            List<byte> playerIds = new List<byte>();
+
+            foreach (var player in players)
+                playerIds.Add(player.PlayerId);
+
+            return playerIds;
+        }
+
+        public static List<PlayerControl> IdListToPlayerControlList(List<byte> playerIds) {
+            List<PlayerControl> players = new List<PlayerControl>();
+
+            foreach (var playerId in playerIds)
+                players.Add(FromPlayerId(playerId));
+
+            return players;
         }
 
         /// <summary>
