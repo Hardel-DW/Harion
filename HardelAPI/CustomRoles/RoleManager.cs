@@ -132,10 +132,14 @@ namespace HardelAPI.CustomRoles {
             Player.myTasks.Insert(0, ImportantTasks);
         }
 
-        public void RefreshTask(string newTasks, PlayerControl player) {
-            foreach (PlayerTask task in player.myTasks)
-                if (task.name != "RolesTasks")
+        public void RemoveImportantTasks(PlayerControl Player) {
+            foreach (PlayerTask task in Player.myTasks)
+                if (task.name == "RolesTasks")
                     UnityEngine.Object.Destroy(task);
+        }
+
+        public void RefreshTask(string newTasks, PlayerControl player) {
+            RemoveImportantTasks(player);
 
             ImportantTextTask ImportantTasks = new GameObject("RolesTasks").AddComponent<ImportantTextTask>();
             ImportantTasks.transform.SetParent(player.transform, false);
@@ -268,13 +272,12 @@ namespace HardelAPI.CustomRoles {
 
         public virtual void OnShipStatusStart(ShipStatus Map) { }
 
-        // TODO
-        public virtual void OnPlayerDisconnect(PlayerControl Player, DisconnectReasons reason) { }
+        public virtual void OnPlayerDisconnect(PlayerControl Player) { }
 
-        // TODO
         public virtual void OnTaskComplete(PlayerControl Player) { }
 
-        // TODO
+        public virtual void OnTaskLeft(PlayerControl Player, int number) { }
+
         public virtual void OnAllTaskComplete(PlayerControl Player) { }
 
         public virtual void OnEnterVent(Vent vent, PlayerControl Player) { }
@@ -308,6 +311,12 @@ namespace HardelAPI.CustomRoles {
         public virtual void OnLocalRevive(PlayerControl Player) { }
 
         public virtual void OnPlayerRevive(PlayerControl Player) { }
+
+        public virtual void OnIntroCutScene() { }
+
+        public virtual (bool condition, List<PlayerControl> playerSelected) OnRoleSelectedInInfected(List<PlayerControl> playerHasNoRole) {
+            return (false, null);
+        }
 
         public virtual void OnRoleWin() { }
 
@@ -364,3 +373,4 @@ namespace HardelAPI.CustomRoles {
         }
     }
 }
+        

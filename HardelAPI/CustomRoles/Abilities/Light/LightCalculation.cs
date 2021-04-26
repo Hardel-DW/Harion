@@ -37,7 +37,7 @@ namespace HardelAPI.CustomRoles.Abilities.Light {
 
                 if ((lightSabotage && canSeeDuringLight) || !lightSabotage) {
                     float result = (__instance.MaxLightRadius * ((Player.Data.IsImpostor ? PlayerControl.GameOptions.ImpostorLightMod : PlayerControl.GameOptions.CrewLightMod) * LightMultiplier)) + LightAdditionnal;
-                    Plugin.Logger.LogInfo($"LightMultiplier: {LightMultiplier}, LightAdditionnal: {LightAdditionnal}, canSeeDuringLight: {canSeeDuringLight}, lightSabotage: {lightSabotage}, Result: {result}");
+                    //Plugin.Logger.LogInfo($"LightMultiplier: {LightMultiplier}, LightAdditionnal: {LightAdditionnal}, canSeeDuringLight: {canSeeDuringLight}, lightSabotage: {lightSabotage}, Result: {result}");
                     __result = result;
                     return false;
                 } else return true;

@@ -10,7 +10,7 @@ namespace HardelAPI.CustomRoles.Patch {
 
             if (AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Started) {
                 foreach (var Role in RoleManager.AllRoles) {
-                    Role.OnPlayerDisconnect(character, reason);
+                    Role.OnPlayerDisconnect(character);
                 }
             }
         }

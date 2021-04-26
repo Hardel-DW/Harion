@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace HardelAPI.Utility {
@@ -44,6 +45,17 @@ namespace HardelAPI.Utility {
                 players.Add(FromPlayerId(playerId));
 
             return players;
+        }
+
+        public static IEnumerator FlashCoroutine(Color color, float waitfor = 1f, float alpha = 0.3f) {
+            color.a = alpha;
+            var fullscreen = DestroyableSingleton<HudManager>.Instance.FullScreen;
+            var oldcolour = fullscreen.color;
+            fullscreen.enabled = true;
+            fullscreen.color = color;
+            yield return new WaitForSeconds(waitfor);
+            fullscreen.enabled = false;
+            fullscreen.color = oldcolour;
         }
 
         /// <summary>
