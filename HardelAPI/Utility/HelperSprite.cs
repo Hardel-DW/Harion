@@ -7,6 +7,24 @@ using UnityEngine;
 
 namespace HardelAPI.Utility {
     public class HelperSprite {
+        private static SpriteRenderer herePoint = null;
+
+        public static SpriteRenderer HerePoint {
+            get => herePoint ??= GetHerePoint();
+            set => herePoint = value;
+        }
+
+        private static SpriteRenderer GetHerePoint() {
+            if (HudManager.Instance == null) {
+                DestroyableSingleton<HudManager>.Instance.ShowMap((Action<MapBehaviour>) (map => {
+                    map.gameObject.SetActive(false);
+                    map.HerePoint.enabled = true;
+                }));
+            }
+
+            return UnityEngine.Object.Instantiate(MapBehaviour.Instance.HerePoint);
+        }
+
         public static Sprite LoadSpriteFromByte(byte[] resource, float PixelPerUnit) {
             try {
                 Texture2D myTexture = new Texture2D(2, 2, TextureFormat.ARGB32, true);

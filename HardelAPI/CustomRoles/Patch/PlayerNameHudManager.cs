@@ -1,6 +1,7 @@
 ﻿using HardelAPI.Utility;
 using HarmonyLib;
 using InnerNet;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -17,7 +18,8 @@ namespace HardelAPI.CustomRoles.Patch {
                 if (PlayerControl.LocalPlayer == null || PlayerControl.AllPlayerControls == null || PlayerControl.AllPlayerControls.Count == 0)
                     return;
 
-                    foreach (var Role in RoleManager.AllRoles) {
+                foreach (var Role in RoleManager.AllRoles) {
+
                     if (Role.AllPlayers == null || Role.AllPlayers.Count == 0)
                         continue;
 
@@ -29,39 +31,9 @@ namespace HardelAPI.CustomRoles.Patch {
                             continue;
 
                         string NamePlayer = Role.NameText(PlayerHasRole);
-                        switch (Role.VisibleBy) {
-                            case Enumerations.PlayerSide.Self:
-                                if (PlayerHasRole.PlayerId == PlayerControl.LocalPlayer.PlayerId)
-                                    DefineName(PlayerHasRole, Role.Color, NamePlayer);
-                            break;
-                            case Enumerations.PlayerSide.Impostor:
-                                if (PlayerControl.LocalPlayer.Data.IsImpostor)
-                                    DefineName(PlayerHasRole, Role.Color, NamePlayer);
-                            break;
-                            case Enumerations.PlayerSide.Crewmate:
-                                if (!PlayerControl.LocalPlayer.Data.IsImpostor)
-                                    DefineName(PlayerHasRole, Role.Color, NamePlayer);
-                            break;
-                            case Enumerations.PlayerSide.Everyone:
-                                    DefineName(PlayerHasRole, Role.Color, NamePlayer);
-                            break;
-                            case Enumerations.PlayerSide.Dead:
-                                if (PlayerControl.LocalPlayer.Data.IsDead)
-                                    DefineName(PlayerHasRole, Role.Color, NamePlayer);
-                            break;
-                            case Enumerations.PlayerSide.DeadCrewmate:
-                                if (PlayerControl.LocalPlayer.Data.IsDead && !PlayerControl.LocalPlayer.Data.IsImpostor)
-                                    DefineName(PlayerHasRole, Role.Color, NamePlayer);
-                            break;
-                            case Enumerations.PlayerSide.DeadImpostor:
-                                if (PlayerControl.LocalPlayer.Data.IsDead && PlayerControl.LocalPlayer.Data.IsImpostor)
-                                    DefineName(PlayerHasRole, Role.Color, NamePlayer);
-                            break;
-                            case Enumerations.PlayerSide.SameRole:
-                                if (Role.HasRole(PlayerControl.LocalPlayer.PlayerId))
-                                    DefineName(PlayerHasRole, Role.Color, NamePlayer);
-                            break;
-                        }
+
+                        if (Role.roleVisibleByWhitelist.ContainsPlayer(PlayerControl.LocalPlayer))
+                            DefineName(PlayerHasRole, Role.Color, NamePlayer);
                     }
                 }
 
@@ -107,6 +79,13 @@ namespace HardelAPI.CustomRoles.Patch {
                         }
                     }
                 }
+
+                foreach (var PlayerSpecific in RoleManager.specificNameInformation) {
+                    if (MeetingHud.Instance != null)
+                        UpdateMeetingForSpecific(MeetingHud.Instance, PlayerSpecific);
+
+                    DefineName(PlayerSpecific.Key, PlayerSpecific.Value.color, RoleManager.NameTextSpecific(PlayerSpecific.Key));
+                }
             }
         }
 
@@ -119,39 +98,9 @@ namespace HardelAPI.CustomRoles.Patch {
                         continue;
 
                     string NamePlayer = Role.NameText(PlayerHasRole, PlayerVA);
-                    switch (Role.VisibleBy) {
-                        case Enumerations.PlayerSide.Self:
-                        if (PlayerControl.LocalPlayer.PlayerId == PlayerHasRole.PlayerId)
-                            DefineMeetingName(PlayerVA, Role.Color, NamePlayer);
-                        break;
-                        case Enumerations.PlayerSide.Impostor:
-                        if (PlayerControl.LocalPlayer.Data.IsImpostor)
-                            DefineMeetingName(PlayerVA, Role.Color, NamePlayer);
-                        break;
-                        case Enumerations.PlayerSide.Crewmate:
-                        if (!PlayerControl.LocalPlayer.Data.IsImpostor)
-                            DefineMeetingName(PlayerVA, Role.Color, NamePlayer);
-                        break;
-                        case Enumerations.PlayerSide.Everyone:
+
+                    if (Role.roleVisibleByWhitelist.ContainsPlayer(PlayerControl.LocalPlayer))
                         DefineMeetingName(PlayerVA, Role.Color, NamePlayer);
-                        break;
-                        case Enumerations.PlayerSide.Dead:
-                        if (PlayerControl.LocalPlayer.Data.IsDead)
-                            DefineMeetingName(PlayerVA, Role.Color, NamePlayer);
-                        break;
-                        case Enumerations.PlayerSide.DeadCrewmate:
-                        if (PlayerControl.LocalPlayer.Data.IsDead && !PlayerControl.LocalPlayer.Data.IsImpostor)
-                            DefineMeetingName(PlayerVA, Role.Color, NamePlayer);
-                        break;
-                        case Enumerations.PlayerSide.DeadImpostor:
-                        if (PlayerControl.LocalPlayer.Data.IsDead && PlayerControl.LocalPlayer.Data.IsImpostor)
-                            DefineMeetingName(PlayerVA, Role.Color, NamePlayer);
-                        break;
-                        case Enumerations.PlayerSide.SameRole:
-                        if (Role.HasRole(PlayerControl.LocalPlayer.PlayerId))
-                            DefineMeetingName(PlayerVA, Role.Color, NamePlayer);
-                        break;
-                    }
                 }
             }
         }
@@ -171,6 +120,15 @@ namespace HardelAPI.CustomRoles.Patch {
                     continue;
 
                 DefineMeetingName(PlayerVA, role.Color, role.NameText(Player, PlayerVA));
+            }
+        }
+
+        public static void UpdateMeetingForSpecific(MeetingHud __instance, KeyValuePair<PlayerControl, (Color color, string name)> playerSpecific) {
+            foreach (PlayerVoteArea PlayerVA in __instance.playerStates) {
+                if (playerSpecific.Key.PlayerId != (byte) PlayerVA.TargetPlayerId)
+                    continue;
+
+                DefineMeetingName(PlayerVA, playerSpecific.Value.color, RoleManager.NameTextSpecific(playerSpecific.Key, PlayerVA));
             }
         }
 

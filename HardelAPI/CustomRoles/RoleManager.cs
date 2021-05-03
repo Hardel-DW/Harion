@@ -1,9 +1,7 @@
 ﻿using HardelAPI.CustomRoles.Abilities;
-using HardelAPI.CustomRoles.Abilities.Kill;
 using HardelAPI.Enumerations;
 using HardelAPI.Utility;
 using Hazel;
-using InnerNet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +10,11 @@ using UnityEngine;
 namespace HardelAPI.CustomRoles {
 
     public class RoleManager {
+        public static Dictionary<PlayerControl, (Color color, string name)> specificNameInformation = new Dictionary<PlayerControl, (Color, string)>();
         public static List<RoleManager> AllRoles = new List<RoleManager>();
         public static List<PlayerControl> WinPlayer = new List<PlayerControl>();
         public List<PlayerControl> AllPlayers = new List<PlayerControl>();
+        public List<PlayerControl> roleVisibleByWhitelist = new List<PlayerControl>();
         public byte RoleId;
         public string Name = "Not Defined";
         public string TasksDescription = "Task Description is not defined go to\n your class and defined 'TasksDescription'.";
@@ -35,8 +35,7 @@ namespace HardelAPI.CustomRoles {
         public PlayerSide VisibleBy = PlayerSide.Self;
         public Moment GiveTasksAt = Moment.StartGame;
         public Moment GiveRoleAt = Moment.StartGame;
-
-        private readonly Type ClassType;
+        public readonly Type ClassType;
 
         public virtual List<Ability> Abilities { get; set; } = null;
         public virtual List<CooldownButton> Button { get; set; } = null;
@@ -101,6 +100,74 @@ namespace HardelAPI.CustomRoles {
                 -0.5f
             );
             return Player.name + "\n" + Name;
+        }
+
+        public static string NameTextSpecific(PlayerControl Player, PlayerVoteArea playerVoteArea = null) {
+            KeyValuePair<PlayerControl, (Color color, string name)> SpecificPlayer = new KeyValuePair<PlayerControl, (Color color, string name)>();
+            bool isContainsInSpecificList = false;
+
+            foreach (var element in specificNameInformation) {
+                if (element.Key.PlayerId == Player.PlayerId) {
+                    SpecificPlayer = element;
+                    isContainsInSpecificList = true;
+                }
+            }
+
+            if (!isContainsInSpecificList)
+                return null;
+
+            if (Player == null)
+                return "";
+
+            if (!Plugin.ShowRoleInName.GetValue())
+                return Player.name;
+
+            if (playerVoteArea != null && (MeetingHud.Instance.state == MeetingHud.VoteStates.Proceeding || MeetingHud.Instance.state == MeetingHud.VoteStates.Results))
+                return Player.name;
+
+            Player.nameText.transform.localPosition = new Vector3(
+                0f,
+                (Player.Data.HatId == 0U) ? 1.05f :
+                HatsCreator.TallIds.Contains(Player.Data.HatId) ? 1.6f : 1.4f,
+                -0.5f
+            );
+            return Player.name + "\n" + SpecificPlayer.Value.name;
+        }
+
+        // Whitelist visible List
+        public virtual void DefineVisibleByWhitelist() {
+            roleVisibleByWhitelist = new List<PlayerControl>();
+
+            switch (VisibleBy) {
+                case PlayerSide.Nobody:
+                    roleVisibleByWhitelist = new List<PlayerControl>();
+                break;
+                case PlayerSide.Self:
+                    if (HasRole(PlayerControl.LocalPlayer))
+                        roleVisibleByWhitelist = new List<PlayerControl>() { PlayerControl.LocalPlayer };
+                break;
+                case PlayerSide.Impostor:
+                    roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => p.Data.IsImpostor).ToList();
+                break;
+                case PlayerSide.Crewmate:
+                roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => !p.Data.IsImpostor).ToList();
+                break;
+                case PlayerSide.Everyone:
+                    roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().ToList();
+                break;
+                case PlayerSide.Dead:
+                    roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => p.Data.IsDead).ToList();
+                break;
+                case PlayerSide.DeadCrewmate:
+                    roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => p.Data.IsDead && !p.Data.IsImpostor).ToList();
+                break;
+                case PlayerSide.DeadImpostor:
+                    roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => p.Data.IsDead && p.Data.IsImpostor).ToList();
+                break;
+                case PlayerSide.SameRole:
+                    roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => HasRole(p)).ToList();
+                break;
+            }
         }
 
         public static RoleManager GerRoleById(byte RoleId) {
@@ -169,7 +236,7 @@ namespace HardelAPI.CustomRoles {
         // Clear the list of all roles
         public static void ClearAllRoles() {
             foreach (var Role in AllRoles) {
-                Role.ClearRole();
+                Role.AllPlayers.ClearPlayerList();
             }
         }
 
@@ -229,36 +296,6 @@ namespace HardelAPI.CustomRoles {
             return HashCode.Combine(RoleId);
         }
 
-        // Player List
-        public void ClearRole() {
-            AllPlayers.Clear();
-        }
-
-        public void AddPlayer(PlayerControl Player) {
-            AllPlayers.Add(Player);
-        }
-
-        public void AddPlayer(byte PlayerId) {
-            AllPlayers.Add(PlayerControlUtils.FromPlayerId(PlayerId));
-        }
-
-        public void AddPlayerRange(List<byte> PlayersId) {
-            foreach (var PlayerId in PlayersId)
-                AllPlayers.Add(PlayerControlUtils.FromPlayerId(PlayerId));
-        }
-
-        public void AddPlayerRange(List<PlayerControl> Players) {
-            AllPlayers.AddRange(Players);
-        }
-
-        public void RemovePlayer(byte PlayerId) {
-            AllPlayers.Remove(AllPlayers.FirstOrDefault(p => p.PlayerId == PlayerId));
-        }
-
-        public void RemovePlayer(PlayerControl Player) {
-            AllPlayers.Remove(AllPlayers.FirstOrDefault(p => p.PlayerId == Player.PlayerId));
-        }
-
         // Event
         public virtual void OnGameStarted() { }
 
@@ -294,6 +331,8 @@ namespace HardelAPI.CustomRoles {
 
         public virtual void OnInfectedStart() { }
 
+        public virtual void OnInfectedEnd() { }
+
         public virtual void OnExiledPlayer(PlayerControl PlayerExiled) { }
 
         public virtual void OnLocalAttempKill(PlayerControl killer, PlayerControl target) {
@@ -314,8 +353,8 @@ namespace HardelAPI.CustomRoles {
 
         public virtual void OnIntroCutScene() { }
 
-        public virtual (bool condition, List<PlayerControl> playerSelected) OnRoleSelectedInInfected(List<PlayerControl> playerHasNoRole) {
-            return (false, null);
+        public virtual bool OnRoleSelectedInInfected(List<PlayerControl> playerHasNoRole) {
+            return false;
         }
 
         public virtual void OnRoleWin() { }

@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace HardelAPI.Utility {
-    public class PlayerControlUtils {
+    public static class PlayerControlUtils {
         public const float OffsetTruePositionX = 0;
         public const float OffsetTruePositionY = 0.366667f;
 
@@ -62,7 +63,7 @@ namespace HardelAPI.Utility {
         /// Set the players opacity (hat bugs a bit)
         /// </summary>
         /// <param name="opacity">Opacity value from 0 - 1</param>
-        public void SetOpacity(float opacity, PlayerControl player) {
+        public static void SetOpacity(float opacity, PlayerControl player) {
             var toSetColor = new Color(1, 1, 1, opacity);
             player.GetComponent<SpriteRenderer>().color = toSetColor;
 
@@ -73,7 +74,7 @@ namespace HardelAPI.Utility {
             player.nameText.color = toSetColor;
         }
 
-        public void Telportation(Vector2 position, PlayerControl player) {
+        public static void Telportation(Vector2 position, PlayerControl player) {
             player.NetTransform.RpcSnapTo(position);
         }
 
@@ -123,12 +124,94 @@ namespace HardelAPI.Utility {
             return result;
         }
 
+        public static PlayerControl GetClosestPlayer(PlayerControl PlayerReference, List<PlayerControl> whitelist, float maxRange = 5f) {
+            double distance = double.MaxValue;
+            PlayerControl result = null;
+
+            foreach (var player in whitelist) {
+                float distanceBeetween = Vector2.Distance(player.transform.position, PlayerReference.transform.position);
+                if (player.Data.IsDead || player.PlayerId == PlayerReference.PlayerId || distance < distanceBeetween)
+                    continue;
+
+                distance = distanceBeetween;
+                result = player;
+            }
+
+            if (distance > maxRange)
+                return null;
+
+            return result;
+        }
+
+        public static DeadBody GetClosestDeadBody(PlayerControl PlayerReference, float maxRange = 1f) {
+            double distance = double.MaxValue;
+            DeadBody result = null;
+
+            foreach (var dead in Object.FindObjectsOfType<DeadBody>()) {
+                PlayerControl playerFromDEead = FromPlayerId(dead.ParentId);
+
+                float distanceBeetween = Vector2.Distance(dead.transform.position, PlayerReference.transform.position);
+                if (!playerFromDEead.Data.IsDead || playerFromDEead.PlayerId == PlayerReference.PlayerId || distance < distanceBeetween)
+                    continue;
+
+                distance = distanceBeetween;
+                result = dead;
+            }
+
+            if (distance > maxRange)
+                return null;
+
+            return result;
+        }
 
         /// <summary>
         /// Player speed
         /// </summary>
         public static void Speed(PlayerControl Player, float Speed) {
             Player.MyPhysics.Speed = Speed;
+        }
+
+        public static void ClearPlayerList(this List<PlayerControl> list) {
+            list.Clear();
+        }
+
+        public static bool ContainsPlayer(this List<PlayerControl> list, PlayerControl player) {
+            return list.FirstOrDefault(p => p.PlayerId == player.PlayerId);
+        }
+
+        public static bool ContainsPlayer(this List<PlayerControl> list, byte PlayerId) {
+            return list.FirstOrDefault(p => p.PlayerId == PlayerId);
+        }
+
+        public static void AddPlayer(this List<PlayerControl> list, PlayerControl Player) {
+            list.Add(Player);
+        }
+
+        public static void AddPlayer(this List<PlayerControl> list, byte PlayerId) {
+            list.Add(FromPlayerId(PlayerId));
+        }
+
+        public static void AddPlayerRange(this List<PlayerControl> list, List<PlayerControl> Players) {
+            list.AddRange(Players);
+        }
+
+        public static void AddPlayerRange(this List<PlayerControl> list, List<byte> PlayersId) {
+            foreach (var PlayerId in PlayersId)
+                list.Add(FromPlayerId(PlayerId));
+        }
+
+        public static void RemovePlayer(this List<PlayerControl> list, byte PlayerId) {
+            PlayerControl exist = list.FirstOrDefault(p => p.PlayerId == PlayerId);
+
+            if (exist)
+                list.Remove(list.FirstOrDefault(p => p.PlayerId == PlayerId));
+        }
+
+        public static void RemovePlayer(this List<PlayerControl> list, PlayerControl Player) {
+            PlayerControl exist = list.FirstOrDefault(p => p.PlayerId == Player.PlayerId);
+
+            if (exist)
+                list.Remove(list.FirstOrDefault(p => p.PlayerId == Player.PlayerId));
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace HardelAPI.CustomRoles.Patch {
 
@@ -12,6 +13,7 @@ namespace HardelAPI.CustomRoles.Patch {
 
                 Role.HasWin = false;
                 RoleManager.WinPlayer = new List<PlayerControl>();
+                RoleManager.specificNameInformation = new Dictionary<PlayerControl, (Color color, string name)>();
                 HudUpdatePatch.MeetingIsPassed = false;
                 Role.OnGameStarted();
             }

@@ -13,9 +13,9 @@ namespace HardelAPI.CustomRoles.Patch {
                 RoleManager Role = RoleManager.GerRoleById(reader.ReadByte());
                 List<byte> selectedPlayers = reader.ReadBytesAndSize().ToList();
 
-                Role.ClearRole();
+                Role.AllPlayers.ClearPlayerList();
                 for (int i = 0; i < selectedPlayers.Count; i++)
-                    Role.AddPlayer(PlayerControlUtils.FromPlayerId(selectedPlayers[i]));
+                    Role.AllPlayers.AddPlayer(PlayerControlUtils.FromPlayerId(selectedPlayers[i]));
 
                 return false;
             }

@@ -25,6 +25,7 @@ namespace HardelAPI.Utility {
         private Action OnUpdate;
         private HudManager hudManager;
         private bool canUse;
+        public bool isDisable = false;
 
         public CooldownButton(Action OnClick, float Cooldown, string embeddedName, float pixelPerUnit, Vector2 PositionOffset, HudManager hudManager, float EffectDuration, Action OnEffectEnd, Action OnUpdate) {
             this.hudManager = hudManager;
@@ -121,7 +122,6 @@ namespace HardelAPI.Utility {
             Start();
         }
 
-
         private void Start() {
             killButtonManager = UnityEngine.Object.Instantiate(hudManager.KillButton, hudManager.transform);
             startColorButton = killButtonManager.renderer.color;
@@ -134,7 +134,7 @@ namespace HardelAPI.Utility {
             button.OnClick.AddListener((UnityEngine.Events.UnityAction) listener);
 
             void listener() {
-                if (Timer < 0f && canUse) {
+                if (Timer < 0f && canUse && !isDisable) {
                     killButtonManager.renderer.color = new Color(1f, 1f, 1f, 0.3f);
                     if (hasEffectDuration) {
                         isEffectActive = true;
@@ -164,7 +164,11 @@ namespace HardelAPI.Utility {
         private void Update() {
             UpdatePosition();
             if (Timer < 0f) {
-                killButtonManager.renderer.color = new Color(1f, 1f, 1f, 1f);
+                if (isDisable)
+                    killButtonManager.renderer.color = new Color(1f, 1f, 1f, 0.3f);
+                else 
+                    killButtonManager.renderer.color = new Color(1f, 1f, 1f, 1f);
+
                 if (isEffectActive) {
                     killButtonManager.TimerText.color = startColorText;
                     Timer = MaxTimer;
@@ -175,7 +179,10 @@ namespace HardelAPI.Utility {
                 if (canUse && (isEffectActive || PlayerControl.LocalPlayer.CanMove))
                     Timer -= Time.deltaTime;
 
-                killButtonManager.renderer.color = new Color(1f, 1f, 1f, 0.3f);
+                if (isDisable)
+                    killButtonManager.renderer.color = new Color(1f, 1f, 1f, 0.3f);
+                else
+                    killButtonManager.renderer.color = new Color(1f, 1f, 1f, 0.75f);
             }
             killButtonManager.gameObject.SetActive(canUse);
             killButtonManager.renderer.enabled = canUse;
