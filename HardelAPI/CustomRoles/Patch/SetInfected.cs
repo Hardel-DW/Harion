@@ -32,7 +32,7 @@ namespace HardelAPI.CustomRoles.Patch {
                     if (condition)
                         continue;
 
-                    MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, 250, SendOption.None, -1);
+                    MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.SetRole, SendOption.None, -1);
                     messageWriter.Write(Role.RoleId);
                     List<byte> playerSelected = new List<byte>();
 
@@ -58,15 +58,24 @@ namespace HardelAPI.CustomRoles.Patch {
                     AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
                 }
             }
+
+            if (AmongUsClient.Instance.AmHost) {
+                foreach (var Role in RoleManager.AllRoles) {
+                    Role.OnInfectedEnd();
+                    Role.DefineVisibleByWhitelist();
+                }
+            }
         }
     }
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.SetInfected))]
     public static class LocalSetInfectedPatch {
         public static void Postfix(PlayerControl __instance) {
-            foreach (var Role in RoleManager.AllRoles) {
-                Role.OnInfectedEnd();
-                Role.DefineVisibleByWhitelist();
+            if (!AmongUsClient.Instance.AmHost) {
+                foreach (var Role in RoleManager.AllRoles) {
+                    Role.OnInfectedEnd();
+                    Role.DefineVisibleByWhitelist();
+                }
             }
         }
     }

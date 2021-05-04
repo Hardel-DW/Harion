@@ -9,7 +9,7 @@ namespace HardelAPI.CustomRoles.Patch {
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.HandleRpc))]
     public static class HandleRpcPatch {
         public static bool Prefix([HarmonyArgument(0)] byte callId, [HarmonyArgument(1)] MessageReader reader) {
-            if (callId == 250) {
+            if (callId == (byte) CustomRPC.SetRole) {
                 RoleManager Role = RoleManager.GerRoleById(reader.ReadByte());
                 List<byte> selectedPlayers = reader.ReadBytesAndSize().ToList();
 
@@ -47,6 +47,15 @@ namespace HardelAPI.CustomRoles.Patch {
                 }
 
                 Role.HasWin = true;
+                return false;
+            }
+
+            if (callId == (byte) CustomRPC.RPCForceEndGame) {
+                RoleManager Role = RoleManager.GerRoleById(reader.ReadByte());
+                List<byte> selectedPlayers = reader.ReadBytesAndSize().ToList();
+                List<PlayerControl> WinPlayer = PlayerControlUtils.IdListToPlayerControlList(selectedPlayers);
+
+                Role.ForceEndGame(WinPlayer);
                 return false;
             }
 

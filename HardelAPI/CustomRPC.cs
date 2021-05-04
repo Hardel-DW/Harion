@@ -1,5 +1,7 @@
 ﻿namespace HardelAPI {
     enum CustomRPC : byte {
-        ForceEndGame = 254
+        SetRole = 250,
+        RPCForceEndGame,
+        ForceEndGame
     }
 }

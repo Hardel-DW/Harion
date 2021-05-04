@@ -368,6 +368,18 @@ namespace HardelAPI.CustomRoles {
             return false;
         }
 
+        public void RpcForceEndGame(List<PlayerControl> playersWin = null) {
+            if (AmongUsClient.Instance.AmHost) {
+                ForceEndGame(playersWin);
+                return;
+            }
+
+            MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.RPCForceEndGame, SendOption.Reliable, AmongUsClient.Instance.HostId);
+            messageWriter.Write(RoleId);
+            messageWriter.WriteBytesAndSize(PlayerControlUtils.PlayerControlListToIdList(WinPlayer).ToArray());
+            AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
+        }
+
         public void ForceEndGame(List<PlayerControl> playersWin = null) {
             if (!AmongUsClient.Instance.AmHost)
                 return;
@@ -375,15 +387,15 @@ namespace HardelAPI.CustomRoles {
             WinPlayer = playersWin;
             OnRoleWin();
 
-            MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.ForceEndGame, SendOption.Reliable, -1);
-            messageWriter.Write(RoleId);
-            messageWriter.WriteBytesAndSize(PlayerControlUtils.PlayerControlListToIdList(WinPlayer).ToArray());
-            AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
-
             if (WinPlayer == null) {
                 Plugin.Logger.LogError("'ForceEndGame' is call, but no win players is defined, you can defined in the method argument or with override 'OnRoleWin'");
                 return;
             }
+
+            MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.ForceEndGame, SendOption.Reliable, -1);
+            messageWriter.Write(RoleId);
+            messageWriter.WriteBytesAndSize(PlayerControlUtils.PlayerControlListToIdList(WinPlayer).ToArray());
+            AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
 
             // Define loses players
             var playerLoses = PlayerControl.AllPlayerControls;
