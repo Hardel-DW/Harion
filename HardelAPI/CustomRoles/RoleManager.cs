@@ -192,7 +192,7 @@ namespace HardelAPI.CustomRoles {
             return listRole;
         }
 
-        public void AddImportantTasks(PlayerControl Player) {
+        public virtual void AddImportantTasks(PlayerControl Player) {
             ImportantTextTask ImportantTasks = new GameObject("RolesTasks").AddComponent<ImportantTextTask>();
             ImportantTasks.transform.SetParent(Player.transform, false);
             ImportantTasks.Text = TasksDescription;
@@ -200,9 +200,13 @@ namespace HardelAPI.CustomRoles {
         }
 
         public void RemoveImportantTasks(PlayerControl Player) {
-            foreach (PlayerTask task in Player.myTasks)
-                if (task.name == "RolesTasks")
+            foreach (PlayerTask task in Player.myTasks.ToArray().ToList()) {
+                if (task.name == "RolesTasks") {
+                    task.OnRemove();
+                    Player.myTasks.Remove(task);
                     UnityEngine.Object.Destroy(task);
+                }
+            }
         }
 
         public void RefreshTask(string newTasks, PlayerControl player) {
@@ -376,7 +380,7 @@ namespace HardelAPI.CustomRoles {
 
             MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.RPCForceEndGame, SendOption.Reliable, AmongUsClient.Instance.HostId);
             messageWriter.Write(RoleId);
-            messageWriter.WriteBytesAndSize(PlayerControlUtils.PlayerControlListToIdList(WinPlayer).ToArray());
+            messageWriter.WriteBytesAndSize(PlayerControlUtils.PlayerControlListToIdList(playersWin).ToArray());
             AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
         }
 
@@ -420,7 +424,7 @@ namespace HardelAPI.CustomRoles {
             }
 
             HasWin = true;
-            ShipStatus.RpcEndGame(GameOverReason.ImpostorByKill, false);
+            ShipStatus.RpcEndGame(GameOverReason.HumansByTask, false);
         }
     }
 }

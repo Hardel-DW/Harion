@@ -45,5 +45,20 @@ namespace HardelAPI.Utility {
             yield return true;
         }
 
+        public static IEnumerator Slide2D(Transform target, Vector2 source, Vector2 dest, float duration = 0.75f) {
+            var temp = default(Vector3);
+            temp.z = target.position.z;
+            for (var time = 0f; time < duration; time += Time.deltaTime) {
+                var t = time / duration;
+                temp.x = Mathf.SmoothStep(source.x, dest.x, t);
+                temp.y = Mathf.SmoothStep(source.y, dest.y, t);
+                target.position = temp;
+                yield return null;
+            }
+
+            temp.x = dest.x;
+            temp.y = dest.y;
+            target.position = temp;
+        }
     }
 }

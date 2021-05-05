@@ -25,6 +25,13 @@ namespace HardelAPI.CustomRoles.Abilities.UsableVent {
             float maxFloat = float.MaxValue;
             couldUse = (CanVent && !playerInfo.IsDead && (player.CanMove || player.inVent));
             canUse = couldUse;
+
+            if (__instance.name.StartsWith("SealedVent_")) {
+                canUse = couldUse = false;
+                __result = maxFloat;
+                return false;
+            }
+
             if (canUse) {
                 maxFloat = Vector2.Distance(player.GetTruePosition(), __instance.transform.position);
                 canUse &= maxFloat <= __instance.UsableDistance && !PhysicsHelpers.AnythingBetween(player.GetTruePosition(), __instance.transform.position, Constants.ShipAndObjectsMask, false);

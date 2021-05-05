@@ -19,13 +19,14 @@ namespace HardelAPI.Utility {
         public bool hasEffectDuration;
         public bool enabled = true;
         public float pixelPerUnit;
-        private Sprite sprite;
         private Action OnClick;
         public Action OnEffectEnd;
         private Action OnUpdate;
         private HudManager hudManager;
         private bool canUse;
         public bool isDisable = false;
+
+        public Sprite Sprite { get; set; }
 
         public CooldownButton(Action OnClick, float Cooldown, string embeddedName, float pixelPerUnit, Vector2 PositionOffset, HudManager hudManager, float EffectDuration, Action OnEffectEnd, Action OnUpdate) {
             this.hudManager = hudManager;
@@ -36,7 +37,7 @@ namespace HardelAPI.Utility {
             this.EffectDuration = EffectDuration;
             this.pixelPerUnit = pixelPerUnit;
             this.embeddedName = embeddedName;
-            this.sprite = HelperSprite.LoadSpriteFromEmbeddedResources(embeddedName, pixelPerUnit);
+            this.Sprite = HelperSprite.LoadSpriteFromEmbeddedResources(embeddedName, pixelPerUnit);
             MaxTimer = Cooldown;
             Timer = MaxTimer;
             hasEffectDuration = true;
@@ -52,7 +53,7 @@ namespace HardelAPI.Utility {
             this.PositionOffset = PositionOffset;
             this.embeddedName = embeddedName;
             this.pixelPerUnit = pixelPerUnit;
-            this.sprite = HelperSprite.LoadSpriteFromEmbeddedResources(embeddedName, pixelPerUnit);
+            this.Sprite = HelperSprite.LoadSpriteFromEmbeddedResources(embeddedName, pixelPerUnit);
             MaxTimer = Cooldown;
             Timer = MaxTimer;
             hasEffectDuration = false;
@@ -68,7 +69,7 @@ namespace HardelAPI.Utility {
             this.PositionOffset = PositionOffset;
             this.EffectDuration = EffectDuration;
             this.pixelPerUnit = pixelPerUnit;
-            this.sprite = HelperSprite.LoadSpriteFromByte(resource, pixelPerUnit);
+            this.Sprite = HelperSprite.LoadSpriteFromByte(resource, pixelPerUnit);
             MaxTimer = Cooldown;
             Timer = MaxTimer;
             hasEffectDuration = true;
@@ -83,7 +84,7 @@ namespace HardelAPI.Utility {
             this.OnUpdate = OnUpdate;
             this.PositionOffset = PositionOffset;
             this.pixelPerUnit = pixelPerUnit;
-            this.sprite = HelperSprite.LoadSpriteFromByte(resource, pixelPerUnit);
+            this.Sprite = HelperSprite.LoadSpriteFromByte(resource, pixelPerUnit);
             MaxTimer = Cooldown;
             Timer = MaxTimer;
             hasEffectDuration = false;
@@ -99,7 +100,7 @@ namespace HardelAPI.Utility {
             this.PositionOffset = PositionOffset;
             this.EffectDuration = EffectDuration;
             this.pixelPerUnit = pixelPerUnit;
-            this.sprite = resource;
+            this.Sprite = resource;
             MaxTimer = Cooldown;
             Timer = MaxTimer;
             hasEffectDuration = true;
@@ -114,7 +115,7 @@ namespace HardelAPI.Utility {
             this.OnUpdate = OnUpdate;
             this.PositionOffset = PositionOffset;
             this.pixelPerUnit = pixelPerUnit;
-            this.sprite = resource;
+            this.Sprite = resource;
             MaxTimer = Cooldown;
             Timer = MaxTimer;
             hasEffectDuration = false;
@@ -128,7 +129,7 @@ namespace HardelAPI.Utility {
             startColorText = killButtonManager.TimerText.color;
             killButtonManager.gameObject.SetActive(true);
             killButtonManager.renderer.enabled = true;
-            killButtonManager.renderer.sprite = sprite;
+            killButtonManager.renderer.sprite = Sprite;
             PassiveButton button = killButtonManager.GetComponent<PassiveButton>();
             button.OnClick.RemoveAllListeners();
             button.OnClick.AddListener((UnityEngine.Events.UnityAction) listener);
@@ -155,7 +156,7 @@ namespace HardelAPI.Utility {
                 if (!UsableButton)
                     buttons[i].SetCanUse(false);
 
-                buttons[i].killButtonManager.renderer.sprite = buttons[i].sprite;
+                buttons[i].killButtonManager.renderer.sprite = buttons[i].Sprite;
                 buttons[i].OnUpdate();
                 buttons[i].Update();
             }

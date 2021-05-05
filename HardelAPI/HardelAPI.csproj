@@ -13,7 +13,7 @@
         <Deobfuscate Include="$(AmongUs)\BepInEx\plugins\Reactor-$(GameVersion).dll" />
         <Deobfuscate Include="$(AmongUs)\BepInEx\plugins\Essentials-$(GameVersion).dll" />
 
-        <EmbeddedResource Include="Resources\*" />      
+        <EmbeddedResource Include="Resources\*" />
         <PackageReference Include="Reactor.OxygenFilter.MSBuild" Version="0.3.0" />
     </ItemGroup>
 

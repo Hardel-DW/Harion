@@ -1,6 +1,8 @@
 ﻿using Hazel;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using System;
 
 namespace HardelAPI.Utility {
 	public static class Utils {
@@ -19,7 +21,34 @@ namespace HardelAPI.Utility {
 			float v2 = (float) reader.ReadUInt16() / 65535f;
 			return new Vector2(XRange.Lerp(v), YRange.Lerp(v2));
 		}
-    }
+
+		public static void WriteListVector2(this MessageWriter writer, List<Vector2> vectors) {
+			byte[] buff = new byte[sizeof(float) * (2 * vectors.Count)];
+
+            for (int i = 0; i < vectors.Count; i++) {
+				Buffer.BlockCopy(BitConverter.GetBytes(vectors[i].x), 0, buff, ((1 * i) - 1) * sizeof(float), sizeof(float));
+				Buffer.BlockCopy(BitConverter.GetBytes(vectors[i].y), 0, buff, (1 * i) * sizeof(float), sizeof(float));
+            }
+
+			writer.WriteBytesAndSize(buff);
+			writer.Write(vectors.Count);
+		}
+
+		public static List<Vector2> ReadListVector2(this MessageReader reader) {
+			byte[] buff = reader.ReadBytesAndSize();
+			int size = reader.ReadInt32();
+			List<Vector2> vectors = new List<Vector2>();
+			
+			for (int i = 0; i < size; i++) {
+				Vector2 position = Vector2.zero;
+				position.x = BitConverter.ToSingle(buff, ((1 * i) - 1) * sizeof(float));
+				position.y = BitConverter.ToSingle(buff, (1 * i) * sizeof(float));
+				vectors.Add(position);
+			}
+
+			return vectors;
+		}
+	}
 
 	public class FloatRange {
 		public float Last {
