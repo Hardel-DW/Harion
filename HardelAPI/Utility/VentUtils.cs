@@ -7,9 +7,8 @@ namespace HardelAPI.Utility {
     public static class VentUtils {
 
 		public static void RpcSealMultipleVent(List<byte> ventIds) {
-			if (AmongUsClient.Instance.AmHost)
-                foreach (var ventId in ventIds)
-					SealVent(IdToVent(ventId));
+            foreach (var ventId in ventIds)
+				SealVent(IdToVent(ventId));
 
 			MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.SealVent, SendOption.Reliable, -1);
 			messageWriter.WriteBytesAndSize(ventIds.ToArray());
@@ -17,9 +16,8 @@ namespace HardelAPI.Utility {
 		}
 
 		public static void RpcSealMultipleVent(List<Vent> vents) {
-			if (AmongUsClient.Instance.AmHost)
-				foreach (var vent in vents)
-					SealVent(vent);
+			foreach (var vent in vents)
+				SealVent(vent);
 
 			MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.SealVent, SendOption.Reliable, -1);
 			messageWriter.WriteBytesAndSize(VentsToList(vents).ToArray());
@@ -27,8 +25,7 @@ namespace HardelAPI.Utility {
 		}
 
 		public static void RpcSealVent(Vent vent) {
-			if (AmongUsClient.Instance.AmHost)
-				SealVent(vent);
+			SealVent(vent);
 
 			MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.SealVent, SendOption.Reliable, -1);
 			messageWriter.Write(vent.Id);

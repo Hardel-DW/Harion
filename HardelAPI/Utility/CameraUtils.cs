@@ -7,9 +7,8 @@ namespace HardelAPI.Utility {
     public static class CameraUtils {
 
 		public static void RpcAddMutipleCamera(List<Vector2> positions) {
-			if (AmongUsClient.Instance.AmHost)
-				foreach (var position in positions)
-					AddNewCamera(position);
+			foreach (var position in positions)
+				AddNewCamera(position);
 
 			MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.PlaceCameraBuffer, SendOption.Reliable, -1);
 			messageWriter.WriteListVector2(positions);
@@ -17,8 +16,7 @@ namespace HardelAPI.Utility {
 		}
 
 		public static void RpcAddCamera(Vector2 position) {
-			if (AmongUsClient.Instance.AmHost)
-				AddNewCamera(position);
+			AddNewCamera(position);
 
 			MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.PlaceCamera, SendOption.Reliable, -1);
 			messageWriter.WriteVector2(position);
