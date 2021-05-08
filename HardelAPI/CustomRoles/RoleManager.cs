@@ -548,8 +548,10 @@ namespace HardelAPI.CustomRoles {
             if (roleLoose)
                 foreach (var role in AllRoles)
                     if (role.LooseRole)
-                        foreach (var player in role.AllPlayers)
+                        foreach (var player in role.AllPlayers) {
                             player.Die(DeathReason.Exile);
+                            player.Data.IsDead = true;
+                        }
 
             // Set PlayerWin
             foreach (var player in WinPlayer) {

@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using System.Collections.Generic;
 
 namespace HardelAPI.CustomRoles.Patch {
 
@@ -10,10 +11,27 @@ namespace HardelAPI.CustomRoles.Patch {
                     if (role.AddEndCriteria() && role.AllPlayers?.Count > 0)
                         return false;
 
-            foreach (var role in RoleManager.AllRoles)
-                if (role.LooseRole)
-                    foreach (var player in role.AllPlayers)
-                        player.Die(DeathReason.Exile);
+            bool CustomEnd = false;
+            List<PlayerControl> LoosePlayers = new List<PlayerControl>();
+            foreach (var role in RoleManager.AllRoles) {
+                if (role.LooseRole) {
+                    CustomEnd = true;
+                    foreach (var player in role.AllPlayers) {
+                        LoosePlayers.Add(player);
+                    }
+                }
+            }
+
+            if (CustomEnd) {
+                if (reason == GameOverReason.HumansByVote || reason == GameOverReason.HumansByTask || reason == GameOverReason.HumansDisconnect)
+                    LoosePlayers.ForEach(p => p.Data.IsImpostor = true);
+                else {
+                    foreach (var player in LoosePlayers) {
+                        player.RemoveInfected();
+                        player.Data.IsImpostor = false;
+                    }
+                }
+            }
 
             return true;
         }

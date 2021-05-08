@@ -4,6 +4,7 @@ using UnityEngine;
 using HarmonyLib;
 using HardelAPI.CustomRoles;
 using System.Linq;
+using TMPro;
 
 namespace HardelAPI.Utility {
 
@@ -12,6 +13,23 @@ namespace HardelAPI.Utility {
         Player,
         Vent,
         DeadBody
+    }
+
+    public enum UseNumberDecremantion {
+        Never,
+        OnClick,
+        OnEffectEnd
+    }
+
+    public enum AnchorPosition {
+        BottomLeft,
+        BottomRight,
+        TopLeft,
+        TopRight,
+        Bottom,
+        Top,
+        Left,
+        Right
     }
 
     public class CooldownButton {
@@ -44,24 +62,32 @@ namespace HardelAPI.Utility {
         public float PixelPerUnit { get; set; }
         public bool IsDisable { get; set; } = false;
         public Sprite Sprite { get; set; }
+        public int UseNumber { get; set; } = int.MaxValue;
+        public UseNumberDecremantion DecreamteUseNimber { get; set; } = UseNumberDecremantion.Never;
+
+        // Text Renderer
+        public GameObject TextObject { get; set; }
+        public TextMeshPro textMeshPro { get; set; }
 
         // Closest Element
         public GameObject closestElement { get; set; }
-        public List<GameObject> allElementTargetable { get; set; } = new List<GameObject>();
+        public List<PlayerControl> allPlayersTargetable { get; set; } = new List<PlayerControl>();
         public Color ColorOutline { get; set; } = Color.white;
-        public float Disntance { get; set; }
+        public float Disntance { get; set; } = 1f;
 
-        public CooldownButton(Action OnClick, float Cooldown, string embeddedName, float pixelPerUnit, Vector2 PositionOffset, HudManager hudManager, float EffectDuration, Action OnEffectEnd = null, Action OnUpdate = null) {
+        // Constructor
+        public CooldownButton(Action OnClick, float Cooldown, string embeddedName, float pixelPerUnit, Vector2 PositionOffset, HudManager hudManager, Action OnUpdate, float EffectDuration = 0f, Action OnEffectEnd = null) {
             this.hudManager = hudManager;
             this.OnClick = OnClick;
             this.PositionOffset = PositionOffset;
-            this.EffectDuration = EffectDuration;
             this.PixelPerUnit = pixelPerUnit;
             this.embeddedName = embeddedName;
             this.Sprite = HelperSprite.LoadSpriteFromEmbeddedResources(embeddedName, pixelPerUnit);
 
-            if (OnEffectEnd != null)
+            if (OnEffectEnd != null) {
+                this.EffectDuration = EffectDuration;
                 this.OnEffectEnd = OnEffectEnd;
+            }
 
             if (OnUpdate != null)
                 this.OnUpdate = OnUpdate;
@@ -74,16 +100,17 @@ namespace HardelAPI.Utility {
             Start();
         }
 
-        public CooldownButton(Action OnClick, float Cooldown, byte[] resource, float pixelPerUnit, Vector2 PositionOffset, HudManager hudManager, float EffectDuration, Action OnEffectEnd = null, Action OnUpdate = null) {
+        public CooldownButton(Action OnClick, float Cooldown, byte[] resource, float pixelPerUnit, Vector2 PositionOffset, HudManager hudManager, Action OnUpdate, float EffectDuration = 0f, Action OnEffectEnd = null) {
             this.hudManager = hudManager;
             this.OnClick = OnClick;
             this.PositionOffset = PositionOffset;
-            this.EffectDuration = EffectDuration;
             this.PixelPerUnit = pixelPerUnit;
             this.Sprite = HelperSprite.LoadSpriteFromByte(resource, pixelPerUnit);
 
-            if (OnEffectEnd != null)
+            if (OnEffectEnd != null) {
+                this.EffectDuration = EffectDuration;
                 this.OnEffectEnd = OnEffectEnd;
+            }
 
             if (OnUpdate != null)
                 this.OnUpdate = OnUpdate;
@@ -96,16 +123,17 @@ namespace HardelAPI.Utility {
             Start();
         }
 
-        public CooldownButton(Action OnClick, float Cooldown, Sprite resource, float pixelPerUnit, Vector2 PositionOffset, HudManager hudManager, float EffectDuration, Action OnEffectEnd = null, Action OnUpdate = null) {
+        public CooldownButton(Action OnClick, float Cooldown, Sprite resources, float pixelPerUnit, Vector2 PositionOffset, HudManager hudManager, Action OnUpdate, float EffectDuration = 0f, Action OnEffectEnd = null) {
             this.hudManager = hudManager;
             this.OnClick = OnClick;
             this.PositionOffset = PositionOffset;
-            this.EffectDuration = EffectDuration;
             this.PixelPerUnit = pixelPerUnit;
-            this.Sprite = resource;
+            this.Sprite = resources;
 
-            if (OnEffectEnd != null)
+            if (OnEffectEnd != null) {
+                this.EffectDuration = EffectDuration;
                 this.OnEffectEnd = OnEffectEnd;
+            }
 
             if (OnUpdate != null)
                 this.OnUpdate = OnUpdate;
@@ -128,6 +156,8 @@ namespace HardelAPI.Utility {
             PassiveButton button = killButtonManager.GetComponent<PassiveButton>();
             button.OnClick.RemoveAllListeners();
             button.OnClick.AddListener((UnityEngine.Events.UnityAction) listener);
+            TextObject = killButtonManager.gameObject.CreateTMP("", Vector2.zero, Color.white);
+            textMeshPro = TextObject.GetComponent<TextMeshPro>();
 
             void listener() {
                 if (Timer < 0f && canUse && !IsDisable) {
@@ -139,6 +169,9 @@ namespace HardelAPI.Utility {
                     } else {
                         Timer = MaxTimer;
                     }
+
+                    if (DecreamteUseNimber == UseNumberDecremantion.OnClick)
+                        UseNumber--;
 
                     OnClick();
                 }
@@ -162,8 +195,11 @@ namespace HardelAPI.Utility {
 
             if (Roles.AllPlayers != null && PlayerControl.LocalPlayer != null)
                 if (Roles.HasRole(PlayerControl.LocalPlayer))
-                    if (!PlayerControl.LocalPlayer.Data.IsDead)
+                    if (!PlayerControl.LocalPlayer.Data.IsDead && UseNumber >= 1)
                         CanUse = !MeetingHud.Instance;
+
+            if (CanUse)
+                UpdateClosestElement();
 
             SetCanUse(CanUse);
         }
@@ -177,22 +213,39 @@ namespace HardelAPI.Utility {
 
             switch (Closest) {
                 case ClosestElement.DeadBody:
-                break;
-                case ClosestElement.Player:
-                    if (allElementTargetable == null)
-                        PlayerControl.AllPlayerControls.ToArray().ToList().ForEach(p => allElementTargetable.Add(p.gameObject));
-
-                    List<PlayerControl> targets = new List<PlayerControl>();
-                    allElementTargetable.ForEach(player => targets.Add(player.GetComponent<PlayerControl>()));
-
-                    PlayerControl target = PlayerControlUtils.GetClosestPlayer(PlayerControl.LocalPlayer, targets, Disntance);
-                    if (target != null)
-                        closestElement = target.gameObject;
+                    DeadBody targetedBody = PlayerControlUtils.GetClosestDeadBody(PlayerControl.LocalPlayer);
+                    if (targetedBody != null)
+                        closestElement = targetedBody.gameObject;
                     else
                         closestElement = null;
                     break;
+                case ClosestElement.Player:
+                    if (allPlayersTargetable == null || allPlayersTargetable.Count == 0)
+                        allPlayersTargetable = PlayerControl.AllPlayerControls.ToArray().ToList();
+
+                    Plugin.Logger.LogInfo(allPlayersTargetable.Count);
+
+                    PlayerControl targetedPlayer = PlayerControlUtils.GetClosestPlayer(PlayerControl.LocalPlayer, allPlayersTargetable, Disntance);
+
+
+
+                    if (targetedPlayer != null) {
+                        Plugin.Logger.LogInfo(targetedPlayer.name);
+                        closestElement = targetedPlayer.gameObject;
+                    }
+                    else
+                        closestElement = null;
+
+                    Plugin.Logger.LogInfo(closestElement);
+
+                    break;
                 case ClosestElement.Vent:
-                break;
+                    Vent targetedVent = VentUtils.GetClosestVent(PlayerControl.LocalPlayer);
+                    if (targetedVent != null)
+                        closestElement = targetedVent.gameObject;
+                    else
+                        closestElement = null;
+                    break;
             }
 
             if (closestElement != null) {
@@ -203,7 +256,6 @@ namespace HardelAPI.Utility {
 
         private void Update() {
             UsableUpdate();
-            UpdateClosestElement();
             UpdatePosition();
             if (Timer < 0f) {
                 if (IsDisable)
@@ -215,6 +267,10 @@ namespace HardelAPI.Utility {
                     killButtonManager.TimerText.color = StartColorText;
                     Timer = MaxTimer;
                     isEffectActive = false;
+
+                    if (DecreamteUseNimber == UseNumberDecremantion.OnEffectEnd)
+                        UseNumber--;
+
                     OnEffectEnd();
                 }
             } else {
@@ -272,7 +328,15 @@ namespace HardelAPI.Utility {
         public bool GetCanUse() {
             return this.canUse;
         }
+
+        public void SetText(string text) {
+            if (textMeshPro != null)
+                textMeshPro.text = text;
+            else
+                Plugin.Logger.LogError("TextMeshPro is not defined in CooldownButton !");
+        }
     }
+
 
     [HarmonyPatch(typeof(HudManager), nameof(HudManager.Update))]
     public static class HudUpdatePatch {
