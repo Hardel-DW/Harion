@@ -23,26 +23,17 @@ namespace HardelAPI.Utility {
 		}
 
 		public static void WriteListVector2(this MessageWriter writer, List<Vector2> vectors) {
-			byte[] buff = new byte[sizeof(float) * (2 * vectors.Count)];
-
-            for (int i = 0; i < vectors.Count; i++) {
-				Buffer.BlockCopy(BitConverter.GetBytes(vectors[i].x), 0, buff, ((1 * i) - 1) * sizeof(float), sizeof(float));
-				Buffer.BlockCopy(BitConverter.GetBytes(vectors[i].y), 0, buff, (1 * i) * sizeof(float), sizeof(float));
-            }
-
-			writer.WriteBytesAndSize(buff);
 			writer.Write(vectors.Count);
+			foreach (var vector in vectors)
+				writer.WriteVector2(vector);
 		}
 
 		public static List<Vector2> ReadListVector2(this MessageReader reader) {
-			byte[] buff = reader.ReadBytesAndSize();
 			int size = reader.ReadInt32();
 			List<Vector2> vectors = new List<Vector2>();
 			
 			for (int i = 0; i < size; i++) {
-				Vector2 position = Vector2.zero;
-				position.x = BitConverter.ToSingle(buff, ((1 * i) - 1) * sizeof(float));
-				position.y = BitConverter.ToSingle(buff, (1 * i) * sizeof(float));
+				Vector2 position = reader.ReadVector2();
 				vectors.Add(position);
 			}
 

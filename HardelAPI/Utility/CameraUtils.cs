@@ -1,4 +1,5 @@
-﻿using Hazel;
+﻿using HardelAPI.Data;
+using Hazel;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -41,6 +42,23 @@ namespace HardelAPI.Utility {
 			List<SurvCamera> allCameras = ShipStatus.Instance.AllCameras.ToList();
 			allCameras.Add(camera);
 			ShipStatus.Instance.AllCameras = allCameras.ToArray();
+
+			new DangerPoint(camera.transform.position, Palette.ImpostorRed, "Camera Custom");
+		}
+
+		public static void DeleteCustomCamera() {
+			if (ShipStatus.Instance == null)
+				return;
+
+            foreach (SurvCamera camera in ShipStatus.Instance.AllCameras) {
+				if (camera.CamName.StartsWith("Custom")) {
+					List<SurvCamera> allCameras = ShipStatus.Instance.AllCameras.ToList();
+					allCameras.Remove(camera);
+					ShipStatus.Instance.AllCameras = allCameras.ToArray();
+
+					Object.Destroy(camera);
+				}
+			}
 		}
 	}
 }

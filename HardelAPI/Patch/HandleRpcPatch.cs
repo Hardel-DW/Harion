@@ -34,8 +34,13 @@ namespace HardelAPI.Patch {
 
             if (callId == (byte) CustomRPC.SealVentBuffer) {
                 List<byte> ventIds = reader.ReadBytesAndSize().ToList();
-                foreach (var ventId in ventIds)
-                    VentUtils.SealVent(VentUtils.IdToVent(ventId));
+
+                Plugin.Logger.LogInfo($"ventIds: {ventIds.Count}");
+                foreach (var ventId in ventIds) {
+                    Vent vent = VentUtils.IdToVent(ventId);
+                    Plugin.Logger.LogInfo($"ventId: {vent.Id}, ventsToSeal: {vent.name}");
+                    VentUtils.SealVent(vent);
+                }
 
                 return false;
             }

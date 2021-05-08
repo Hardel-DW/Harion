@@ -19,7 +19,6 @@ namespace HardelAPI.CustomRoles.Patch {
                     return;
 
                 foreach (var Role in RoleManager.AllRoles) {
-
                     if (Role.AllPlayers == null || Role.AllPlayers.Count == 0)
                         continue;
 

@@ -1,4 +1,5 @@
-﻿using Hazel;
+﻿using HardelAPI.Data;
+using Hazel;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,19 +8,25 @@ namespace HardelAPI.Utility {
     public static class VentUtils {
 
 		public static void RpcSealMultipleVent(List<byte> ventIds) {
-            foreach (var ventId in ventIds)
-				SealVent(IdToVent(ventId));
+            foreach (var ventId in ventIds) {
+				Vent vent = IdToVent(ventId);
+				SealVent(vent);
+            }
 
-			MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.SealVent, SendOption.Reliable, -1);
+			MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.SealVentBuffer, SendOption.Reliable, -1);
 			messageWriter.WriteBytesAndSize(ventIds.ToArray());
 			AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
 		}
 
 		public static void RpcSealMultipleVent(List<Vent> vents) {
-			foreach (var vent in vents)
-				SealVent(vent);
+			Plugin.Logger.LogInfo($"ventIds: {vents.Count}");
+			foreach (var vent in vents) {
+				Plugin.Logger.LogInfo($"ventId: {vent.Id}, ventsToSeal: {vent.name}");
 
-			MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.SealVent, SendOption.Reliable, -1);
+				SealVent(vent);
+			}
+
+			MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.SealVentBuffer, SendOption.Reliable, -1);
 			messageWriter.WriteBytesAndSize(VentsToList(vents).ToArray());
 			AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
 		}
@@ -36,6 +43,8 @@ namespace HardelAPI.Utility {
 			if (vent == null)
 				return;
 
+			Plugin.Logger.LogInfo($"Seal vent:  {vent.Id}");
+
 			Sprite staticSealdedVent = HelperSprite.LoadSpriteFromEmbeddedResources("HardelAPI.Resources.StaticVentSealed.png", 150f);
 			Sprite animatedSealeddVent = HelperSprite.LoadSpriteFromEmbeddedResources("HardelAPI.Resources.AnimatedVentSealed.png", 150f);
 
@@ -43,6 +52,25 @@ namespace HardelAPI.Utility {
 			animator?.Stop();
 			vent.myRend.sprite = animator == null ? staticSealdedVent : animatedSealeddVent;
 			vent.name = "SealedVent_" + vent.name;
+
+			new DangerPoint(vent.transform.position, Palette.CrewmateBlue, vent.name);
+		}
+
+		public static void UnsealVents() {
+			if (ShipStatus.Instance == null)
+				return;
+
+			foreach (Vent vent in ShipStatus.Instance.AllVents) {
+				if (vent == null)
+					continue;
+
+				if (vent.name.StartsWith("SealedVent_")) {
+					PowerTools.SpriteAnim animator = vent.GetComponent<PowerTools.SpriteAnim>();
+					animator?.Play();
+					vent.myRend.sprite = GetVentSprite();
+					vent.name = "Vent_" + vent.name;
+				}
+			}
 		}
 
 		public static Vent IdToVent(int id) {
@@ -74,6 +102,18 @@ namespace HardelAPI.Utility {
 			}
 
 			return result;
+		}
+
+		public static Sprite GetVentSprite() {
+			Vent vent;
+			if (ShipStatus.Instance == null)
+				return null;
+
+			vent = ShipStatus.Instance.AllVents.FirstOrDefault(v => !v.name.StartsWith("SealedVent_"));
+			if (vent == null)
+				return null;
+
+			return vent?.GetComponent<SpriteRenderer>()?.sprite;
 		}
 	}
 }

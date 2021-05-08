@@ -22,6 +22,7 @@ namespace HardelAPI.CustomRoles {
         public string OutroDescription = "Outro Description is not defined";
         public int NumberPlayers = 1;
         public int PercentApparition = 100;
+        public bool LooseRole = false;
         public bool ForceUnshowAllRolesOnMeeting = false;
         public bool ForceExiledReveal = false;
         public bool ShowIntroCutScene = true;
@@ -134,6 +135,141 @@ namespace HardelAPI.CustomRoles {
             return Player.name + "\n" + SpecificPlayer.Value.name;
         }
 
+        // Player List Management
+
+        private void AddPlayer(byte PlayerId) {
+            PlayerControl Player = PlayerControlUtils.FromPlayerId(PlayerId);
+            if (Player != null) {
+                RoleManager MainRole = GetMainRole(Player);
+
+                if (MainRole == null || !IsMainRole)
+                    AllPlayers.Add(Player);
+            }
+
+            DefineVisibleByWhitelist();
+        }
+
+        public void AddPlayerRange(List<byte> PlayerIds) => PlayerIds.ForEach(p => AddPlayer(p));
+
+        public void RpcAddPlayer(PlayerControl Player) {
+            List<byte> PlayerIds = new List<byte>() { Player.PlayerId };
+            AddPlayer(Player.PlayerId);
+
+            MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.AddPlayer, SendOption.Reliable, -1);
+            messageWriter.WriteBytesAndSize(PlayerIds.ToArray());
+            messageWriter.Write(RoleId);
+            AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
+        }
+
+        public void RpcAddPlayer(byte PlayerId) {
+            List<byte> PlayerIds = new List<byte>() { PlayerId };
+            AddPlayer(PlayerId);
+
+            MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.AddPlayer, SendOption.Reliable, -1);
+            messageWriter.WriteBytesAndSize(PlayerIds.ToArray());
+            messageWriter.Write(RoleId);
+            AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
+        }
+
+        public void RpcAddPlayerRange(List<PlayerControl> Players) {
+            List<byte> PlayerIds = PlayerControlUtils.PlayerControlListToIdList(Players);
+            PlayerIds.ForEach(p => AddPlayer(p));
+
+            MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.AddPlayer, SendOption.Reliable, -1);
+            messageWriter.WriteBytesAndSize(PlayerIds.ToArray());
+            messageWriter.Write(RoleId);
+            AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
+        }
+
+        public void RpcAddPlayerRange(List<byte> PlayerIds) {
+            PlayerIds.ForEach(p => AddPlayer(p));
+
+            MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.AddPlayer, SendOption.Reliable, -1);
+            messageWriter.WriteBytesAndSize(PlayerIds.ToArray());
+            messageWriter.Write(RoleId);
+            AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
+        }
+
+        // Remove method
+        private void RemovePlayer(byte PlayerId) {
+            AllPlayers.RemovePlayer(PlayerId);
+            DefineVisibleByWhitelist();
+        }
+
+        public void RemovePlayerRange(List<byte> PlayerIds) => PlayerIds.ForEach(p => RemovePlayer(p));
+
+        public void RpcRemovePlayer(PlayerControl Player) {
+            List<byte> PlayerIds = new List<byte>() { Player.PlayerId };
+            RemovePlayer(Player.PlayerId);
+
+            MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.RemovePlayer, SendOption.Reliable, -1);
+            messageWriter.WriteBytesAndSize(PlayerIds.ToArray());
+            messageWriter.Write(RoleId);
+            AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
+        }
+
+        public void RpcRemovePlayer(byte PlayerId) {
+            List<byte> PlayerIds = new List<byte>() { PlayerId };
+            RemovePlayer(PlayerId);
+
+            MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.RemovePlayer, SendOption.Reliable, -1);
+            messageWriter.WriteBytesAndSize(PlayerIds.ToArray());
+            messageWriter.Write(RoleId);
+            AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
+        }
+
+        public void RpcRemovePlayerRange(List<PlayerControl> Players) {
+            List<byte> PlayerIds = PlayerControlUtils.PlayerControlListToIdList(Players);
+            PlayerIds.ForEach(p => RemovePlayer(p));
+
+            MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.RemovePlayer, SendOption.Reliable, -1);
+            messageWriter.WriteBytesAndSize(PlayerIds.ToArray());
+            messageWriter.Write(RoleId);
+            AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
+        }
+
+        public void RpcRemovePlayerRange(List<byte> PlayerIds) {
+            PlayerIds.ForEach(p => RemovePlayer(p));
+
+            MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.RemovePlayer, SendOption.Reliable, -1);
+            messageWriter.WriteBytesAndSize(PlayerIds.ToArray());
+            messageWriter.Write(RoleId);
+            AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
+        }
+
+        public static void SwapPlayer(byte Player1, byte Player2) {
+            List<RoleManager> Player1Roles = GetAllRoles(PlayerControlUtils.FromPlayerId(Player1));
+            List<RoleManager> Player2Roles = GetAllRoles(PlayerControlUtils.FromPlayerId(Player2));
+
+            // Remove Roles for Players
+            Player1Roles.ForEach(role => role.RemovePlayer(Player1));
+            Player2Roles.ForEach(role => role.RemovePlayer(Player2));
+
+            // Add Roles for Players
+            Player1Roles.ForEach(role => role.AddPlayer(Player2));
+            Player2Roles.ForEach(role => role.AddPlayer(Player1));
+        }
+
+        public static void RpcSwapPlayer(PlayerControl Player1, PlayerControl Player2) {
+            SwapPlayer(Player1.PlayerId, Player2.PlayerId);
+
+            MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.SwapPlayer, SendOption.Reliable, -1);
+            messageWriter.Write(Player1.PlayerId);
+            messageWriter.Write(Player2.PlayerId);
+            AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
+        }
+
+        public static void RpcSwapPlayer(byte PlayerId1, byte PlayerId2) {
+            SwapPlayer(PlayerId1, PlayerId2);
+
+            MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.SwapPlayer, SendOption.Reliable, -1);
+            messageWriter.Write(PlayerId1);
+            messageWriter.Write(PlayerId2);
+            AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
+
+        }
+
+
         // Whitelist visible List
         public virtual void DefineVisibleByWhitelist() {
             roleVisibleByWhitelist = new List<PlayerControl>();
@@ -170,7 +306,7 @@ namespace HardelAPI.CustomRoles {
             }
         }
 
-        public static RoleManager GerRoleById(byte RoleId) {
+        public static RoleManager GetRoleById(byte RoleId) {
             return AllRoles.FirstOrDefault(r => r.RoleId == RoleId);
         }
 
@@ -384,7 +520,7 @@ namespace HardelAPI.CustomRoles {
             AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
         }
 
-        public void ForceEndGame(List<PlayerControl> playersWin = null) {
+        public void ForceEndGame(List<PlayerControl> playersWin = null, bool roleLoose = true) {
             if (!AmongUsClient.Instance.AmHost)
                 return;
 
@@ -407,6 +543,13 @@ namespace HardelAPI.CustomRoles {
                 foreach (var Player in WinPlayer)
                     if (playerLose.PlayerId == Player.PlayerId)
                         playerLoses.Remove(playerLose);
+
+            // If role is loose kill player
+            if (roleLoose)
+                foreach (var role in AllRoles)
+                    if (role.LooseRole)
+                        foreach (var player in role.AllPlayers)
+                            player.Die(DeathReason.Exile);
 
             // Set PlayerWin
             foreach (var player in WinPlayer) {

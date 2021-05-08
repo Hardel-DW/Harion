@@ -10,7 +10,7 @@ namespace HardelAPI.CustomRoles.Patch {
     public static class HandleRpcPatch {
         public static bool Prefix([HarmonyArgument(0)] byte callId, [HarmonyArgument(1)] MessageReader reader) {
             if (callId == (byte) CustomRPC.SetRole) {
-                RoleManager Role = RoleManager.GerRoleById(reader.ReadByte());
+                RoleManager Role = RoleManager.GetRoleById(reader.ReadByte());
                 List<byte> selectedPlayers = reader.ReadBytesAndSize().ToList();
 
                 Role.AllPlayers.ClearPlayerList();
@@ -21,7 +21,7 @@ namespace HardelAPI.CustomRoles.Patch {
             }
 
             if (callId == (byte) CustomRPC.ForceEndGame) {
-                RoleManager Role = RoleManager.GerRoleById(reader.ReadByte());
+                RoleManager Role = RoleManager.GetRoleById(reader.ReadByte());
                 List<byte> selectedPlayers = reader.ReadBytesAndSize().ToList();
                 List<PlayerControl> WinPlayer = PlayerControlUtils.IdListToPlayerControlList(selectedPlayers);
 
@@ -51,7 +51,7 @@ namespace HardelAPI.CustomRoles.Patch {
             }
 
             if (callId == (byte) CustomRPC.RPCForceEndGame) {
-                RoleManager Role = RoleManager.GerRoleById(reader.ReadByte());
+                RoleManager Role = RoleManager.GetRoleById(reader.ReadByte());
                 List<byte> selectedPlayers = reader.ReadBytesAndSize().ToList();
                 List<PlayerControl> WinPlayer = PlayerControlUtils.IdListToPlayerControlList(selectedPlayers);
 
@@ -59,6 +59,28 @@ namespace HardelAPI.CustomRoles.Patch {
                 return false;
             }
 
+            if (callId == (byte) CustomRPC.AddPlayer) {
+                List<byte> PlayerIds = reader.ReadBytesAndSize().ToList();
+                RoleManager Role = RoleManager.GetRoleById(reader.ReadByte());
+
+                Role.AddPlayerRange(PlayerIds);
+                return false;
+            }
+
+            if (callId == (byte) CustomRPC.RemovePlayer) {
+                List<byte> PlayerIds = reader.ReadBytesAndSize().ToList();
+                RoleManager Role = RoleManager.GetRoleById(reader.ReadByte());
+
+                Role.RemovePlayerRange(PlayerIds);
+                return false;
+            }
+
+            if (callId == (byte) CustomRPC.SwapPlayer) {
+                byte Player1 = reader.ReadByte();
+                byte Player2 = reader.ReadByte();
+                RoleManager.SwapPlayer(Player1, Player2);
+                return false;
+            }
             return true;
         }
     }

@@ -1,11 +1,14 @@
 ﻿namespace HardelAPI {
     enum CustomRPC : byte {
-        PlaceCamera = 246,
+        PlaceCamera = 243,
         SealVent,
         SetRole,
         RPCForceEndGame,
         ForceEndGame,
         PlaceCameraBuffer,
-        SealVentBuffer
+        SealVentBuffer,
+        AddPlayer,
+        RemovePlayer,
+        SwapPlayer
     }
 }

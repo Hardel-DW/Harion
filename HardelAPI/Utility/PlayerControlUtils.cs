@@ -203,14 +203,14 @@ namespace HardelAPI.Utility {
         public static void RemovePlayer(this List<PlayerControl> list, byte PlayerId) {
             PlayerControl exist = list.FirstOrDefault(p => p.PlayerId == PlayerId);
 
-            if (exist)
+            if (exist != null)
                 list.Remove(list.FirstOrDefault(p => p.PlayerId == PlayerId));
         }
 
         public static void RemovePlayer(this List<PlayerControl> list, PlayerControl Player) {
             PlayerControl exist = list.FirstOrDefault(p => p.PlayerId == Player.PlayerId);
 
-            if (exist)
+            if (exist != null)
                 list.Remove(list.FirstOrDefault(p => p.PlayerId == Player.PlayerId));
         }
     }
