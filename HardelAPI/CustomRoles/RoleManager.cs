@@ -1,6 +1,7 @@
 ﻿using HardelAPI.CustomRoles.Abilities;
 using HardelAPI.Enumerations;
 using HardelAPI.Utility;
+using HardelAPI.Utility.Utils;
 using Hazel;
 using System;
 using System.Collections.Generic;
@@ -32,21 +33,22 @@ namespace HardelAPI.CustomRoles {
         public bool HasTask = true;
         public bool HasWin = false;
         public Color Color = new Color(1f, 0f, 0f, 1f);
+        public IntroCutSceneTeam TeamIntro = IntroCutSceneTeam.Default;
+        public RoleType RoleType = RoleType.Default;
         public PlayerSide Side = PlayerSide.Crewmate;
-        public PlayerSide VisibleBy = PlayerSide.Self;
+        public VisibleBy VisibleBy = VisibleBy.Self;
         public Moment GiveTasksAt = Moment.StartGame;
         public Moment GiveRoleAt = Moment.StartGame;
         public readonly Type ClassType;
 
         public virtual List<Ability> Abilities { get; set; } = null;
-        public virtual List<CooldownButton> Button { get; set; } = null;
 
         // Constructor
         protected RoleManager(Type type) {
             ClassType = type;
             RoleId = GetAvailableRoleId();
             AllRoles.Add(this);
-            Plugin.Logger.LogInfo($"Role: {type.Name} Loaded, RoleID: {RoleId}");
+            HardelApiPlugin.Logger.LogInfo($"Role: {type.Name} Loaded, RoleID: {RoleId}");
         }
 
         // Utils method
@@ -65,7 +67,7 @@ namespace HardelAPI.CustomRoles {
             if (Player == null)
                 return "";
 
-            if (!Plugin.ShowRoleInName.GetValue())
+            if (!HardelApiPlugin.ShowRoleInName.GetValue())
                 return Player.name;
 
             if (playerVoteArea != null && (MeetingHud.Instance.state == MeetingHud.VoteStates.Proceeding || MeetingHud.Instance.state == MeetingHud.VoteStates.Results))
@@ -88,7 +90,7 @@ namespace HardelAPI.CustomRoles {
             if (Player == null)
                 return "";
 
-            if (!Plugin.ShowRoleInName.GetValue())
+            if (!HardelApiPlugin.ShowRoleInName.GetValue())
                 return Player.name;
 
             if (playerVoteArea != null && (MeetingHud.Instance.state == MeetingHud.VoteStates.Proceeding || MeetingHud.Instance.state == MeetingHud.VoteStates.Results))
@@ -104,7 +106,7 @@ namespace HardelAPI.CustomRoles {
         }
 
         public static string NameTextSpecific(PlayerControl Player, PlayerVoteArea playerVoteArea = null) {
-            KeyValuePair<PlayerControl, (Color color, string name)> SpecificPlayer = new KeyValuePair<PlayerControl, (Color color, string name)>();
+            KeyValuePair<PlayerControl, (UnityEngine.Color color, string name)> SpecificPlayer = new KeyValuePair<PlayerControl, (UnityEngine.Color color, string name)>();
             bool isContainsInSpecificList = false;
 
             foreach (var element in specificNameInformation) {
@@ -120,7 +122,7 @@ namespace HardelAPI.CustomRoles {
             if (Player == null)
                 return "";
 
-            if (!Plugin.ShowRoleInName.GetValue())
+            if (!HardelApiPlugin.ShowRoleInName.GetValue())
                 return Player.name;
 
             if (playerVoteArea != null && (MeetingHud.Instance.state == MeetingHud.VoteStates.Proceeding || MeetingHud.Instance.state == MeetingHud.VoteStates.Results))
@@ -275,32 +277,32 @@ namespace HardelAPI.CustomRoles {
             roleVisibleByWhitelist = new List<PlayerControl>();
 
             switch (VisibleBy) {
-                case PlayerSide.Nobody:
+                case VisibleBy.Nobody:
                     roleVisibleByWhitelist = new List<PlayerControl>();
                 break;
-                case PlayerSide.Self:
+                case VisibleBy.Self:
                     if (HasRole(PlayerControl.LocalPlayer))
                         roleVisibleByWhitelist = new List<PlayerControl>() { PlayerControl.LocalPlayer };
                 break;
-                case PlayerSide.Impostor:
+                case VisibleBy.Impostor:
                     roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => p.Data.IsImpostor).ToList();
                 break;
-                case PlayerSide.Crewmate:
+                case VisibleBy.Crewmate:
                 roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => !p.Data.IsImpostor).ToList();
                 break;
-                case PlayerSide.Everyone:
+                case VisibleBy.Everyone:
                     roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().ToList();
                 break;
-                case PlayerSide.Dead:
+                case VisibleBy.Dead:
                     roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => p.Data.IsDead).ToList();
                 break;
-                case PlayerSide.DeadCrewmate:
+                case VisibleBy.DeadCrewmate:
                     roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => p.Data.IsDead && !p.Data.IsImpostor).ToList();
                 break;
-                case PlayerSide.DeadImpostor:
+                case VisibleBy.DeadImpostor:
                     roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => p.Data.IsDead && p.Data.IsImpostor).ToList();
                 break;
-                case PlayerSide.SameRole:
+                case VisibleBy.SameRole:
                     roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => HasRole(p)).ToList();
                 break;
             }
@@ -333,6 +335,7 @@ namespace HardelAPI.CustomRoles {
             ImportantTasks.transform.SetParent(Player.transform, false);
             ImportantTasks.Text = TasksDescription;
             Player.myTasks.Insert(0, ImportantTasks);
+            DestroyableSingleton<HudManager>.Instance.TaskStuff.SetActive(true);
         }
 
         public void RemoveImportantTasks(PlayerControl Player) {
@@ -437,6 +440,39 @@ namespace HardelAPI.CustomRoles {
         }
 
         // Event
+        public virtual void DefineIntroTeam(ref Il2CppSystem.Collections.Generic.List<PlayerControl> yourTeam) {
+            Il2CppSystem.Collections.Generic.List<PlayerControl> newTeam = new Il2CppSystem.Collections.Generic.List<PlayerControl>();
+
+            switch (TeamIntro) {
+                case IntroCutSceneTeam.OnlySelf:
+                    newTeam.Add(PlayerControl.LocalPlayer);
+                    yourTeam = newTeam;
+                    break;
+                case IntroCutSceneTeam.SameRole:
+                    AllPlayers.ForEach(player => newTeam.Add(player));
+                    break;
+                case IntroCutSceneTeam.Crewmate:
+                    foreach (PlayerControl player in PlayerControl.AllPlayerControls)
+                        if (!player.Data.IsImpostor)
+                            newTeam.Add(player);
+
+                    newTeam.Add(PlayerControl.LocalPlayer);
+                    break;
+                case IntroCutSceneTeam.Impostor:
+                    foreach (PlayerControl player in PlayerControl.AllPlayerControls)
+                        if (player.Data.IsImpostor)
+                            newTeam.Add(player);
+
+                    newTeam.Add(PlayerControl.LocalPlayer);
+                    break;
+                default:
+                    newTeam = yourTeam;
+                    break;
+            }
+
+            yourTeam = newTeam;
+        }
+
         public virtual void OnGameStarted() { }
 
         public virtual void OnGameEnded() { }
@@ -528,7 +564,7 @@ namespace HardelAPI.CustomRoles {
             OnRoleWin();
 
             if (WinPlayer == null) {
-                Plugin.Logger.LogError("'ForceEndGame' is call, but no win players is defined, you can defined in the method argument or with override 'OnRoleWin'");
+                HardelApiPlugin.Logger.LogError("'ForceEndGame' is call, but no win players is defined, you can defined in the method argument or with override 'OnRoleWin'");
                 return;
             }
 

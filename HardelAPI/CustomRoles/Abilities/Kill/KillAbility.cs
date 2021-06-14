@@ -1,9 +1,9 @@
-﻿using HardelAPI.Utility;
-using HardelAPI.Enumerations;
+﻿using HardelAPI.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using HardelAPI.Utility.Utils;
 
 namespace HardelAPI.CustomRoles.Abilities.Kill {
     
@@ -11,21 +11,21 @@ namespace HardelAPI.CustomRoles.Abilities.Kill {
         public List<PlayerControl> WhiteListKill = null;
         public float KillCooldown = 0f;
         public DateTime LastKilled;
-        public PlayerSide CanKill = PlayerSide.Nobody;
+        public VisibleBy CanKill = VisibleBy.Nobody;
 
         public virtual void DefineKillWhiteList() {
             List<PlayerControl> AllPlayer = PlayerControl.AllPlayerControls.ToArray().ToList();
 
             WhiteListKill = CanKill switch
             {
-                PlayerSide.Everyone => AllPlayer,
-                PlayerSide.Impostor => AllPlayer.FindAll(p => p.Data.IsImpostor),
-                PlayerSide.Crewmate => AllPlayer.FindAll(p => !p.Data.IsImpostor),
-                PlayerSide.SameRole => AllPlayer.FindAll(p => Role.HasRole(p)),
+                VisibleBy.Everyone => AllPlayer,
+                VisibleBy.Impostor => AllPlayer.FindAll(p => p.Data.IsImpostor),
+                VisibleBy.Crewmate => AllPlayer.FindAll(p => !p.Data.IsImpostor),
+                VisibleBy.SameRole => AllPlayer.FindAll(p => Role.HasRole(p)),
                 _ => null
             };
 
-            if (CanKill == PlayerSide.Nobody && WhiteListKill == null && PlayerControl.LocalPlayer.Data.IsImpostor)
+            if (CanKill == VisibleBy.Nobody && WhiteListKill == null && PlayerControl.LocalPlayer.Data.IsImpostor)
                 WhiteListKill = AllPlayer.FindAll(p => !p.Data.IsImpostor);
         }
 
@@ -44,7 +44,7 @@ namespace HardelAPI.CustomRoles.Abilities.Kill {
             PlayerControl result = null;
 
             if (WhiteListKill == null) {
-                Plugin.Logger.LogError("GetClosestTarget => WhiteListKill is null");
+                HardelApiPlugin.Logger.LogError("GetClosestTarget => WhiteListKill is null");
             }
 
             foreach (var player in WhiteListKill) {

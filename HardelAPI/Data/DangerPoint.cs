@@ -1,5 +1,4 @@
-﻿using HardelAPI.Utility;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,17 +7,17 @@ namespace HardelAPI.Data {
         public static List<DangerPoint> points = new List<DangerPoint>();
 
         public Vector2 Position { get; set; }
-        public Color color { get; set; }
-        public Sprite texture { get; set; }
+        public Color Color { get; set; }
+        public Sprite Texture { get; set; }
         public string TypeElement { get; set; }
         public bool SaboatageHidePoint { get; set; }
         public GameObject GameObject { get; set; }
         public DateTime? ExpiredOn { get; set; }
 
-        public DangerPoint(Vector2 position, Color color, string typeElement, bool saboatageHidePoint = false, Sprite texture = null, DateTime? ExpiredOn = null) {
+        public DangerPoint(Vector2 position, UnityEngine.Color color, string typeElement, bool saboatageHidePoint = false, Sprite texture = null, DateTime? ExpiredOn = null) {
             this.Position = position;
-            this.color = color;
-            this.texture = texture;
+            this.Color = color;
+            this.Texture = texture;
             this.TypeElement = typeElement;
             this.SaboatageHidePoint = saboatageHidePoint;
 
@@ -42,12 +41,12 @@ namespace HardelAPI.Data {
             GameObject Prefab = MapBehaviour.Instance.gameObject.transform.Find("HereIndicatorParent/TaskOverlay/TaskIcon(Clone)").gameObject;
             GameObject PooledMapIcon = UnityEngine.Object.Instantiate(Prefab, Prefab.transform.parent);
             SpriteRenderer renderer = PooledMapIcon.GetComponent<SpriteRenderer>();
-            if (texture != null)
-                renderer.sprite = texture;
+            if (Texture != null)
+                renderer.sprite = Texture;
 
-            renderer.color = color;
+            renderer.color = Color;
             renderer.material.SetFloat("_Outline", 1f);
-            renderer.material.SetColor("_OutlineColor", color);
+            renderer.material.SetColor("_OutlineColor", Color);
             PooledMapIcon.layer = 5;
             PooledMapIcon.transform.localScale = Vector3.one;
 

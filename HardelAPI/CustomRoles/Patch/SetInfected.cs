@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using Hazel;
 using HardelAPI.Enumerations;
-using HardelAPI.Utility;
+using HardelAPI.Utility.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +26,7 @@ namespace HardelAPI.CustomRoles.Patch {
 
                 int PercentApparition = new Random().Next(0, 100);
 
-                Plugin.Logger.LogInfo($"Role: {Role.Name}, Active: {Role.RoleActive}, PercentApparition: {Role.PercentApparition}, Number Player: {Role.NumberPlayers}");
+                HardelApiPlugin.Logger.LogInfo($"Role: {Role.Name}, Active: {Role.RoleActive}, PercentApparition: {Role.PercentApparition}, Number Player: {Role.NumberPlayers}, Percent Apparition: {PercentApparition}");
                 if (playersList != null && playersList.Count > 0 && Role.RoleActive && Role.PercentApparition > PercentApparition) {
                     bool condition = Role.OnRoleSelectedInInfected(playersList);
                     if (condition)
@@ -50,7 +50,7 @@ namespace HardelAPI.CustomRoles.Patch {
                             Role.AllPlayers.AddPlayer(selectedPlayer);
                             playersList.Remove(selectedPlayer);
                             playerSelected.Add(selectedPlayer.PlayerId);
-                            Plugin.Logger.LogInfo($"Role: {Role.Name}, Given to: {selectedPlayer.nameText.text}");
+                            HardelApiPlugin.Logger.LogInfo($"Role: {Role.Name}, Given to: {selectedPlayer.nameText.text}");
                         }
                     }
 

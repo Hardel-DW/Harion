@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace HardelAPI.CustomRoles {
+﻿namespace HardelAPI.CustomRoles {
     public static class RoleUtils {
         public static bool Is<T>(this PlayerControl player) where T : RoleManager {
             for (int i = 0; i < RoleManager.AllRoles.Count; i++)

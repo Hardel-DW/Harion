@@ -17,7 +17,7 @@ namespace HardelAPI.Utility {
 					break;
 
 				alpha = Mathf.Max(0, alpha - (speed * Time.deltaTime));
-				renderer.color = new Color(1f, 1f, 1f, alpha);
+				renderer.color = new UnityEngine.Color(1f, 1f, 1f, alpha);
 				yield return new WaitForEndOfFrame();
 			}
 
@@ -41,7 +41,7 @@ namespace HardelAPI.Utility {
 					break;
 
 				alpha = Mathf.Max(0, alpha + (speed * Time.deltaTime));
-				renderer.color = new Color(1f, 1f, 1f, alpha);
+				renderer.color = new UnityEngine.Color(1f, 1f, 1f, alpha);
 				yield return new WaitForEndOfFrame();
 			}
 

@@ -1,4 +1,4 @@
-﻿using HardelAPI.Utility;
+﻿using HardelAPI.Utility.Utils;
 using HarmonyLib;
 using InnerNet;
 using System.Collections.Generic;
@@ -57,7 +57,7 @@ namespace HardelAPI.CustomRoles.Patch {
                     DefineName(PlayerControl.LocalPlayer, Palette.White, RoleManager.NameTextVanilla(PlayerControl.LocalPlayer));
                 }
 
-                if (PlayerControl.LocalPlayer.Data.IsDead && MeetingIsPassed && Plugin.DeadSeeAllRoles.GetValue()) {
+                if (PlayerControl.LocalPlayer.Data.IsDead && MeetingIsPassed && HardelApiPlugin.DeadSeeAllRoles.GetValue()) {
                     bool CanSee = true;
 
                     foreach (var Role in RoleManager.GetAllRoles(PlayerControl.LocalPlayer))
@@ -70,7 +70,7 @@ namespace HardelAPI.CustomRoles.Patch {
                                 UpdateMeetingForDead(MeetingHud.Instance, player);
 
                             if (RoleManager.GetAllRoles(player).Count == 0) {
-                                DefineName(player, player.Data.IsImpostor ? Palette.ImpostorRed : Palette.White, RoleManager.NameTextVanilla(PlayerControl.LocalPlayer));
+                                DefineName(player, player.Data.IsImpostor ? Palette.ImpostorRed : Palette.White, RoleManager.NameTextVanilla(player));
                             } else {
                                 RoleManager role = RoleManager.GetAllRoles(player).FirstOrDefault();
                                 DefineName(player, role.Color, role.NameText(player));
@@ -122,7 +122,7 @@ namespace HardelAPI.CustomRoles.Patch {
             }
         }
 
-        public static void UpdateMeetingForSpecific(MeetingHud __instance, KeyValuePair<PlayerControl, (Color color, string name)> playerSpecific) {
+        public static void UpdateMeetingForSpecific(MeetingHud __instance, KeyValuePair<PlayerControl, (UnityEngine.Color color, string name)> playerSpecific) {
             foreach (PlayerVoteArea PlayerVA in __instance.playerStates) {
                 if (playerSpecific.Key.PlayerId != (byte) PlayerVA.TargetPlayerId)
                     continue;
@@ -146,12 +146,12 @@ namespace HardelAPI.CustomRoles.Patch {
         }
 
         // Set display Name
-        public static void DefineName(PlayerControl Player, Color color, string newName) {
+        public static void DefineName(PlayerControl Player, UnityEngine.Color color, string newName) {
             Player.nameText.text = newName;
             Player.nameText.color = color;
         }
 
-        public static void DefineMeetingName(PlayerVoteArea Player, Color color, string newName) {
+        public static void DefineMeetingName(PlayerVoteArea Player, UnityEngine.Color color, string newName) {
             Player.NameText.text = newName;
             Player.NameText.color = color;
 

@@ -1,4 +1,4 @@
-﻿using HardelAPI.Utility;
+﻿using HardelAPI.Utility.Helper;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -37,7 +37,7 @@ namespace HardelAPI.ArrowManagement {
             Renderer = Arrow.AddComponent<SpriteRenderer>();
             ArrowComponent.image = Renderer;
             ArrowComponent.target = Parent.transform.position;
-            Renderer.sprite = HelperSprite.LoadSpriteFromEmbeddedResources("HardelAPI.Resources.Arrow.png", 150f);
+            Renderer.sprite = SpriteHelper.LoadSpriteFromEmbeddedResources("HardelAPI.Resources.Arrow.png", 150f);
             Arrow.AddComponent<UpdateComponent>().period = Time;
 
             allArrow.Add(this);

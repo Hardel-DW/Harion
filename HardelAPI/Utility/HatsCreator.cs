@@ -14,6 +14,7 @@ namespace HardelAPI.Utility {
             public bool highUp;
             public Vector2 offset;
             public string author;
+            public Sprite sprite;
         }
 
         private static List<HatData> allHatsData = new List<HatData>();
@@ -30,7 +31,7 @@ namespace HardelAPI.Utility {
 
         private static HatBehaviour CreateHat(HatData hat, int id) {
             System.Console.WriteLine($"Creating Hat: {hat.name}");
-            Sprite sprite = HelperSprite.LoadHatSprite($"IronMan.Resources.Hats.{hat.name}.png");
+            Sprite sprite = hat.sprite;
             HatBehaviour newHat = ScriptableObject.CreateInstance<HatBehaviour>();
             newHat.MainImage = sprite;
             newHat.ProductId = hat.name;

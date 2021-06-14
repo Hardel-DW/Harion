@@ -4,6 +4,8 @@ using UnityEngine;
 using HarmonyLib;
 using System.Linq;
 using TMPro;
+using HardelAPI.Utility.Helper;
+using HardelAPI.Cooldown;
 
 namespace HardelAPI.Utility {
     public class PlayerButton {
@@ -117,8 +119,8 @@ namespace HardelAPI.Utility {
             for (int i = 0; i < buttons.Count; i++)
                 buttons[i].Destroy();
 
-            for (int i = 0; i < CooldownButton.buttons.Count; i++)
-                CooldownButton.buttons[i].UpdatePosition();
+            for (int i = 0; i < CooldownButton.RegisteredButtons.Count; i++)
+                CooldownButton.RegisteredButtons[i].UpdatePosition();
 
             CooldownButton.UsableButton = true;
         }

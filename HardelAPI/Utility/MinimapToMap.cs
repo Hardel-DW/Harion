@@ -1,5 +1,5 @@
-﻿using System;
-using Reactor;
+﻿using HardelAPI.Reactor;
+using System;
 using UnityEngine;
 
 namespace HardelAPI.Utility {
@@ -10,7 +10,6 @@ namespace HardelAPI.Utility {
         public static MinimapToMap Instance;
         private MapBehaviour Map = null;
         public Action<Vector3> GetPosition = null;
-        public CooldownButton Button = null;
 
         private void OnEnable() {
             gameObject.AddComponent<BoxCollider2D>();
@@ -39,7 +38,6 @@ namespace HardelAPI.Utility {
         private void CloseHud() {
             DestroyableSingleton<HudManager>.Instance.ShowMap((Action<MapBehaviour>) (map => map.gameObject.SetActive(false)));
             DestroyableSingleton<HudManager>.Instance.SetHudActive(true);
-            Button.ForceClick(false);
         }
     }
 }

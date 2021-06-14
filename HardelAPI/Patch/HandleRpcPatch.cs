@@ -1,9 +1,11 @@
 ﻿using HarmonyLib;
 using Hazel;
 using UnityEngine;
-using HardelAPI.Utility;
 using System.Collections.Generic;
 using System.Linq;
+using HardelAPI.Utility.Utils;
+using HardelAPI.Reactor;
+using HardelAPI.Utility.Ability;
 
 namespace HardelAPI.Patch {
 
@@ -35,12 +37,57 @@ namespace HardelAPI.Patch {
             if (callId == (byte) CustomRPC.SealVentBuffer) {
                 List<byte> ventIds = reader.ReadBytesAndSize().ToList();
 
-                Plugin.Logger.LogInfo($"ventIds: {ventIds.Count}");
+                HardelApiPlugin.Logger.LogInfo($"ventIds: {ventIds.Count}");
                 foreach (var ventId in ventIds) {
                     Vent vent = VentUtils.IdToVent(ventId);
-                    Plugin.Logger.LogInfo($"ventId: {vent.Id}, ventsToSeal: {vent.name}");
+                    HardelApiPlugin.Logger.LogInfo($"ventId: {vent.Id}, ventsToSeal: {vent.name}");
                     VentUtils.SealVent(vent);
                 }
+
+                return false;
+            }
+
+            if (callId == (byte) CustomRPC.PlaceVent) {
+                int id = reader.ReadPackedInt32();
+                Vector2 postion = reader.ReadVector2();
+                int leftVent = reader.ReadPackedInt32();
+                int centerVent = reader.ReadPackedInt32();
+                int rightVent = reader.ReadPackedInt32();
+
+                VentUtils.SpawnVent(
+                    id: id,
+                    postion: postion,
+                    leftVent: leftVent,
+                    centerVent: centerVent,
+                    rightVent: rightVent
+                );
+                return false;
+            }
+
+            if (callId == (byte) CustomRPC.FixLights) {
+                SwitchSystem lights = ShipStatus.Instance.Systems[SystemTypes.Electrical].Cast<SwitchSystem>();
+                lights.ActualSwitches = lights.ExpectedSwitches;
+
+                return false;
+            }
+
+            if (callId == (byte) CustomRPC.Invisibility) {
+                byte PlayerId = reader.ReadByte();
+                float Duration = reader.ReadSingle();
+                List<byte> whiteListIds = reader.ReadBytesAndSize().ToArray().ToList();
+
+                List<PlayerControl> whiteList = PlayerControlUtils.IdListToPlayerControlList(whiteListIds);
+                PlayerControl Player = PlayerControlUtils.FromPlayerId(PlayerId);
+
+                Coroutines.Start(Invisbility.Invisibility(Player, Duration, whiteList));
+                return false;
+            }
+
+            if (callId == (byte) CustomRPC.CleanBody) {
+                DeadBody deadBody = DeadBodyUtils.FromParentId(reader.ReadByte());
+                float duration = reader.ReadSingle();
+
+                Coroutines.Start(DeadBodyUtils.CleanCoroutine(deadBody, duration));
 
                 return false;
             }

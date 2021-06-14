@@ -1,5 +1,5 @@
 ﻿using HarmonyLib;
-using HardelAPI.Utility;
+using HardelAPI.Utility.Utils;
 
 namespace HardelAPI.CustomRoles.Patch {
 

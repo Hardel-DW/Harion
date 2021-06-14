@@ -23,7 +23,7 @@ namespace HardelAPI.CustomRoles.Abilities.Kill {
                     continue;
 
                 if (KillAbility.WhiteListKill == null)
-                    if (KillAbility.CanKill != PlayerSide.Nobody || PlayerControl.LocalPlayer.Data.IsImpostor)
+                    if (KillAbility.CanKill != VisibleBy.Nobody || PlayerControl.LocalPlayer.Data.IsImpostor)
                         KillAbility.DefineKillWhiteList();
 
                 if (KillAbility.KillCooldown == 0f && PlayerControl.LocalPlayer.Data.IsImpostor)
@@ -41,7 +41,7 @@ namespace HardelAPI.CustomRoles.Abilities.Kill {
                             KillButton.isActive = !MeetingHud.Instance;
                             KillButton.SetCoolDown(KillAbility.KillTimer(), KillAbility.KillCooldown);
 
-                            if (Input.GetKeyDown(KeyCode.Q))
+                            if (Input.GetKeyDown(CustomKeyBinds.Patch.KeyBindPatch.Kill.Key))
                                 KillButton.PerformKill();
                             
                             float distBetweenPlayers = Vector3.Distance(PlayerControl.LocalPlayer.transform.position, ClosestPlayer.transform.position);

@@ -5,7 +5,7 @@ namespace HardelAPI.CustomRoles.Patch {
     [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Awake))]
     public static class MeetingStartPatch {
         public static void Postfix(MeetingHud __instance) {
-            Plugin.Logger.LogInfo($"{PlayerControl.LocalPlayer.Data.IsDead}, {HudUpdatePatch.MeetingIsPassed}");
+            //Plugin.Logger.LogInfo($"{PlayerControl.LocalPlayer.Data.IsDead}, {HudUpdatePatch.MeetingIsPassed}");
             if (PlayerControl.LocalPlayer.Data.IsDead && !HudUpdatePatch.MeetingIsPassed)
                 HudUpdatePatch.MeetingIsPassed = true;
 
