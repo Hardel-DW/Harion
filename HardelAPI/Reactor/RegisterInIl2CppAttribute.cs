@@ -16,6 +16,7 @@
  * Documentation :
  * https://docs.reactor.gg/
 */
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -23,13 +24,14 @@ using HarmonyLib;
 using UnhollowerRuntimeLib;
 
 namespace HardelAPI.Reactor {
+
     /// <summary>
-    /// Utility attribute for automatically calling <see cref="ClassInjector.RegisterTypeInIl2Cpp{T}()"/>
+    /// Utility attribute for automatically calling <see cref="UnhollowerRuntimeLib.ClassInjector.RegisterTypeInIl2Cpp{T}"/>
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public class RegisterInIl2CppAttribute : Attribute {
-        [Obsolete("You don't need to call this anymore", true)]
         public static void Register() {
+            Register(Assembly.GetCallingAssembly());
         }
 
         private static readonly AccessTools.FieldRef<object, HashSet<string>> _injectedTypes
@@ -65,7 +67,9 @@ namespace HardelAPI.Reactor {
             }
 
             try {
-                ClassInjector.RegisterTypeInIl2Cpp(type);
+                typeof(ClassInjector).GetMethod(nameof(ClassInjector.RegisterTypeInIl2Cpp))!
+                    .MakeGenericMethod(type)
+                    .Invoke(null, new object[0]);
             } catch (Exception e) {
                 HardelApiPlugin.Logger.LogWarning($"Failed to register {type.FullDescription()}: {e}");
             }
@@ -77,10 +81,6 @@ namespace HardelAPI.Reactor {
                     Register(type);
                 }
             }
-        }
-
-        internal static void Initialize() {
-            ChainloaderHooks.PluginLoad += plugin => Register(plugin.GetType().Assembly);
         }
     }
 }

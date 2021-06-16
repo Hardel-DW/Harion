@@ -71,7 +71,7 @@ namespace HardelAPI.ModsManagers.Mods {
 
             Entry.SetActive(true);
             ModEntries.Add(this);
-            ModEntry.RefreshMaterial();
+            RefreshMaterial();
         }
 
         internal static void Update() {
@@ -140,7 +140,6 @@ namespace HardelAPI.ModsManagers.Mods {
                     string browser_download_url = current["browser_download_url"]?.ToString();
                     if (browser_download_url != null && current["content_type"] != null) {
                         if (current["content_type"].ToString().Equals("application/x-msdownload") && browser_download_url.EndsWith(".dll")) {
-                            HardelApiPlugin.Logger.LogInfo($"New Update is come, Currently in version {ModData.Version}, new Version : {tagname}, with URL : {browser_download_url}");
                             ModData.UpdateLink = browser_download_url;
                             ModData.NewTagsVersion = tagname;
                             return true;

@@ -51,15 +51,18 @@ namespace HardelAPI.Utility.Helper {
             return null;
         }
 
-        public static Sprite LoadHatSprite(string resource) {
+        public static Sprite LoadHatSprite(string resource, Assembly assembly = null) {
             try {
-                Assembly assembly = Assembly.GetExecutingAssembly();
-                Texture2D tex = UIUtils.CreateEmptyTexture();
-                Stream imageStream = assembly.GetManifestResourceStream(resource);
-                byte[] img = imageStream.ReadFully();
-                LoadImage(tex, img, true);
-                tex.DontDestroy();
-                Sprite sprite = Sprite.Create(tex, new Rect(0.0f, 0.0f, (float) tex.width, (float) tex.height), new Vector2(0.5f, 0.8f), 225f);
+                Assembly myAssembly = null;
+                myAssembly = assembly == null ? Assembly.GetCallingAssembly() : assembly;
+                Stream myStream = Assembly.Load(myAssembly.GetName()).GetManifestResourceStream(resource);
+
+                byte[] image = new byte[myStream.Length];
+                myStream.Read(image, 0, (int) myStream.Length);
+                Texture2D myTexture = new Texture2D(2, 2, TextureFormat.ARGB32, true);
+                LoadImage(myTexture, image, true);
+                
+                Sprite sprite = Sprite.Create(myTexture, new Rect(0.0f, 0.0f, myTexture.width, myTexture.height), new Vector2(0.53f, 0.575f), 100f);
                 sprite.DontDestroy();
                 return sprite;
             } catch { }

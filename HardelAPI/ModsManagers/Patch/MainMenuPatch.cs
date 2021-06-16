@@ -27,6 +27,7 @@ namespace HardelAPI.ModsManagers.Patch {
         public static GameObject Mask;
         public static GameObject RefreshButton;
         public static MainMenuManager Instance;
+        internal static ModSelection ModSelection = null;
 
         public static void OpenModsMenu() {
             Popup.SetActive(true);
@@ -285,12 +286,16 @@ namespace HardelAPI.ModsManagers.Patch {
                 if (Popup == null)
                     return;
 
+                GameObject Object = __instance.gameObject.FindObject("Slider");
+                if (ModSelection == null && Object != null)
+                    ModSelection = new ModSelection(Popup, Object);
+
                 if (Input.GetKeyUp(KeyCode.Escape))
                     CloseModsMenu();
 
                 ModEntry.Update();
                 if (ModsInformation.Instance != null)
-                    ModsInformation.Instance.UpdateMenu();
+                    ModsInformation.Instance.UpdateMenu();   
             }
         }
     }

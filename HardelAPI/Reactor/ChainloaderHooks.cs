@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿/*
+ * The "ChainLoader" is not very practical it causes me errors in the code.
+ */
+
+/*using System.Collections.Generic;
 using System.Reflection.Emit;
 using BepInEx.IL2CPP;
 using HarmonyLib;
@@ -26,4 +30,4 @@ namespace HardelAPI.Reactor {
             }
         }
     }
-}
+}*/

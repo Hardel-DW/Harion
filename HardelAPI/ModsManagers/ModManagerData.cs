@@ -50,7 +50,14 @@ namespace HardelAPI.ModsManagers {
         internal string GetModPath() => $"{AssemblyPathDirectory}/{FileName}";
 
         // Link Builder
-        internal string GithubApiLink() => $"https://api.github.com/repos/{GithubAuthor}/{GithubRepository}/releases/latest";
+        internal string GithubApiLink() => GithubRepositoryVisibility == GithubVisibility.Private
+            ? $"https://api.github.com/repos/{GithubAuthor}/{GithubRepository}/releases/latest?access_token={GithubToken}"
+            : $"https://api.github.com/repos/{GithubAuthor}/{GithubRepository}/releases/latest";
+
+        internal string GithubTag() => GithubRepositoryVisibility == GithubVisibility.Private
+            ? $"https://api.github.com/repos/{GithubAuthor}/{GithubRepository}/releases?access_token={GithubToken}"
+            : $"https://api.github.com/repos/{GithubAuthor}/{GithubRepository}/releases";
+
         internal string GithubLink() => $"https://github.com/{GithubAuthor}/{GithubRepository}";
 
         // Add Social Button

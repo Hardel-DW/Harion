@@ -20,15 +20,15 @@ namespace HardelAPI.ModsManagers.Mods {
         }
 
         // Social Sprite
-        internal static Sprite YoutubeSprite => SpriteHelper.LoadSpriteFromEmbeddedResources("HardelAPI.Resources.Social.Youtube.png", 100f).DontDestroy();
-        internal static Sprite TwitchSprite => SpriteHelper.LoadSpriteFromEmbeddedResources("HardelAPI.Resources.Social.Twitch.png", 100f).DontDestroy();
-        internal static Sprite PatreonSprite => SpriteHelper.LoadSpriteFromEmbeddedResources("HardelAPI.Resources.Social.Patreon.png", 100f).DontDestroy();
-        internal static Sprite PaypalSprite => SpriteHelper.LoadSpriteFromEmbeddedResources("HardelAPI.Resources.Social.Paypal.png", 100f).DontDestroy();
-        internal static Sprite DiscordSprite => SpriteHelper.LoadSpriteFromEmbeddedResources("HardelAPI.Resources.Social.Discord.png", 100f).DontDestroy();
-        internal static Sprite GithubSprite => SpriteHelper.LoadSpriteFromEmbeddedResources("HardelAPI.Resources.Social.Github.png", 100f).DontDestroy();
+        public static Sprite YoutubeSprite => SpriteHelper.LoadSpriteFromEmbeddedResources("HardelAPI.Resources.Social.Youtube.png", 100f).DontDestroy();
+        public static Sprite TwitchSprite => SpriteHelper.LoadSpriteFromEmbeddedResources("HardelAPI.Resources.Social.Twitch.png", 100f).DontDestroy();
+        public static Sprite PatreonSprite => SpriteHelper.LoadSpriteFromEmbeddedResources("HardelAPI.Resources.Social.Patreon.png", 100f).DontDestroy();
+        public static Sprite PaypalSprite => SpriteHelper.LoadSpriteFromEmbeddedResources("HardelAPI.Resources.Social.Paypal.png", 100f).DontDestroy();
+        public static Sprite DiscordSprite => SpriteHelper.LoadSpriteFromEmbeddedResources("HardelAPI.Resources.Social.Discord.png", 100f).DontDestroy();
+        public static Sprite GithubSprite => SpriteHelper.LoadSpriteFromEmbeddedResources("HardelAPI.Resources.Social.Github.png", 100f).DontDestroy();
 
         // Create Game Object
-        public GameObject CreateObject(Vector3 Position, GameObject Parent) {
+        internal GameObject CreateObject(Vector3 Position, GameObject Parent) {
             GameObject SocialLink = new GameObject { name = "Link", layer = 1 };
             SocialLink.transform.SetParent(Parent.transform);
             SocialLink.transform.localPosition = Position;

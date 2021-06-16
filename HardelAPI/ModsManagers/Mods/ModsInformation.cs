@@ -1,9 +1,6 @@
 ﻿using BepInEx;
-using BepInEx.Bootstrap;
-using BepInEx.IL2CPP;
 using HardelAPI.Utility.Helper;
 using HardelAPI.Utility.Utils;
-using Mono.Cecil;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -203,13 +200,15 @@ namespace HardelAPI.ModsManagers.Mods {
             })));
 
             void OnClick() {
-                if (ModData.CanUpdate) {
-                    bool Updated = DownloadUpdate().GetAwaiter().GetResult();
-                    if (Updated) {
-                        ModData.CanUpdate = false;
-                        UpdateText.GetComponent<TextMeshPro>().text = "The mod has been updated with success !\nRestart the game to make the changes effective.";
-                    }
-                }
+                ModSelection.Instance?.ShowUpdateSelection(ModData, InstanceManager);
+
+                /*                if (ModData.CanUpdate) {
+                                    bool Updated = DownloadUpdate().GetAwaiter().GetResult();
+                                    if (Updated) {
+                                        ModData.CanUpdate = false;
+                                        UpdateText.GetComponent<TextMeshPro>().text = "The mod has been updated with success !\nRestart the game to make the changes effective.";
+                                    }
+                                }*/
             }
         }
 

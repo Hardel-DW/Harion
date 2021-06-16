@@ -14,6 +14,7 @@ using HardelAPI.Utility.Helper;
 using HardelAPI.Utility.Utils;
 using HarmonyLib;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 namespace HardelAPI {
@@ -40,7 +41,7 @@ namespace HardelAPI {
 
         // Mod Manager Information
         public string DisplayName => "Harion";
-        public string Version => "V1.0";
+        public string Version => typeof(HardelApiPlugin).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
         public string Description => "Harion is a mod API adding compatibility between mods, and various functionality, and ensures the smooth running of modding.\nAdding a ModManager, key configuration, server management, role harmonization, game options, colors and more...";
         public string Credit => "Developer: Hardel";
         public string SmallDescription => "Harion is an Framework.";
@@ -48,31 +49,27 @@ namespace HardelAPI {
         // Mod Manager Github Auto Updater
         public string GithubRepositoryName => "HardelAPI";
         public string GithubAuthorName => "Hardel-DW";
-        public GithubVisibility GithubRepositoryVisibility => GithubVisibility.Public;
-        public string GithubAccessToken => "";
+        public GithubVisibility GithubRepositoryVisibility => GithubVisibility.Private;
+        public string GithubAccessToken => "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";
 
         public Dictionary<string, Sprite> ModsLinks => new Dictionary<string, Sprite>() {
             { "https://www.patreon.com/hardel", ModsSocial.PatreonSprite },
             { "https://discord.gg/HZtCDK3s",  ModsSocial.DiscordSprite }
         };
 
-        public HardelApiPlugin() {
-            PluginSingleton<BasePlugin>.Initialize();
-            RegisterInIl2CppAttribute.Initialize();
-
-            ChainloaderHooks.OnPluginLoad(this);
-        }
 
         public override void Load() {
-            // PatchAll
             Logger = Log;
-            Harmony.PatchAll();
+            RegisterInIl2CppAttribute.Register();
 
             // Harion GameObject
             gameObject = new GameObject(nameof(HardelApiPlugin)).DontDestroy();
             gameObject.AddComponent<HarionComponent>().Plugin = this;
             gameObject.AddComponent<Coroutines.Component>();
 
+            // PatchAll
+            PluginSingleton<HardelApiPlugin>.Instance = this;
+            Harmony.PatchAll();
 
             // Initialiaze Thing
             ColorHelper.Load();

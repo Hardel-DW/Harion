@@ -114,5 +114,16 @@ namespace HardelAPI.Utility.Utils {
 
             return path;
         }
+
+        public static GameObject FindObject(this GameObject parent, string name) {
+            Transform[] transforms = parent.GetComponentsInChildren<Transform>(true);
+            foreach (Transform transform in transforms) {
+                if (transform.name == name) {
+                    return transform.gameObject;
+                }
+            }
+
+            return null;
+        }
     }
 }

@@ -3,14 +3,11 @@ using System.Linq;
 using UnityEngine;
 using HarmonyLib;
 using UnhollowerBaseLib;
-using Assets.CoreScripts;
 
 namespace HardelAPI.Utility.Helper {
     public class ColorHelper {
-
         public struct CustomColor {
-            public string longname;
-            public string shortname;
+            public string name;
             public Color32 color;
             public Color32 shadow;
             public bool isLighterColor;
@@ -18,22 +15,19 @@ namespace HardelAPI.Utility.Helper {
 
         protected static Dictionary<int, string> ColorStrings = new Dictionary<int, string>();
         public static List<int> lighterColors = new List<int>() { 3, 4, 5, 7, 10, 11 };
-        public static uint pickableColors = 12;
+        public static uint pickableColors = (uint) Palette.ColorNames.Length;
         public static List<CustomColor> colors = new List<CustomColor>();
         private static int LastId = 50000;
 
         public static void AddColor(CustomColor color) {
             List<StringNames> longlist = Enumerable.ToList<StringNames>(Palette.ColorNames);
-            List<StringNames> shortlist = Enumerable.ToList<StringNames>(Palette.ShortColorNames);
             List<Color32> colorlist = Enumerable.ToList<Color32>(Palette.PlayerColors);
             List<Color32> shadowlist = Enumerable.ToList<Color32>(Palette.ShadowColors);
 
             LastId++;
             int id = LastId;
             longlist.Add((StringNames) id);
-            ColorStrings[id++] = color.longname;
-            shortlist.Add((StringNames) id);
-            ColorStrings[id++] = color.shortname;
+            ColorStrings[id++] = color.name;
 
             colorlist.Add(color.color);
             shadowlist.Add(color.shadow);
@@ -41,39 +35,30 @@ namespace HardelAPI.Utility.Helper {
             if (color.isLighterColor)
                 lighterColors.Add(colorlist.Count - 1);
 
-            Palette.ShortColorNames = shortlist.ToArray();
             Palette.ColorNames = longlist.ToArray();
             Palette.PlayerColors = colorlist.ToArray();
             Palette.ShadowColors = shadowlist.ToArray();
-            MedScanMinigame.ColorNames = Palette.ColorNames;
-            Telemetry.ColorNames = Palette.ColorNames;
             pickableColors++;
         }
 
         public static void Load() {
             List<StringNames> longlist = Enumerable.ToList<StringNames>(Palette.ColorNames);
-            List<StringNames> shortlist = Enumerable.ToList<StringNames>(Palette.ShortColorNames);
             List<Color32> colorlist = Enumerable.ToList<Color32>(Palette.PlayerColors);
             List<Color32> shadowlist = Enumerable.ToList<Color32>(Palette.ShadowColors);
 
             int id = 50000;
             foreach (CustomColor cc in colors) {
                 longlist.Add((StringNames) id);
-                ColorStrings[id++] = cc.longname;
-                shortlist.Add((StringNames) id);
-                ColorStrings[id++] = cc.shortname;
+                ColorStrings[id++] = cc.name;
                 colorlist.Add(cc.color);
                 shadowlist.Add(cc.shadow);
                 if (cc.isLighterColor)
                     lighterColors.Add(colorlist.Count - 1);
             }
 
-            Palette.ShortColorNames = shortlist.ToArray();
             Palette.ColorNames = longlist.ToArray();
             Palette.PlayerColors = colorlist.ToArray();
             Palette.ShadowColors = shadowlist.ToArray();
-            MedScanMinigame.ColorNames = Palette.ColorNames;
-            Telemetry.ColorNames = Palette.ColorNames;
         }
 
         public static Color32 Shadow(Color32 color) {
@@ -95,7 +80,6 @@ namespace HardelAPI.Utility.Helper {
                 typeof(StringNames),
                 typeof(Il2CppReferenceArray<Il2CppSystem.Object>)
             })]
-
             private class ColorStringPatch {
                 public static bool Prefix(ref string __result, [HarmonyArgument(0)] StringNames name) {
                     if ((int) name >= 50000) {
@@ -113,15 +97,15 @@ namespace HardelAPI.Utility.Helper {
             private static class PlayerTabEnablePatch {
                 public static void Postfix(PlayerTab __instance) { // Replace instead
                     Il2CppArrayBase<ColorChip> chips = __instance.ColorChips.ToArray();
-                    int cols = 4; // TODO: Design an algorithm to dynamically position chips to optimally fill space
+                    int cols = 4;
                     for (int i = 0; i < chips.Length; i++) {
                         ColorChip chip = chips[i];
-                        int row = i / cols, col = i % cols; // Dynamically do the positioning
-                        chip.transform.localPosition = new Vector3(1.46f + (col * 0.6f), -0.43f - (row * 0.55f), chip.transform.localPosition.z);
+                        int row = i / cols, col = i % cols;
+                        chip.transform.localPosition = new Vector3(-0.9f + (col * 0.6f), 1.550f - (row * 0.55f), chip.transform.localPosition.z);
                         chip.transform.localScale *= 0.9f;
 
                         if (i >= pickableColors)
-                            chip.transform.localScale *= 0f; // Needs to exist for PlayerTab
+                            chip.transform.localScale *= 0f;
                     }
                 }
             }
@@ -150,7 +134,7 @@ namespace HardelAPI.Utility.Helper {
                     return false;
                 }
 
-                public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] byte bodyColor) { // Fix incorrect color assignment
+                public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] byte bodyColor) {
                     uint color = (uint) bodyColor;
                     if (isTaken(__instance, color) || color >= Palette.PlayerColors.Length) {
                         int num = 0;
