@@ -115,7 +115,7 @@ namespace HardelAPI.ModsManagers.Mods {
             SpriteMask.layer = 5;
             SpriteMask.transform.SetParent(SocialBackground.transform);
             SpriteMask.transform.localPosition = new Vector3(0f, 0f, 0f);
-            SpriteMask.transform.localScale = new Vector3(4f, 5.1f, 1f);
+            SpriteMask.transform.localScale = new Vector3(1f, 5.1f, 1f);
             SpriteMask.SetActive(true);
         }
 
@@ -201,14 +201,6 @@ namespace HardelAPI.ModsManagers.Mods {
 
             void OnClick() {
                 ModSelection.Instance?.ShowUpdateSelection(ModData, InstanceManager);
-
-                /*                if (ModData.CanUpdate) {
-                                    bool Updated = DownloadUpdate().GetAwaiter().GetResult();
-                                    if (Updated) {
-                                        ModData.CanUpdate = false;
-                                        UpdateText.GetComponent<TextMeshPro>().text = "The mod has been updated with success !\nRestart the game to make the changes effective.";
-                                    }
-                                }*/
             }
         }
 
@@ -334,7 +326,8 @@ namespace HardelAPI.ModsManagers.Mods {
         public async Task<bool> DownloadUpdate() {
             try {
                 HttpClient http = new HttpClient();
-                http.DefaultRequestHeaders.Add("User-Agent", "Updater");
+                http.DefaultRequestHeaders.Add("User-Agent", "Mod Getter");
+                http.DefaultRequestHeaders.Add("Authorization", ModData.GithubToken);
                 var response = await http.GetAsync(new System.Uri(ModData.UpdateLink), HttpCompletionOption.ResponseContentRead);
                 if (response.StatusCode != HttpStatusCode.OK || response.Content == null) {
                     System.Console.WriteLine("Server returned no data: " + response.StatusCode.ToString());
@@ -362,6 +355,14 @@ namespace HardelAPI.ModsManagers.Mods {
             }
             HardelApiPlugin.Logger.LogError("Update wasn't successful\nTry again later,\nor update manually.");
             return false;
+        }
+
+        public void UpdateMods() {
+            if (ModData.CanUpdate) {
+                bool Updated = DownloadUpdate().GetAwaiter().GetResult();
+                if (Updated)
+                    UpdateText.GetComponent<TextMeshPro>().text = "The mod has been updated with success !\nRestart the game to make the changes effective.";
+            }
         }
     }
 }

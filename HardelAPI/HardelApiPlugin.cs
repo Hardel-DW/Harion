@@ -6,6 +6,7 @@ using HardelAPI.CustomOptions;
 using HardelAPI.CustomOptions.UI;
 using HardelAPI.ModsManagers.Configuration;
 using HardelAPI.ModsManagers.Mods;
+using HardelAPI.Patch;
 using HardelAPI.Reactor;
 using HardelAPI.Reactor.Patch;
 using HardelAPI.ServerManagers.Controls;
@@ -79,6 +80,7 @@ namespace HardelAPI {
             Button.InitializeBaseButton();
             RegionsEditor.SetUp();
             ResourceLoader.LoadAssets();
+            ChangeNamePatch.Initialize();
 
             // Config Bind
             StreamerMode = Config.Bind("Preferences", "Enable Streamer Mode", false);

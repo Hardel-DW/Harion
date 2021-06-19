@@ -63,6 +63,16 @@ namespace HardelAPI.CustomRoles {
             }
         }
 
+        // Name Text Visibility
+        internal static void PlayerNamePositon(PlayerControl Player) {
+            Player.nameText.transform.localPosition = new Vector3(
+                0f,
+                (Player.Data.HatId == 0U) ? 2.05f :
+                HatsCreator.TallIds.Contains(Player.Data.HatId) ? 2.6f : 2.4f,
+                -0.5f
+            );
+        }
+
         public static string NameTextVanilla(PlayerControl Player, PlayerVoteArea playerVoteArea = null) {
             if (Player == null)
                 return "";
@@ -72,13 +82,6 @@ namespace HardelAPI.CustomRoles {
 
             if (playerVoteArea != null && (MeetingHud.Instance.state == MeetingHud.VoteStates.Proceeding || MeetingHud.Instance.state == MeetingHud.VoteStates.Results))
                 return Player.name;
-
-            Player.nameText.transform.localPosition = new Vector3(
-                0f,
-                (Player.Data.HatId == 0U) ? 1.05f :
-                HatsCreator.TallIds.Contains(Player.Data.HatId) ? 1.6f : 1.4f,
-                -0.5f
-            );
 
             if (Player.Data.IsImpostor)
                 return $"{Player.name}\nImpostor";
@@ -96,17 +99,11 @@ namespace HardelAPI.CustomRoles {
             if (playerVoteArea != null && (MeetingHud.Instance.state == MeetingHud.VoteStates.Proceeding || MeetingHud.Instance.state == MeetingHud.VoteStates.Results))
                 return Player.name;
 
-            Player.nameText.transform.localPosition = new Vector3(
-                0f,
-                (Player.Data.HatId == 0U) ? 1.05f :
-                HatsCreator.TallIds.Contains(Player.Data.HatId) ? 1.6f : 1.4f,
-                -0.5f
-            );
             return Player.name + "\n" + Name;
         }
 
         public static string NameTextSpecific(PlayerControl Player, PlayerVoteArea playerVoteArea = null) {
-            KeyValuePair<PlayerControl, (UnityEngine.Color color, string name)> SpecificPlayer = new KeyValuePair<PlayerControl, (UnityEngine.Color color, string name)>();
+            KeyValuePair<PlayerControl, (Color color, string name)> SpecificPlayer = new KeyValuePair<PlayerControl, (Color color, string name)>();
             bool isContainsInSpecificList = false;
 
             foreach (var element in specificNameInformation) {
@@ -128,12 +125,6 @@ namespace HardelAPI.CustomRoles {
             if (playerVoteArea != null && (MeetingHud.Instance.state == MeetingHud.VoteStates.Proceeding || MeetingHud.Instance.state == MeetingHud.VoteStates.Results))
                 return Player.name;
 
-            Player.nameText.transform.localPosition = new Vector3(
-                0f,
-                (Player.Data.HatId == 0U) ? 1.05f :
-                HatsCreator.TallIds.Contains(Player.Data.HatId) ? 1.6f : 1.4f,
-                -0.5f
-            );
             return Player.name + "\n" + SpecificPlayer.Value.name;
         }
 
@@ -333,7 +324,7 @@ namespace HardelAPI.CustomRoles {
         public virtual void AddImportantTasks(PlayerControl Player) {
             ImportantTextTask ImportantTasks = new GameObject("RolesTasks").AddComponent<ImportantTextTask>();
             ImportantTasks.transform.SetParent(Player.transform, false);
-            ImportantTasks.Text = TasksDescription;
+            ImportantTasks.Text = $"{TasksDescription}{(!HasTask ? "<color=#FFFFFFFF>\nFake Tasks:</color>" : "")}";
             Player.myTasks.Insert(0, ImportantTasks);
             DestroyableSingleton<HudManager>.Instance.TaskStuff.SetActive(true);
         }

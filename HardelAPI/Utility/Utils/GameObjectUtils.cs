@@ -125,5 +125,17 @@ namespace HardelAPI.Utility.Utils {
 
             return null;
         }
+
+        public static void ChangeX(this ref Vector3 v, float x) {
+            v = new Vector3(x, v.y, v.z);
+        }   
+
+        public static void ChangeY(this ref Vector3 v, float y) {
+            v = new Vector3(v.x, y, v.z);
+        }
+
+        public static void ChangeZ(this ref Vector3 v, float z) {
+            v = new Vector3(v.x, v.y, z);
+        }
     }
 }

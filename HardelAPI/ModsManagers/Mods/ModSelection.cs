@@ -17,6 +17,8 @@ namespace HardelAPI.ModsManagers.Mods {
         internal List<GameObject> Button = new List<GameObject>();
         internal Dictionary<string, string> Tags = new Dictionary<string, string>();
         internal GameObject Slider;
+        internal GameObject Inner;
+        internal GameObject Backdrop;
         internal static ModSelection Instance = null;
 
         public ModSelection(GameObject Parent, GameObject Template) {
@@ -25,11 +27,35 @@ namespace HardelAPI.ModsManagers.Mods {
             Slider.transform.localPosition = new Vector3(0f, 0f, -50f);
             Slider.SetActive(false);
             Instance = this;
+
+            GameObject BackdropTemplate = Template.transform.parent.parent.GetChild(0).gameObject;
+            Backdrop = Object.Instantiate(BackdropTemplate, Slider.transform);
+            
+            PassiveButton button = Backdrop.GetComponent<PassiveButton>();
+            button.OnClick.RemoveAllListeners();
+            button.OnClick.AddListener((UnityAction) CloseModsMenuActive);
+
+            SpriteRenderer Renderer = Backdrop.GetComponent<SpriteRenderer>();
+            Renderer.color = new Color(0f, 0f, 0f, 0.9f);
+
+            Inner = Slider.gameObject.FindObject("Inner");
+            Inner.transform.localPosition = new Vector3(0f, 0f, -2f);
+
+            Scroller Scroll = Slider.GetComponent<Scroller>();
+            Scroll.allowX = false;
+            Scroll.allowY = true;
+            Scroll.velocity = new Vector2(0.008f, 0.005f);
+            Scroll.ScrollerYRange = new FloatRange(0f, 0f);
+            Scroll.YBounds = new FloatRange(0f, 3f);
+            Scroll.Inner = Inner.transform;
         }
 
         internal void ShowUpdateSelection(ModManagerData ModData, MainMenuManager instance) {
             if (Instance == null)
                 return;
+
+            if (Button.Count > 0)
+                Button.ForEach(button => Object.Destroy(button));
 
             Button = new List<GameObject>();
             Tags = new Dictionary<string, string>();
@@ -39,11 +65,9 @@ namespace HardelAPI.ModsManagers.Mods {
                 return;
 
             Slider.SetActive(true);
-
-            GameObject Parent = Slider.transform.Find("Inner").gameObject;
             foreach (var Tag in Tags) {
                 HardelApiPlugin.Logger.LogInfo(Tag.Key);
-                CreateButton(instance, Parent, Tag, ModData);
+                CreateButton(instance, Inner, Tag, ModData);
             }
         }
 
@@ -51,15 +75,7 @@ namespace HardelAPI.ModsManagers.Mods {
             // Game Object
             GameObject Entry = Object.Instantiate(instance.Announcement.gameObject, Parent.transform);
             Entry.name = $"SelectionVersion";
-            Entry.transform.localPosition = new Vector3(0f, 0f, 0f);
-
-            // Text
-            TextMeshPro TMP = Entry.transform.GetChild(0).GetComponent<TextMeshPro>();
-            TMP.transform.localPosition = new Vector3(0.250f, -0.365f, -2f);
-            TMP.fontMaterial = ResourceLoader.Liberia;
-
-            TMP_Text text = Entry.transform.GetChild(0).GetComponent<TMP_Text>();
-            instance.StartCoroutine(Effects.Lerp(0.1f, new System.Action<float>((p) => text.SetText(Tag.Key))));
+            Entry.transform.localPosition = new Vector3(0f, Button.Count * -0.7f, 0f);
 
             // Button
             GameObject Background = Entry.transform.Find("Background").gameObject;
@@ -85,19 +101,31 @@ namespace HardelAPI.ModsManagers.Mods {
             // Renderer
             Background.transform.localPosition = new Vector3(0.000f, 1.300f, 1.000f);
             SpriteRenderer renderer = Background.gameObject.GetComponent<SpriteRenderer>();
-            renderer.size = new Vector2(4.5f, 0.75f);
+            renderer.size = new Vector2(3.5f, 0.6f);
             renderer.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
             if (ModData.Version.ToLower().Equals(Tag.Key.ToLower()))
                 renderer.color = new Color(0.729f, 0.729f, 0.309f, 1f);
 
+            // Text
+            TextMeshPro TMP = Entry.transform.Find("Text_TMP").gameObject.GetComponent<TextMeshPro>();
+            TMP.transform.localPosition = new Vector3(0f, -0.5f, -2f);
+            TMP.horizontalAlignment = HorizontalAlignmentOptions.Center;
+            TMP.gameObject.transform.SetParent(Background.transform);
+
+            string DisplayTest = $"Version: {Tag.Key}";
+            instance.StartCoroutine(Effects.Lerp(0.1f, new Action<float>((p) => {
+                TMP.SetText(DisplayTest);
+                TMP.fontMaterial = ResourceLoader.Liberia;
+            })));
+
             // Collider
             BoxCollider2D collider = Background.gameObject.GetComponent<BoxCollider2D>();
-            collider.size = new Vector2(4.5f, 0.75f);
+            collider.size = new Vector2(3.5f, 0.6f);
 
             Entry.SetActive(true);
             Button.Add(Entry);
 
-            void OnClick() => PopupMessage.PopupLink($"Are you sure you want to continue on the following link?\n{Tag.Value}", Tag.Value);
+            void OnClick() => PopupMessage.PopupUpdateMods($"Are you sure to update the mod ?\n{Tag.Value}", Tag.Value);
             void OnMouseOver() => Background.GetComponent<SpriteRenderer>().color = new Color(0.3f, 1f, 0.3f, 1f);
             void OnMouseOut() => Background.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1, 1f);
         }
@@ -145,5 +173,7 @@ namespace HardelAPI.ModsManagers.Mods {
 
             return false;
         }
+
+        public void CloseModsMenuActive() => Slider.SetActive(false);
     }
 }

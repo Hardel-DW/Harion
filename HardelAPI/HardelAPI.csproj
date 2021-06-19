@@ -18,9 +18,6 @@
       
         <EmbeddedResource Include="Resources\*" />
         <EmbeddedResource Include="Resources\Social\*" />
-        
-        <Reference Remove="$(AmongUs)\BepInEx\unhollowed\netstandard.dll;$(AmongUs)\BepInEx\unhollowed\Newtonsoft.Json.dll" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     </ItemGroup>
     
     <Target Name="Copy" AfterTargets="PostBuildEvent">

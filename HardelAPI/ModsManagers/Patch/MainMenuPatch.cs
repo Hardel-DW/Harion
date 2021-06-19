@@ -1,18 +1,18 @@
-﻿using BepInEx.IL2CPP;
+﻿using HarmonyLib;
+using BepInEx.IL2CPP;
 using HardelAPI.ModsManagers.Configuration;
 using HardelAPI.ModsManagers.Mods;
 using HardelAPI.Utility.Helper;
 using HardelAPI.Utility.Utils;
-using HarmonyLib;
-using System.Collections.Generic;
+using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using System.Reflection;
 using Object = UnityEngine.Object;
 using Type = System.Type;
-using System;
 
 namespace HardelAPI.ModsManagers.Patch {
 
@@ -50,8 +50,7 @@ namespace HardelAPI.ModsManagers.Patch {
                     ModsInformation.InitializeModsInformation(__instance, Popup);
 
                 GameObject LocalButton = GameObject.Find("PlayLocalButton");
-                GameObject AccountManager = GameObject.Find("AccountManager");
-
+                
                 // Mods Button
                 GameObject ModsButton = Object.Instantiate(LocalButton);
                 if (ModsButton == null)
@@ -78,22 +77,6 @@ namespace HardelAPI.ModsManagers.Patch {
 
                 void OnMouseOver() => ModsButton.GetComponent<SpriteRenderer>().color = new Color(0.3f, 1f, 0.3f, 1f);
                 void OnMouseOut() => ModsButton.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1, 1f);
-
-                // Credits Button
-                GameObject CreditsButton = Object.Instantiate(LocalButton);
-                if (CreditsButton == null)
-                    HardelApiPlugin.Logger.LogError($"CreditsButton in MainMenuStart does not exist !");
-
-                CreditsButton.name = "CreditsButton";
-                CreditsButton.transform.localPosition = new Vector3(1.025f, 0f, CreditsButton.transform.localPosition.z);
-                Object.Destroy(CreditsButton.GetComponent<ImageTranslator>());
-                SpriteRenderer RendererCredits = CreditsButton.GetComponent<SpriteRenderer>();
-                if (RendererCredits != null)
-                    RendererCredits.sprite = SpriteHelper.LoadSpriteFromEmbeddedResources("HardelAPI.Resources.CreditsButton.png", 100f);
-
-                // AccountTab
-                GameObject AccountTab = AccountManager.transform.Find("AccountTab/AccountTab").gameObject;
-                AccountTab.transform.localPosition = new Vector3(AccountTab.transform.localPosition.x, 0f, AccountTab.transform.localPosition.z);
             }
 
             private static void CreatePopup(MainMenuManager __instance) {
@@ -295,7 +278,9 @@ namespace HardelAPI.ModsManagers.Patch {
 
                 ModEntry.Update();
                 if (ModsInformation.Instance != null)
-                    ModsInformation.Instance.UpdateMenu();   
+                    ModsInformation.Instance.UpdateMenu();
+
+                ScrollerEntries.SetActive(!ModSelection.Slider.activeSelf);
             }
         }
     }

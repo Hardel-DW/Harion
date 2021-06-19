@@ -99,6 +99,32 @@ namespace HardelAPI.Utility.Utils {
             void OnClick() => System.Diagnostics.Process.Start(URL);
         }
 
+        internal static void PopupUpdateMods(string text, string URL) {
+            if (ItsInitialize()) {
+                Coroutines.Start(UpdateText());
+                PassiveButton[] PassivesButtons = Follow.GetComponents<PassiveButton>();
+                foreach (PassiveButton Passivesutton in PassivesButtons)
+                    Object.Destroy(Passivesutton);
+
+                PassiveButton passive = Follow.AddComponent<PassiveButton>();
+                passive.OnClick.RemoveAllListeners();
+                passive.OnClick.AddListener((UnityAction) OnClick);
+                passive.OnMouseOver = new UnityEvent();
+                passive.OnMouseOver.AddListener((UnityAction) OnMouseOver);
+                passive.OnMouseOut = new UnityEvent();
+                passive.OnMouseOut.AddListener((UnityAction) OnMouseOut);
+
+                LinkContainer.SetActive(true);
+                Button.SetActive(false);
+                Show(text);
+            }
+
+            void OnMouseOver() => Follow.GetComponent<SpriteRenderer>().color = new Color(0.3f, 1f, 0.3f, 1f);
+            void OnMouseOut() => Follow.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1, 1f);
+            void OnClick() => ModsManagers.Mods.ModsInformation.Instance.UpdateMods();
+        }
+
+
         private static IEnumerator UpdateText() {
             yield return new WaitForSeconds(0.01f);
             DenyTMP.SetText("Deny");

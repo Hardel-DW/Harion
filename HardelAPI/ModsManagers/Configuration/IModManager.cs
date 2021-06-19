@@ -8,8 +8,5 @@
         string SmallDescription { get; }
 
         string Description { get; }
-
-        string Credit { get; }
-
     }
 }

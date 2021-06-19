@@ -303,30 +303,24 @@ namespace HardelAPI.Cooldown {
         }
 
         public PlayerControl GetPlayerTarget() {
-            PlayerControl Player = ClosestElement.GetComponent<PlayerControl>();
-
             if (Closest != Cooldown.ClosestElement.Player || ClosestElement == null)
                 return null;
 
-            return Player;
+            return ClosestElement?.GetComponent<PlayerControl>();
         }
 
         public DeadBody GetDeadBodyTarget() {
-            DeadBody Body = ClosestElement.GetComponent<DeadBody>();
-
             if (Closest != Cooldown.ClosestElement.DeadBody || ClosestElement == null)
                 return null;
 
-            return Body;
+            return ClosestElement?.GetComponent<DeadBody>();
         }
 
         public Vent GetVentTarget() {
-            Vent vent = ClosestElement.GetComponent<Vent>();
-
             if (Closest != Cooldown.ClosestElement.Vent || ClosestElement == null)
                 return null;
 
-            return vent;
+            return ClosestElement?.GetComponent<Vent>();
         }
 
         // Event

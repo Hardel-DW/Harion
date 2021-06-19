@@ -31,7 +31,7 @@ namespace HardelAPI.Patch {
                 int seconds = (int) timer % 60;
                 string suffix = $" ({minutes:00}:{seconds:00})";
 
-                __instance.GameRoomName.text = $"\n\n{GameRoomName}\n{suffix}";
+                __instance.GameRoomName.text = $"{GameRoomName}\n{suffix}";
             }
         }
     }
