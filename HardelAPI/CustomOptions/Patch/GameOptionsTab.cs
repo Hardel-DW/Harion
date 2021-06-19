@@ -20,6 +20,7 @@ namespace HardelAPI.CustomOptions.Patch {
     public static class GameSettingMenuPatch {
         public static void Postfix(GameSettingMenu __instance) {
             Transform Background = __instance.gameObject.transform.GetChild(0);
+            Background.gameObject.GetComponent<SpriteRenderer>().color = new Color(0.085f, 0.085f, 0.085f, 1f);
             Background.localPosition = new Vector3(0f, -0.300f, 1f);
             Background.localScale = new Vector3(
                 Background.localScale.x * 1.1f,

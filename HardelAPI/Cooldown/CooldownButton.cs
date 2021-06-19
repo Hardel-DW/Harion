@@ -80,11 +80,16 @@ namespace HardelAPI.Cooldown {
             gameObject.gameObject.SetActive(true);
             gameObject.renderer.enabled = true;
             gameObject.renderer.sprite = Sprite;
+
             PassiveButton button = gameObject.GetComponent<PassiveButton>();
             button.OnClick.RemoveAllListeners();
             button.OnClick.AddListener((UnityEngine.Events.UnityAction) Listener);
-            TextObject = gameObject.gameObject.CreateTMP("", Vector2.zero, Color.white);
+
+            TextObject = Object.Instantiate(gameObject.transform.GetChild(1).gameObject, gameObject.transform);
+            TextObject.name = "Information Text";
             TextMeshPro = TextObject.GetComponent<TextMeshPro>();
+            TextMeshPro.transform.localPosition = new Vector3(0.35f, -0.35f, 0f);
+
             OnCreateButton();
         }
 
@@ -136,10 +141,13 @@ namespace HardelAPI.Cooldown {
                     HasRole = false;
                 else HasRole = Roles.HasRole(PlayerControl.LocalPlayer);
 
-            if (!PlayerControl.LocalPlayer.Data.IsDead && UseNumber >= 1)
+            if (!PlayerControl.LocalPlayer.Data.IsDead)
                 CouldUse = !MeetingHud.Instance;
 
             if (HudManager.Instance == null)
+                CouldUse = false;
+
+            if (UseNumber <= 0)
                 CouldUse = false;
 
             CanUse = CouldUse && HasRole;
