@@ -76,6 +76,7 @@ namespace HardelAPI.Utility.Helper {
 
         [HarmonyPatch]
         public static class CustomColorPatches {
+
             [HarmonyPatch(typeof(TranslationController), nameof(TranslationController.GetString), new[] {
                 typeof(StringNames),
                 typeof(Il2CppReferenceArray<Il2CppSystem.Object>)
@@ -95,7 +96,51 @@ namespace HardelAPI.Utility.Helper {
 
             [HarmonyPatch(typeof(PlayerTab), nameof(PlayerTab.OnEnable))]
             private static class PlayerTabEnablePatch {
-                public static void Postfix(PlayerTab __instance) { // Replace instead
+
+                private static GameObject Inner = null;
+                private static Scroller Scroll;
+
+                private static GameObject CreateScoller(PlayerTab __instance) {
+                    // Inner
+                    Inner = new GameObject { layer = 5, name = "Inner" };
+                    Inner.transform.SetParent(__instance.ColorTabArea);
+                    Inner.transform.localPosition = Vector3.zero;
+
+                    // Scroller
+                    GameObject Scroller = new GameObject { layer = 5, name = "Scroller" };
+                    Scroller.transform.SetParent(__instance.transform);
+
+                    Scroll = Scroller.AddComponent<Scroller>();
+                    Scroll.allowX = false;
+                    Scroll.allowY = true;
+                    Scroll.velocity = new Vector2(0.008f, 0.005f);
+                    Scroll.ScrollerYRange = new FloatRange(0f, 0f);
+                    Scroll.YBounds = new FloatRange(0f, 3f);
+                    Scroll.Inner = Inner.transform;
+
+                    // Mask
+                    GameObject SpriteMask = new GameObject();
+                    SpriteMask.name = "Mask";
+                    SpriteMask.layer = 5;
+                    SpriteMask.transform.SetParent(__instance.ColorTabArea);
+                    SpriteMask.transform.localPosition = new Vector3(0f, 0f, 0f);
+                    SpriteMask.transform.localScale = new Vector3(250f, 400f, 1f);
+
+                    SpriteMask mask = SpriteMask.AddComponent<SpriteMask>();
+                    mask.sprite = SpriteHelper.LoadSpriteFromEmbeddedResources("HardelAPI.Resources.Background.png", 100f);
+
+                    BoxCollider2D collider = SpriteMask.AddComponent<BoxCollider2D>();
+                    collider.size = Vector2.one;
+                    collider.enabled = true;
+
+                    SpriteMask.SetActive(true);
+                    return Inner;
+                }
+
+                public static void Postfix(PlayerTab __instance) {
+                    if (Inner == null)
+                        CreateScoller(__instance);
+
                     Il2CppArrayBase<ColorChip> chips = __instance.ColorChips.ToArray();
                     int cols = 4;
                     for (int i = 0; i < chips.Length; i++) {
@@ -103,10 +148,33 @@ namespace HardelAPI.Utility.Helper {
                         int row = i / cols, col = i % cols;
                         chip.transform.localPosition = new Vector3(-0.9f + (col * 0.6f), 1.550f - (row * 0.55f), chip.transform.localPosition.z);
                         chip.transform.localScale *= 0.9f;
+                        chip.transform.SetParent(Inner.transform);
+
+                        SpriteRenderer renderer = chip.GetComponent<SpriteRenderer>();
+                        renderer.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+
+                        GameObject ForeGround = chip.transform.GetChild(0).gameObject;
+                        GameObject ControllerHighlight = chip.transform.GetChild(1).gameObject;
+
+                        GameObject Shade = ForeGround.transform.GetChild(0).gameObject;
+                        GameObject Shade1 = ForeGround.transform.GetChild(1).gameObject;
+
+                        SpriteRenderer HighlightRenderer = ControllerHighlight.GetComponent<SpriteRenderer>();
+                        HighlightRenderer.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+
+                        SpriteRenderer shadeRenderer = Shade1.GetComponent<SpriteRenderer>();
+                        shadeRenderer.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+                        shadeRenderer.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+                        Object.Destroy(ForeGround.GetComponent<SpriteMask>());
+                        Object.Destroy(Shade);
 
                         if (i >= pickableColors)
                             chip.transform.localScale *= 0f;
                     }
+
+                    int scrollRow = Mathf.Max((__instance.ColorChips.Count / cols) - 6, 0);
+                    float YRange = (scrollRow * 0.55f) + 0.25f;
+                    Scroll.YBounds = new FloatRange(0f, YRange);
                 }
             }
 

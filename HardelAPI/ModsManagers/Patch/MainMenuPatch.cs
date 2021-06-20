@@ -156,9 +156,6 @@ namespace HardelAPI.ModsManagers.Patch {
                 // Mask
                 SpriteMask spriteMaskTemplate = Object.FindObjectsOfType<SpriteMask>().FirstOrDefault();
                 GameObject SpriteMask = Object.Instantiate(spriteMaskTemplate.gameObject);
-                if (SpriteMask == null)
-                    HardelApiPlugin.Logger.LogError($"SpriteMask in MainMenuStart does not exist !");
-
                 SpriteMask.name = "Mask";
                 SpriteMask.layer = 5;
                 SpriteMask.transform.SetParent(Parent.transform);
