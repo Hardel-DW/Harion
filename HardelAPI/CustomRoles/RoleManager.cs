@@ -1,6 +1,6 @@
 ﻿using HardelAPI.CustomRoles.Abilities;
 using HardelAPI.Enumerations;
-using HardelAPI.Utility;
+using HardelAPI.HatDesigner;
 using HardelAPI.Utility.Utils;
 using Hazel;
 using System;
@@ -68,7 +68,7 @@ namespace HardelAPI.CustomRoles {
             Player.nameText.transform.localPosition = new Vector3(
                 0f,
                 (Player.Data.HatId == 0U) ? 2.05f :
-                HatsCreator.TallIds.Contains(Player.Data.HatId) ? 2.6f : 2.4f,
+                HatCreator.TallIds.Contains(Player.Data.HatId) ? 2.6f : 2.4f,
                 -0.5f
             );
         }

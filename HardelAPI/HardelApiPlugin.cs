@@ -2,6 +2,7 @@
 using BepInEx.Configuration;
 using BepInEx.IL2CPP;
 using BepInEx.Logging;
+using HardelAPI.ColorDesigner;
 using HardelAPI.CustomOptions;
 using HardelAPI.CustomOptions.UI;
 using HardelAPI.ModsManagers.Configuration;
@@ -11,7 +12,6 @@ using HardelAPI.Reactor;
 using HardelAPI.Reactor.Patch;
 using HardelAPI.ServerManagers.Controls;
 using HardelAPI.ServerManagers.Patch;
-using HardelAPI.Utility.Helper;
 using HardelAPI.Utility.Utils;
 using HarmonyLib;
 using System.Collections.Generic;
@@ -73,7 +73,7 @@ namespace HardelAPI {
             Harmony.PatchAll();
 
             // Initialiaze Thing
-            ColorHelper.Load();
+            ColorCreator.Load();
             HarionVersionShower.Initialize();
             SplashSkip.Initialize();
             HudPosition.Load();
