@@ -65,8 +65,7 @@ namespace HardelAPI.Patch {
             }
 
             if (callId == (byte) CustomRPC.FixLights) {
-                SwitchSystem lights = ShipStatus.Instance.Systems[SystemTypes.Electrical].Cast<SwitchSystem>();
-                lights.ActualSwitches = lights.ExpectedSwitches;
+                SaboatageUtils.FixLight();
 
                 return false;
             }
