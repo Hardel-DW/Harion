@@ -1,4 +1,5 @@
-﻿using HardelAPI.Utility.Utils;
+﻿using HardelAPI.ModsManagers.Patch;
+using HardelAPI.Utility.Utils;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
@@ -78,6 +79,17 @@ namespace HardelAPI.ModsManagers.Mods {
             foreach (var entry in ModEntries) {
                 entry.TMP.text = entry.text;
             }
+        }
+
+        internal static void UpdateScroll() {
+            if (MainMenuPatch.ScrollerEntries == null) {
+                HardelApiPlugin.Logger.LogError($"An error occurred while updating the YBounds of the ModManager Scroll. The GameObject ScrollerEntries, of the MainMenuPatch class is not defined or at the wrong time.");
+                return;
+            }
+
+            int scrollRow = Mathf.Max(ModEntries.Count - 5, 0);
+            float YRange = scrollRow * 0.85f;
+            MainMenuPatch.ScrollerEntries.GetComponent<Scroller>().YBounds = new FloatRange(0f, YRange);
         }
 
         internal void OnClick() {

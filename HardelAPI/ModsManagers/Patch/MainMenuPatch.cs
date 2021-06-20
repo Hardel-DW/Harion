@@ -140,6 +140,7 @@ namespace HardelAPI.ModsManagers.Patch {
                 void OnClick() {
                     ModEntry.RemoveDisableEntry();
                     AddDisableEntries();
+                    ModEntry.UpdateScroll();
                 }
             }
 
@@ -178,9 +179,10 @@ namespace HardelAPI.ModsManagers.Patch {
                 scrollEntries.allowY = true;
                 scrollEntries.velocity = new Vector2(0.008f, 0.005f);
                 scrollEntries.ScrollerYRange = new FloatRange(0f, 0f);
-                scrollEntries.YBounds = new FloatRange(0f, 3f);
+                scrollEntries.YBounds = new FloatRange(0f, 0f);
                 scrollEntries.Inner = InnerEntries.transform;
                 ScrollerEntries.SetActive(true);
+                ModEntry.UpdateScroll();
             }
 
             private static void CreateModEntrie(object MainClass, GlobalInformation Data) {

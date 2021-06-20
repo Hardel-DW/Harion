@@ -119,6 +119,17 @@ namespace HardelAPI.ModsManagers.Mods {
             SpriteMask.SetActive(true);
         }
 
+        private void UpdateScroll() {
+            if (ModsInformation.Instance.SocialContainer == null) {
+                HardelApiPlugin.Logger.LogError($"An error occurred while updating the YBounds of the ModsInformation.SocialContainer Scroll. The GameObject SocialContainer, of the ModsInformation class is not defined or at the wrong time.");
+                return;
+            }
+
+            int scrollRow = Mathf.Max(ModEntries.Count - 5, 0);
+            float YRange = scrollRow * 0.85f;
+            MainMenuPatch.ScrollerEntries.GetComponent<Scroller>().YBounds = new FloatRange(0f, YRange);
+        }
+
         private void AddDisabledButton() {
             GameObject template = GameObject.Find("ExitGameButton");
             if (template == null)
