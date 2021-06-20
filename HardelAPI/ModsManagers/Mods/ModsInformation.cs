@@ -120,14 +120,14 @@ namespace HardelAPI.ModsManagers.Mods {
         }
 
         private void UpdateScroll() {
-            if (ModsInformation.Instance.SocialContainer == null) {
-                HardelApiPlugin.Logger.LogError($"An error occurred while updating the YBounds of the ModsInformation.SocialContainer Scroll. The GameObject SocialContainer, of the ModsInformation class is not defined or at the wrong time.");
+            if (Instance.SocialBackground == null) {
+                HardelApiPlugin.Logger.LogError($"An error occurred while updating the YBounds of the ModsInformation.SocialBackground Scroll. The GameObject SocialBackground, of the ModsInformation class is not defined or at the wrong time.");
                 return;
             }
 
-            int scrollRow = Mathf.Max(ModEntries.Count - 5, 0);
-            float YRange = scrollRow * 0.85f;
-            MainMenuPatch.ScrollerEntries.GetComponent<Scroller>().YBounds = new FloatRange(0f, YRange);
+            int scrollRow = Mathf.Max(ModData.SocialsLink.Count - 7, 0);
+            float YRange = (scrollRow * 0.8f) + 0.35f;
+            SocialBackground.GetComponent<Scroller>().YBounds = new FloatRange(0f, YRange);
         }
 
         private void AddDisabledButton() {
@@ -222,6 +222,7 @@ namespace HardelAPI.ModsManagers.Mods {
             }
 
             SocialBackground.SetActive(ModData.SocialsLink.Count > 0);
+            UpdateScroll();
         }
 
         public void CloseModsMenu() {
