@@ -65,10 +65,10 @@ namespace HardelAPI.ModsManagers.Mods {
                 return;
 
             Slider.SetActive(true);
-            foreach (var Tag in Tags) {
-                HardelApiPlugin.Logger.LogInfo(Tag.Key);
+            foreach (var Tag in Tags)
                 CreateButton(instance, Inner, Tag, ModData);
-            }
+
+            UpdateScroll();
         }
 
         internal void CreateButton(MainMenuManager instance, GameObject Parent, KeyValuePair<string, string> Tag, ModManagerData ModData) {
@@ -130,11 +130,22 @@ namespace HardelAPI.ModsManagers.Mods {
             void OnMouseOut() => Background.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1, 1f);
         }
 
+        internal void UpdateScroll() {
+            if (Slider == null) {
+                HardelApiPlugin.Logger.LogError($"An error occurred while updating the YBounds of the ModSelection.Slider Scroll. The GameObject Slider, of the ModSelection class is not defined or at the wrong time.");
+                return;
+            }
+
+            int scrollRow = Mathf.Max(Button.Count - 5, 0);
+            float YRange = scrollRow * 0.7f;
+            Slider.GetComponent<Scroller>().YBounds = new FloatRange(0f, YRange);
+        }
+
         internal async Task<bool> GetAllTags(ModManagerData ModData) {
             try {
                 HttpClient http = new HttpClient();
                 http.DefaultRequestHeaders.Add("User-Agent", "Mod Getter");
-                var response = await http.GetAsync(new System.Uri(ModData.GithubTag()), HttpCompletionOption.ResponseContentRead);
+                var response = await http.GetAsync(new Uri(ModData.GithubTag()), HttpCompletionOption.ResponseContentRead);
                 if (response.StatusCode != HttpStatusCode.OK || response.Content == null) {
                     HardelApiPlugin.Logger.LogWarning("Server returned no data: " + response.StatusCode.ToString());
                     return false;
