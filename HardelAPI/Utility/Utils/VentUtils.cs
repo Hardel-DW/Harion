@@ -144,12 +144,12 @@ namespace HardelAPI.Utility.Utils {
 			}
 		}
 
-		internal static Vent SpawnVent(int id, Vector2 postion, int leftVent, int centerVent, int rightVent) {
+		internal static Vent SpawnVent(int id, Vector3 postion, int leftVent, int centerVent, int rightVent) {
 			Vent ventPref = GameObject.FindObjectOfType<Vent>();
 			Vent vent = GameObject.Instantiate<Vent>(ventPref, ventPref.transform.parent);
 
 			vent.Id = id;
-			vent.transform.position = postion;
+			vent.transform.position = new Vector3(postion.x, postion.y, postion.z + 0.1f);
 			vent.Left = leftVent == int.MaxValue ? null : ShipStatus.Instance.AllVents.FirstOrDefault(v => v.Id == leftVent);
 			vent.Center = centerVent == int.MaxValue ? null : ShipStatus.Instance.AllVents.FirstOrDefault(v => v.Id == centerVent);
 			vent.Right = rightVent == int.MaxValue ? null : ShipStatus.Instance.AllVents.FirstOrDefault(v => v.Id == rightVent);
@@ -165,12 +165,12 @@ namespace HardelAPI.Utility.Utils {
 			return vent;
 		}
 
-		private static Vent RpcSpawnVent(int id, Vector2 postion, int leftVent, int centerVent, int rightVent) {
+		private static Vent RpcSpawnVent(int id, Vector3 postion, int leftVent, int centerVent, int rightVent) {
 			Vent vent = SpawnVent(id, postion, leftVent, centerVent, rightVent);
 			MessageWriter w = AmongUsClient.Instance.StartRpc(ShipStatus.Instance.NetId, (byte) CustomRPC.PlaceVent, SendOption.Reliable);
 
 			w.WritePacked(id);
-			w.WriteVector2(postion);
+			w.WriteVector3(postion);
 			w.WritePacked(leftVent);
 			w.WritePacked(centerVent);
 			w.WritePacked(rightVent);

@@ -49,7 +49,7 @@ namespace HardelAPI.Patch {
 
             if (callId == (byte) CustomRPC.PlaceVent) {
                 int id = reader.ReadPackedInt32();
-                Vector2 postion = reader.ReadVector2();
+                Vector3 postion = reader.ReadVector3();
                 int leftVent = reader.ReadPackedInt32();
                 int centerVent = reader.ReadPackedInt32();
                 int rightVent = reader.ReadPackedInt32();

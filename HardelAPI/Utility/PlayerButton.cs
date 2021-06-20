@@ -146,7 +146,7 @@ namespace HardelAPI.Utility {
             for (int i = 0; i < PlayerControl.AllPlayerControls.Count; i++) {
                 PlayerControl currentPlayer = PlayerControl.AllPlayerControls[i];
 
-                float row = 2;
+                float row = 3;
                 float x = (i % row);
                 float y = ((i - (i % row)) / row);
 

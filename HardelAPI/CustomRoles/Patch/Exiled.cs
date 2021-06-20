@@ -14,8 +14,8 @@ namespace HardelAPI.CustomRoles.Patch {
     [HarmonyPatch(typeof(ExileController), nameof(ExileController.Begin))]
     public static class ExileControllerPatch {
         public static void Postfix([HarmonyArgument(0)] GameData.PlayerInfo exiled, ExileController __instance) {
-            if (RoleManager.GetAllRoles(exiled.Object).Count > 0) {
-                RoleManager Role = RoleManager.GetMainRole(exiled.Object);
+            RoleManager Role = RoleManager.GetMainRole(exiled.Object);
+            if (Role != null) {
                 if (PlayerControl.GameOptions.ConfirmImpostor || Role.ForceExiledReveal) {
                     __instance.completeString = $"{exiled.PlayerName} was the {Role.Name}";
                 }

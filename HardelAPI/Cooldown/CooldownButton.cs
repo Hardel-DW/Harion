@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using HardelAPI.CustomRoles;
 using System.Linq;
@@ -26,6 +25,7 @@ namespace HardelAPI.Cooldown {
         public float EffectDuration { get; set; } = 0f;
 
         // Boolean
+        public bool AutoDisable { get; set; } = true;
         public bool IsEffectActive { get; internal set; }
         public bool HasEffectDuration { get; set; }
         public bool Enabled { get; set; } = true;
@@ -119,7 +119,6 @@ namespace HardelAPI.Cooldown {
                     continue;
 
                 RegisteredButtons[i].gameObject.renderer.sprite = RegisteredButtons[i].Sprite;
-                RegisteredButtons[i].OnUpdate();
                 RegisteredButtons[i].Update();
             }
         }
@@ -199,7 +198,9 @@ namespace HardelAPI.Cooldown {
                     ClosestElement.GetComponent<SpriteRenderer>()?.material.SetColor("_OutlineColor", outline);
                 }
             }
-            IsDisable = ClosestElement == null;
+
+            if (AutoDisable)
+                IsDisable = ClosestElement == null;
         }
 
         private void UpdateText() {
@@ -213,6 +214,7 @@ namespace HardelAPI.Cooldown {
             UsableUpdate();
             UpdatePosition();
             UpdateText();
+            OnUpdate();
 
             if (Timer < 0f) {
                 DefineButtonColor(IsDisable ? 0.3f : 1f);
@@ -341,6 +343,8 @@ namespace HardelAPI.Cooldown {
         public virtual void OnCooldownEnd() { }
 
         public virtual void OnUpdate() { }
+
+        public virtual void OnPostUpdate() { }
 
         public virtual void OnForceClick() { }
 
