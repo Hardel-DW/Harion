@@ -51,7 +51,7 @@ namespace Harion.CustomOptions {
         /// <param name="min">The lowest value permitted, may be overriden if <paramref name="value"/> is lower</param>
         /// <param name="max">The highest value permitted, may be overriden if <paramref name="value"/> is higher</param>
         /// <param name="increment">The increment or decrement steps when <see cref="Increase"/> or <see cref="Decrease"/> are called</param>
-        public CustomNumberOption(string id, string name, bool saveValue, float value, float min = 0.25F, float max = 5F, float increment = 0.25F) : base(id, name, saveValue, CustomOptionType.Number, value) {
+        public CustomNumberOption(string id, string name, bool saveValue, float value, CustomOption parent, float min = 0.25F, float max = 5F, float increment = 0.25F) : base(id, name, saveValue, CustomOptionType.Number, value, parent) {
             Min = Mathf.Min(value, min);
             Max = Mathf.Max(value, max);
 
@@ -141,8 +141,8 @@ namespace Harion.CustomOptions {
         /// <param name="min">The lowest value permitted, may be overriden if <paramref name="value"/> is lower</param>
         /// <param name="max">The highest value permitted, may be overriden if <paramref name="value"/> is higher</param>
         /// <param name="increment">The increment or decrement steps when <see cref="CustomNumberOption.Increase"/> or <see cref="CustomNumberOption.Decrease"/> are called</param>
-        public static CustomNumberOption AddNumber(string id, string name, bool saveValue, float value, float min = 0.25F, float max = 5F, float increment = 0.25F) {
-            return new CustomNumberOption(id, name, saveValue, value, min, max, increment);
+        public static CustomNumberOption AddNumber(string id, string name, bool saveValue, float value, float min = 0.25F, float max = 5F, float increment = 0.25F, CustomOption parent = null) {
+            return new CustomNumberOption(id, name, saveValue, value, parent, min, max, increment);
         }
 
         /// <summary>
@@ -154,8 +154,8 @@ namespace Harion.CustomOptions {
         /// <param name="min">The lowest value permitted, may be overriden if <paramref name="value"/> is lower</param>
         /// <param name="max">The highest value permitted, may be overriden if <paramref name="value"/> is higher</param>
         /// <param name="increment">The increment or decrement steps when <see cref="CustomNumberOption.Increase"/> or <see cref="CustomNumberOption.Decrease"/> are called</param>
-        public static CustomNumberOption AddNumber(string id, string name, float value, float min = 0.25F, float max = 5F, float increment = 0.25F) {
-            return AddNumber(id, name, true, value, min, max, increment);
+        public static CustomNumberOption AddNumber(string id, string name, float value, float min = 0.25F, float max = 5F, float increment = 0.25F, CustomOption parent = null) {
+            return AddNumber(id, name, true, value, min, max, increment, parent);
         }
 
         /// <summary>
@@ -167,8 +167,8 @@ namespace Harion.CustomOptions {
         /// <param name="min">The lowest value permitted, may be overriden if <paramref name="value"/> is lower</param>
         /// <param name="max">The highest value permitted, may be overriden if <paramref name="value"/> is higher</param>
         /// <param name="increment">The increment or decrement steps when <see cref="CustomNumberOption.Increase"/> or <see cref="CustomNumberOption.Decrease"/> are called</param>
-        public static CustomNumberOption AddNumber(string name, bool saveValue, float value, float min = 0.25F, float max = 5F, float increment = 0.25F) {
-            return AddNumber(name, name, saveValue, value, min, max, increment);
+        public static CustomNumberOption AddNumber(string name, bool saveValue, float value, float min = 0.25F, float max = 5F, float increment = 0.25F, CustomOption parent = null) {
+            return AddNumber(name, name, saveValue, value, min, max, increment, parent);
         }
 
         /// <summary>
@@ -179,8 +179,8 @@ namespace Harion.CustomOptions {
         /// <param name="min">The lowest value permitted, may be overriden if <paramref name="value"/> is lower</param>
         /// <param name="max">The highest value permitted, may be overriden if <paramref name="value"/> is higher</param>
         /// <param name="increment">The increment or decrement steps when <see cref="CustomNumberOption.Increase"/> or <see cref="CustomNumberOption.Decrease"/> are called</param>
-        public static CustomNumberOption AddNumber(string name, float value, float min = 0.25F, float max = 5F, float increment = 0.25F) {
-            return AddNumber(name, true, value, min, max, increment);
+        public static CustomNumberOption AddNumber(string name, float value, float min = 0.25F, float max = 5F, float increment = 0.25F, CustomOption parent = null) {
+            return AddNumber(name, true, value, min, max, increment, parent);
         }
     }
 }

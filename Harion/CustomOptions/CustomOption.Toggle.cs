@@ -1,4 +1,5 @@
 ﻿using BepInEx.Configuration;
+using System;
 
 namespace Harion.CustomOptions {
     public interface IToggleOption {
@@ -24,7 +25,7 @@ namespace Harion.CustomOptions {
         /// <param name="name">The name/title of the option</param>
         /// <param name="saveValue">Saves the last value of the option to apply again when the game is reopened (only applies for the lobby host)</param>
         /// <param name="value">The initial/default value</param>
-        public CustomToggleOption(string id, string name, bool saveValue, bool value) : base(id, name, saveValue, CustomOptionType.Toggle, value) {
+        public CustomToggleOption(string id, string name, bool saveValue, bool value, CustomOption parent) : base(id, name, saveValue, CustomOptionType.Toggle, value, parent) {
             ValueChanged += (sender, args) => {
                 if (ConfigEntry != null && GameObject is ToggleOption && AmongUsClient.Instance?.AmHost == true && PlayerControl.LocalPlayer)
                     ConfigEntry.Value = GetValue();
@@ -49,6 +50,11 @@ namespace Harion.CustomOptions {
         /// </summary>
         public virtual void Toggle() {
             SetValue(!GetValue());
+        }
+
+        public override Func<bool> ShowChildrenConidtion {
+            get => () => GetValue();
+            set => base.ShowChildrenConidtion = value;
         }
 
         protected virtual void SetValue(bool value, bool raiseEvents) {
@@ -87,8 +93,8 @@ namespace Harion.CustomOptions {
         /// <param name="name">The name/title of the option</param>
         /// <param name="saveValue">Saves the last value of the option to apply again when the game is reopened (only applies for the lobby host)</param>
         /// <param name="value">The initial/default value</param>
-        public static CustomToggleOption AddToggle(string id, string name, bool saveValue, bool value) {
-            return new CustomToggleOption(id, name, saveValue, value);
+        public static CustomToggleOption AddToggle(string id, string name, bool saveValue, bool value, CustomOption parent = null) {
+            return new CustomToggleOption(id, name, saveValue, value, parent);
         }
 
         /// <summary>
@@ -97,8 +103,8 @@ namespace Harion.CustomOptions {
         /// <param name="id">The ID of the option, used to maintain the last value when <paramref name="saveValue"/> is true and to transmit the value between players</param>
         /// <param name="name">The name/title of the option</param>
         /// <param name="value">The initial/default value</param>
-        public static CustomToggleOption AddToggle(string id, string name, bool value) {
-            return AddToggle(id, name, true, value);
+        public static CustomToggleOption AddToggle(string id, string name, bool value, CustomOption parent = null) {
+            return AddToggle(id, name, true, value, parent);
         }
 
         /// <summary>
@@ -107,8 +113,8 @@ namespace Harion.CustomOptions {
         /// <param name="name">The name/title of the option, also used as the option's ID</param>
         /// <param name="saveValue">Saves the last value of the option to apply again when the game is reopened (only applies for the lobby host)</param>
         /// <param name="value">The initial/default value</param>
-        public static CustomToggleOption AddToggle(string name, bool saveValue, bool value) {
-            return AddToggle(name, name, saveValue, value);
+        public static CustomToggleOption AddToggle(string name, bool saveValue, bool value, CustomOption parent = null) {
+            return AddToggle(name, name, saveValue, value, parent);
         }
 
         /// <summary>
@@ -116,8 +122,8 @@ namespace Harion.CustomOptions {
         /// </summary>
         /// <param name="name">The name/title of the option</param>
         /// <param name="value">The initial/default value</param>
-        public static CustomToggleOption AddToggle(string name, bool value) {
-            return AddToggle(name, name, value);
+        public static CustomToggleOption AddToggle(string name, bool value, CustomOption parent = null) {
+            return AddToggle(name, name, value, parent);
         }
     }
 }

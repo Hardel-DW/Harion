@@ -1,4 +1,6 @@
-﻿namespace Harion.CustomOptions {
+﻿using System;
+
+namespace Harion.CustomOptions {
     /// <summary>
     /// A derivative of <see cref="CustomOption"/>, handling "buttons" in the options menu.
     /// </summary>
@@ -12,7 +14,7 @@
         /// <param name="menu">The button will be visible in the lobby options menu</param>
         /// <param name="hud">The button title will appear in the HUD (option list) in the lobby</param>
         /// <param name="initialValue">The button's initial (client sided) value, can be used to hide/show other options</param>
-        public CustomOptionButton(string title, bool menu = true, bool hud = false, bool initialValue = false) : base(title, title, false, CustomOptionType.Toggle, initialValue) {
+        public CustomOptionButton(string title, bool menu = true, bool hud = false, bool initialValue = false, CustomOption parent = null) : base(title, title, false, CustomOptionType.Toggle, initialValue, parent) {
             HudStringFormat = (_, name, _) => name;
             ValueStringFormat = (_, _) => string.Empty;
 
@@ -68,8 +70,8 @@
         /// <param name="menu">The button will be visible in the lobby options menu</param>
         /// <param name="hud">The button title will appear in the HUD (option list) in the lobby</param>
         /// <param name="initialValue">The button's initial (client sided) value, can be used to hide/show other options</param>
-        public static CustomOptionButton AddButton(string title, bool menu = true, bool hud = false, bool initialValue = false) {
-            return new CustomOptionButton(title, menu, hud, initialValue);
+        public static CustomOptionButton AddButton(string title, bool menu = true, bool hud = false, bool initialValue = false, CustomOption parent = null) {
+            return new CustomOptionButton(title, menu, hud, initialValue, parent);
         }
     }
 }

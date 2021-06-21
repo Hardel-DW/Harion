@@ -1,4 +1,6 @@
-﻿namespace Harion.CustomOptions {
+﻿using System;
+
+namespace Harion.CustomOptions {
     /// <summary>
     /// A derivative of <see cref="CustomOptionButton"/>, handling option headers.
     /// </summary>
@@ -10,7 +12,7 @@
         /// <param name="menu">The header will be visible in the lobby options menu</param>
         /// <param name="hud">The header will appear in the HUD (option list) in the lobby</param>
         /// <param name="initialValue">The header's initial (client sided) value, can be used to hide/show other options</param>
-        public CustomOptionHeader(string title, bool menu = true, bool hud = true, bool initialValue = false) : base(title, menu, hud, initialValue) {
+        public CustomOptionHeader(string title, bool menu = true, bool hud = true, bool initialValue = false, CustomOption parent = null) : base(title, menu, hud, initialValue, parent) {
         }
 
         protected override bool GameObjectCreated(OptionBehaviour o) {
@@ -36,8 +38,8 @@
         /// <param name="menu">The header will be visible in the lobby options menu</param>
         /// <param name="hud">The header will appear in the HUD (option list) in the lobby</param>
         /// <param name="initialValue">The header's initial (client sided) value, can be used to hide/show other options</param>
-        public static CustomOptionHeader AddHeader(string title, bool menu = true, bool hud = true, bool initialValue = false) {
-            return new CustomOptionHeader(title, menu, hud, initialValue);
+        public static CustomOptionHeader AddHeader(string title, bool menu = true, bool hud = true, bool initialValue = false, CustomOption parent = null) {
+            return new CustomOptionHeader(title, menu, hud, initialValue, parent);
         }
     }
 }

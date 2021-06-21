@@ -14,7 +14,7 @@ namespace Harion.Data {
         public GameObject GameObject { get; set; }
         public DateTime? ExpiredOn { get; set; }
 
-        public DangerPoint(Vector2 position, UnityEngine.Color color, string typeElement, bool saboatageHidePoint = false, Sprite texture = null, DateTime? ExpiredOn = null) {
+        public DangerPoint(Vector2 position, Color color, string typeElement, bool saboatageHidePoint = false, Sprite texture = null, DateTime? ExpiredOn = null) {
             this.Position = position;
             this.Color = color;
             this.Texture = texture;
@@ -26,7 +26,7 @@ namespace Harion.Data {
             else
                 this.ExpiredOn = ExpiredOn;
 
-            this.GameObject = CreateGameObject();
+            GameObject = CreateGameObject();
             points.Add(this);
         }
 

@@ -32,6 +32,16 @@ namespace Harion.CustomOptions {
         private static List<CustomOption> Options = new List<CustomOption>();
 
         /// <summary>
+        /// The list of all Childrens Game options.
+        /// </summary>
+        private List<CustomOption> Childrens = new List<CustomOption>();
+
+        /// <summary>
+        /// The parent of this game option
+        /// </summary>
+        private CustomOption Parent;
+
+        /// <summary>
         /// Enables or disables the credit string appended to the HUD (option list) in the lobby.
         /// Please provide credit or reference elsewhere if you disable this.
         /// </summary>
@@ -121,6 +131,8 @@ namespace Harion.CustomOptions {
         /// </summary>
         public virtual OptionBehaviour GameObject { get; protected set; }
 
+        public virtual Func<bool> ShowChildrenConidtion { get; set; } = () => true;
+
         public static Func<CustomOption, string, string> DefaultNameStringFormat = (_, name) => name;
         /// <summary>
         /// The string format reflecting the option name, result returned by <see cref="GetFormattedName"/>.
@@ -163,7 +175,7 @@ namespace Harion.CustomOptions {
         /// <param name="saveValue">Saves the last value of the option to apply again when the game is reopened (only applies for the lobby host)</param>
         /// <param name="type">The option type. See <see cref="CustomOptionType"/>.</param>
         /// <param name="value">The initial/default value</param>
-        protected CustomOption(string id, string name, bool saveValue, CustomOptionType type, object value) {
+        protected CustomOption(string id, string name, bool saveValue, CustomOptionType type, object value, CustomOption parent = null) {
             if (string.IsNullOrEmpty(id))
                 throw new ArgumentNullException(nameof(id), "Option id cannot be null or empty.");
 
@@ -176,7 +188,6 @@ namespace Harion.CustomOptions {
             PluginID = PluginHelper.GetCallingPluginId();
             ConfigID = id;
 
-            //string Id = ID = $"{nameof(CustomOption)}_{PluginID}_{id}";
             string Id = ID = $"{PluginID}_{id}";
             Name = name;
 
@@ -189,6 +200,15 @@ namespace Harion.CustomOptions {
             while (Options.Any(option => option.ID.Equals(ID, StringComparison.Ordinal))) {
                 ID = $"{Id}_{++i}";
                 ConfigID = $"{id}_{i}";
+            }
+
+            Parent = parent;
+            if (Parent != null) {
+                Parent.Childrens.Add(this);
+                ShowSelf(Parent.ShowChildrenConidtion());
+
+                if (Parent is CustomOptionHolder)
+                    ShowSelf(false, false, true);
             }
 
             SHA1 = SHA1Helper.Create(ID);
@@ -363,6 +383,9 @@ namespace Harion.CustomOptions {
 
             Value = value;
 
+            if (ShowChildrenConidtion != null)
+                ShowChildren(ShowChildrenConidtion());
+
             if (SendRpc && GameObject != null && AmongUsClient.Instance?.AmHost == true && PlayerControl.LocalPlayer)
                 SendSyncro(this);
 
@@ -440,6 +463,53 @@ namespace Harion.CustomOptions {
         /// <returns><see cref="object.ToString()"/> or the return value of <see cref="ValueStringFormat"/> when provided.</returns>
         public override string ToString() {
             return (HudStringFormat ?? DefaultHudStringFormat).Invoke(this, GetFormattedName(), GetFormattedValue());
+        }
+
+        private void UpdateScale() {
+            if (GameObject == null || Parent == null || Parent.GameObject == null)
+                return;
+
+            GameObject.transform.localScale = new UnityEngine.Vector3(Parent.GameObject.transform.localScale.x / 1.05f, GameObject.transform.localScale.y, GameObject.transform.localScale.z);
+        }
+
+        public void ToggleSelf(bool ChangeHudVisibleValue = true, bool ChangeMenuVisibleValue = true) {
+            if (ChangeHudVisibleValue)
+                HudVisible = !HudVisible;
+
+            if (ChangeMenuVisibleValue)
+                MenuVisible = !MenuVisible;
+
+            UpdateScale();
+        }
+
+        public void ShowSelf(bool show = true, bool ChangeHudVisibleValue = true, bool ChangeMenuVisibleValue = true) {
+            if (ChangeHudVisibleValue)
+                HudVisible = show;
+            
+            if (ChangeMenuVisibleValue)
+                MenuVisible = show;
+
+            UpdateScale();
+        }
+
+        public void ToggleChildren(bool ChangeHudVisibleValue = true, bool ChangeMenuVisibleValue = true) {
+            if (Childrens != null && Childrens.Count > 0) {
+                for (int i = 0; i < Childrens.Count; i++) {
+                    CustomOption Children = Childrens[i];
+
+                    Children.ToggleSelf(ChangeHudVisibleValue, ChangeMenuVisibleValue);
+                }
+            }
+        }
+
+        public void ShowChildren(bool show = true, bool ChangeHudVisibleValue = true, bool ChangeMenuVisibleValue = true) {
+            if (Childrens != null && Childrens.Count > 0) {
+                for (int i = 0; i < Childrens.Count; i++) {
+                    CustomOption Children = Childrens[i];
+
+                    Children.ShowSelf(show, ChangeHudVisibleValue, ChangeMenuVisibleValue);
+                }
+            }
         }
     }
 }

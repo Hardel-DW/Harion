@@ -31,7 +31,7 @@ namespace Harion.CustomOptions {
         /// <param name="name">The name/title of the option</param>
         /// <param name="saveValue">Saves the last value of the option to apply again when the game is reopened (only applies for the lobby host)</param>
         /// <param name="values">The string values that may be displayed, initial/default value is index 0</param>
-        public CustomStringOption(string id, string name, bool saveValue, string[] values) : base(id, name, saveValue, CustomOptionType.String, 0) {
+        public CustomStringOption(string id, string name, bool saveValue, CustomOption parent, string[] values) : base(id, name, saveValue, CustomOptionType.String, 0, parent) {
             _values = values;
 
             ValueChanged += (sender, args) => {
@@ -117,7 +117,7 @@ namespace Harion.CustomOptions {
         /// <param name="saveValue">Saves the last value of the option to apply again when the game is reopened (only applies for the lobby host)</param>
         /// <param name="values">The string values that may be displayed, initial/default value is index 0</param>
         public static CustomStringOption AddString(string id, string name, bool saveValue, params string[] values) {
-            return new CustomStringOption(id, name, saveValue, values);
+            return new CustomStringOption(id, name, saveValue, null, values);
         }
 
         /// <summary>
@@ -147,6 +147,46 @@ namespace Harion.CustomOptions {
         /// <param name="values">The string values that may be displayed, initial/default value is index 0</param>
         public static CustomStringOption AddString(string name, params string[] values) {
             return AddString(name, name, values);
+        }
+
+        /// <summary>
+        /// Adds a string option.
+        /// </summary>
+        /// <param name="id">The ID of the option, used to maintain the last value when <paramref name="saveValue"/> is true and to transmit the value between players</param>
+        /// <param name="name">The name/title of the option</param>
+        /// <param name="saveValue">Saves the last value of the option to apply again when the game is reopened (only applies for the lobby host)</param>
+        /// <param name="values">The string values that may be displayed, initial/default value is index 0</param>
+        public static CustomStringOption AddString(string id, string name, bool saveValue, CustomOption parent = null, params string[] values) {
+            return new CustomStringOption(id, name, saveValue, parent, values);
+        }
+
+        /// <summary>
+        /// Adds a string option.
+        /// </summary>
+        /// <param name="id">The ID of the option, used to maintain the last value when <paramref name="saveValue"/> is true and to transmit the value between players</param>
+        /// <param name="name">The name/title of the option</param>
+        /// <param name="values">The string values that may be displayed, initial/default value is index 0</param>
+        public static CustomStringOption AddString(string id, string name, CustomOption parent = null, params string[] values) {
+            return AddString(id, name, true, parent, values);
+        }
+
+        /// <summary>
+        /// Adds a string option.
+        /// </summary>
+        /// <param name="name">The name/title of the option</param>
+        /// <param name="saveValue">Saves the last value of the option to apply again when the game is reopened (only applies for the lobby host)</param>
+        /// <param name="values">The string values that may be displayed, initial/default value is index 0</param>
+        public static CustomStringOption AddString(string name, bool saveValue, CustomOption parent = null, params string[] values) {
+            return AddString(name, name, saveValue, parent, values);
+        }
+
+        /// <summary>
+        /// Adds a string option.
+        /// </summary>
+        /// <param name="name">The name/title of the option</param>
+        /// <param name="values">The string values that may be displayed, initial/default value is index 0</param>
+        public static CustomStringOption AddString(string name, CustomOption parent = null, params string[] values) {
+            return AddString(name, name, parent, values);
         }
     }
 }
