@@ -1,6 +1,6 @@
 [![Hardel](https://discord.com/assets/e4923594e694a21542a489471ecffa50.svg)](https://discord.gg/AP9axbXXNC)
 
-# Harion API
+# Hardel API
 Soon ...
 
 # Bugs/Feature suggestions
