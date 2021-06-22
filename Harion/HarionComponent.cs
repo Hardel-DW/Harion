@@ -9,6 +9,8 @@ namespace Harion {
         [HideFromIl2Cpp]
         public HarionPlugin Plugin { get; internal set; }
 
+        private void Start() => ModManager.Instance.ShowModStamp();
+
         public HarionComponent(IntPtr ptr) : base(ptr) { }
     } 
 }

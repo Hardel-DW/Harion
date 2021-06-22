@@ -23,7 +23,6 @@ namespace Harion.ModsManagers.Mods {
 
             foreach (var path in paths) {
                 Assembly ModAssembly = Assembly.LoadFrom(path);
-                HarionPlugin.Logger.LogInfo($"{ModAssembly.GetName().Name} was found !");
                 assemblies.Add(ModAssembly);
             }
 

@@ -231,7 +231,7 @@ namespace Harion.ModsManagers.Patch {
             private static void AddDisableEntries() {
                 foreach (Assembly Assembly in Disable.GetDisableModData()) {
                     foreach (Type type in Assembly.GetTypes()) {
-                        if (type.IsClass && type.IsSubclassOf(typeof(BasePlugin))) {
+                        if (type.IsClass && type.IsSubclassOf(typeof(ModRegistry))) {
                             HarionPlugin.Logger.LogInfo($"{type.Name}");
                             GlobalInformation Data = new GlobalInformation {
                                 Name = $"{Assembly.GetName().Name}",
@@ -255,7 +255,7 @@ namespace Harion.ModsManagers.Patch {
                     string[] files = directory.GetFiles("*.old").Select(file => file.FullName).ToArray();
                     foreach (var file in files)
                         File.Delete(file);
-                } catch (System.Exception e) {
+                } catch (Exception e) {
                     HarionPlugin.Logger.LogError("Exeption has been throw when clearing old version : " + e);
                     throw;
                 }

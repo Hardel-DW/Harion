@@ -1,5 +1,4 @@
-﻿using Hazel;
-using UnityEngine;
+﻿using Harion.Data;
 
 namespace Harion.Utility.Ability {
     public static class Morphing {
@@ -16,11 +15,12 @@ namespace Harion.Utility.Ability {
         }
 
         public static void Unmorph(PlayerControl Player, bool resetAnim = false) {
-            Player.RpcSetHat(Data.InitialPlayerApparence.PlayerHat);
-            Player.RpcSetSkin(Data.InitialPlayerApparence.PlayerSkin);
-            Player.RpcSetPet(Data.InitialPlayerApparence.PlayerPet);
-            Player.RpcSetColor((byte) Data.InitialPlayerApparence.PlayerColor);
-            Player.RpcSetName(Data.InitialPlayerApparence.PlayerName);
+            InitialPlayerApparence PlayerData = InitialPlayerApparence.GetLocalPlayerData();
+            Player.RpcSetHat(PlayerData.PlayerHat);
+            Player.RpcSetSkin(PlayerData.PlayerSkin);
+            Player.RpcSetPet(PlayerData.PlayerPet);
+            Player.RpcSetColor((byte) PlayerData.PlayerColor);
+            Player.RpcSetName(PlayerData.PlayerName);
 
             if (resetAnim && !Player.inVent)
                 Player.MyPhysics.ResetAnimState();
