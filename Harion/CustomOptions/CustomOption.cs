@@ -133,11 +133,12 @@ namespace Harion.CustomOptions {
 
         private Func<bool> _ShowChildrenConidtion { get; set; } = () => true;
 
-        public Func<bool> ShowChildrenConidtion { 
+        public Func<bool> ShowChildrenConidtion {
             get => _ShowChildrenConidtion;
             set {
                 _ShowChildrenConidtion = value;
-                ShowChildren(_ShowChildrenConidtion());
+                ShowChildren(_ShowChildrenConidtion(), true, false);
+                TryCollapseChildren(this, _ShowChildrenConidtion());
             }
         }
 
@@ -172,6 +173,11 @@ namespace Harion.CustomOptions {
         /// Affects whether the custom option will appear in the HUD (option list) in the lobby.
         /// </summary>
         public virtual bool HudVisible { get; set; } = true;
+
+        /// <summary>
+        /// Stores if this game options is collapsed in the menu. 
+        /// </summary>
+        public virtual bool MenuIsRevealed { get; set; } = true;
 
         /// <summary>
         /// Whether the custom option and it's value changes will be sent through RPC.
@@ -216,6 +222,9 @@ namespace Harion.CustomOptions {
                 ShowSelf(Parent._ShowChildrenConidtion());
 
                 if (Parent is CustomOptionHolder)
+                    ShowSelf(false, false, true);
+
+                if (!Parent.IsMenuVisible())
                     ShowSelf(false, false, true);
             }
 
@@ -483,32 +492,39 @@ namespace Harion.CustomOptions {
             GameObject.transform.localScale = new UnityEngine.Vector3(Parent.GameObject.transform.localScale.x / 1.05f, GameObject.transform.localScale.y, GameObject.transform.localScale.z);
         }
 
-        public void ToggleSelf(bool ChangeHudVisibleValue = true, bool ChangeMenuVisibleValue = true) {
-            if (ChangeHudVisibleValue)
-                HudVisible = !HudVisible;
-
-            if (ChangeMenuVisibleValue)
-                MenuVisible = !MenuVisible;
-
-            UpdateScale();
+        public void CollapseSelf(bool collapse) {
+            MenuIsRevealed = !collapse;
+            TryCollapseChildren(this, MenuIsRevealed);
         }
 
         public void ShowSelf(bool show = true, bool ChangeHudVisibleValue = true, bool ChangeMenuVisibleValue = true) {
             if (ChangeHudVisibleValue)
                 HudVisible = show;
-            
-            if (ChangeMenuVisibleValue)
+
+            if (ChangeMenuVisibleValue) {
+                TryCollapseChildren(this, show);
                 MenuVisible = show;
+                MenuIsRevealed = show;
+            }
 
             UpdateScale();
         }
 
-        public void ToggleChildren(bool ChangeHudVisibleValue = true, bool ChangeMenuVisibleValue = true) {
-            if (Childrens != null && Childrens.Count > 0) {
-                for (int i = 0; i < Childrens.Count; i++) {
-                    CustomOption Children = Childrens[i];
+        private void TryCollapseChildren(CustomOption Option, bool show) {
+            if (Option.Childrens != null && Option.Childrens.Count > 0) {
+                foreach (CustomOption Children in Option.Childrens) {
+                    Children.MenuIsRevealed = show;
+                    TryCollapseChildren(Children, show);
+                }
+            }
+        }
 
-                    Children.ToggleSelf(ChangeHudVisibleValue, ChangeMenuVisibleValue);
+        private void TryShowChildren(CustomOption Option, bool ChangeHudVisibleValue = true, bool ChangeMenuVisibleValue = true) {
+            if (Option.Childrens != null && Option.Childrens.Count > 0) {
+                for (int i = 0; i < Option.Childrens.Count; i++) {
+                    CustomOption Children = Option.Childrens[i];
+                    Children.ShowSelf(Option._ShowChildrenConidtion(), ChangeHudVisibleValue, ChangeMenuVisibleValue);
+                    TryShowChildren(Children, ChangeHudVisibleValue, ChangeMenuVisibleValue);
                 }
             }
         }
@@ -517,8 +533,9 @@ namespace Harion.CustomOptions {
             if (Childrens != null && Childrens.Count > 0) {
                 for (int i = 0; i < Childrens.Count; i++) {
                     CustomOption Children = Childrens[i];
-
+                    
                     Children.ShowSelf(show, ChangeHudVisibleValue, ChangeMenuVisibleValue);
+                    TryShowChildren(Children, ChangeHudVisibleValue, ChangeMenuVisibleValue);
                 }
             }
         }
@@ -536,5 +553,7 @@ namespace Harion.CustomOptions {
 
             return NumberParent;
         }
+
+        public bool IsMenuVisible() => MenuVisible && MenuIsRevealed;
     }
 }

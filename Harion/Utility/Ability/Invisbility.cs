@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Harion.Utility.Utils;
-using System.Linq;
 using Harion.Reactor;
 
 namespace Harion.Utility.Ability {
@@ -20,32 +19,45 @@ namespace Harion.Utility.Ability {
         }
 
         internal static IEnumerator Invisibility(PlayerControl Player, float Duration, List<PlayerControl> whiteListVisibility = null) {
-            Color color = Color.clear;
+            float alpha = 0f;
             if (PlayerControl.LocalPlayer.PlayerId == Player.PlayerId || PlayerControl.LocalPlayer.Data.IsDead)
-                color.a = 0.1f;
+                alpha = 0.2f;
 
             foreach (PlayerControl whiteListPlayer in whiteListVisibility)
                 if (whiteListPlayer.PlayerId == PlayerControl.LocalPlayer.PlayerId)
-                    color.a = 0.1f;
+                    alpha = 0.2f;
 
-            Player.GetComponent<SpriteRenderer>().color = color;
-            Player.HatRenderer.SetHat(0, 0);
-            Player.nameText.text = "";
-
-            if (Player.MyPhysics.Skin.skin.ProdId != DestroyableSingleton<HatManager>.Instance.AllSkins.ToArray()[0].ProdId)
-                Player.MyPhysics.SetSkin(0);
-
-            if (Player.CurrentPet != null)
-                Object.Destroy(Player.CurrentPet.gameObject);
-
-            Player.CurrentPet = Object.Instantiate(DestroyableSingleton<HatManager>.Instance.AllPets.ToArray()[0]);
-            Player.CurrentPet.transform.position = Player.transform.position;
-            Player.CurrentPet.Source = Player;
-            Player.CurrentPet.Visible = Player.Visible;
-
+            Invisibility(Player, alpha);
             yield return new WaitForSeconds(Duration);
-            Player.GetComponent<SpriteRenderer>().color = Color.white;
+            Invisibility(Player, 1f);
             yield return true;
+        }
+
+        private static void Invisibility(PlayerControl Player, float alpha) {
+            Player.myRend.SetColorAlpha(alpha);
+            Player.nameText.enabled = alpha <= 0 ? false : true;
+
+            if (Player.HatRenderer != null) {
+                Player.HatRenderer.FrontLayer.SetColorAlpha(alpha);
+                Player.HatRenderer.BackLayer.SetColorAlpha(alpha);
+            }
+
+            if (Player.MyPhysics != null && Player.MyPhysics.Skin != null) {
+                Player.MyPhysics.Skin.layer.SetColorAlpha(alpha);
+            }
+
+            if (Player.CurrentPet != null) {
+                Player.CurrentPet.rend.SetColorAlpha(alpha);
+
+                if (Player.CurrentPet.shadowRend != null) {
+                    Player.CurrentPet.shadowRend.SetColorAlpha(alpha);
+                }
+            }
+
+        }
+
+        private static void SetColorAlpha(this SpriteRenderer renderer, float alpha) {
+            renderer.color = new Color(renderer.color.r, renderer.color.g, renderer.color.b, alpha);
         }
     }
 }

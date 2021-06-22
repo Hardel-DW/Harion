@@ -28,7 +28,7 @@ namespace Harion.CustomOptions {
             int i = 0;
             foreach (CustomOption option in Options) {
                 if (option.GameObject) {
-                    option.GameObject.gameObject.SetActive(option.MenuVisible);
+                    option.GameObject.gameObject.SetActive(option.IsMenuVisible());
 
                     options.Add(option.GameObject);
 
@@ -82,10 +82,10 @@ namespace Harion.CustomOptions {
                 if (Debug)
                     HarionPlugin.Logger.LogInfo($"Option \"{option.Name}\" was created");
 
-                if (option.MenuVisible)
+                if (option.IsMenuVisible())
                     option.GameObject.transform.localPosition = new Vector3(option.GameObject.transform.localPosition.x, lowestY - ++i * 0.5F, option.GameObject.transform.localPosition.z);
 
-                option.GameObject.gameObject.SetActive(option.MenuVisible);
+                option.GameObject.gameObject.SetActive(option.IsMenuVisible());
             }
 
             return options;
@@ -116,9 +116,9 @@ namespace Harion.CustomOptions {
                     if (!option.GameObject?.gameObject)
                         continue;
 
-                    option.GameObject.gameObject.SetActive(option.MenuVisible);
+                    option.GameObject.gameObject.SetActive(option.IsMenuVisible());
 
-                    if (option.MenuVisible) {
+                    if (option.IsMenuVisible()) {
                         option.GameObject.transform.localPosition = new Vector3(option.GameObject.transform.localPosition.x, lowestY - ++i * 0.5F, option.GameObject.transform.localPosition.z);
 
                         options.Add(option.GameObject);
