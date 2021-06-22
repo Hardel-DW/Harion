@@ -29,7 +29,7 @@ namespace Harion.CustomOptions {
         /// <summary>
         /// The list of all the added custom options.
         /// </summary>
-        private static List<CustomOption> Options = new List<CustomOption>();
+        internal static List<CustomOption> Options = new List<CustomOption>();
 
         /// <summary>
         /// The list of all Childrens Game options.
@@ -131,7 +131,15 @@ namespace Harion.CustomOptions {
         /// </summary>
         public virtual OptionBehaviour GameObject { get; protected set; }
 
-        public virtual Func<bool> ShowChildrenConidtion { get; set; } = () => true;
+        private Func<bool> _ShowChildrenConidtion { get; set; } = () => true;
+
+        public Func<bool> ShowChildrenConidtion { 
+            get => _ShowChildrenConidtion;
+            set {
+                _ShowChildrenConidtion = value;
+                ShowChildren(_ShowChildrenConidtion());
+            }
+        }
 
         public static Func<CustomOption, string, string> DefaultNameStringFormat = (_, name) => name;
         /// <summary>
@@ -205,7 +213,7 @@ namespace Harion.CustomOptions {
             Parent = parent;
             if (Parent != null) {
                 Parent.Childrens.Add(this);
-                ShowSelf(Parent.ShowChildrenConidtion());
+                ShowSelf(Parent._ShowChildrenConidtion());
 
                 if (Parent is CustomOptionHolder)
                     ShowSelf(false, false, true);
@@ -213,7 +221,10 @@ namespace Harion.CustomOptions {
 
             SHA1 = SHA1Helper.Create(ID);
 
-            Options.Add(this);
+            if (Parent != null)
+                Options.Insert(Options.IndexOf(Parent) + 1, this);
+            else
+                Options.Add(this);
         }
 
         /// <summary>
@@ -383,8 +394,8 @@ namespace Harion.CustomOptions {
 
             Value = value;
 
-            if (ShowChildrenConidtion != null)
-                ShowChildren(ShowChildrenConidtion());
+            if (_ShowChildrenConidtion != null)
+                ShowChildren(_ShowChildrenConidtion());
 
             if (SendRpc && GameObject != null && AmongUsClient.Instance?.AmHost == true && PlayerControl.LocalPlayer)
                 SendSyncro(this);
@@ -465,7 +476,7 @@ namespace Harion.CustomOptions {
             return (HudStringFormat ?? DefaultHudStringFormat).Invoke(this, GetFormattedName(), GetFormattedValue());
         }
 
-        private void UpdateScale() {
+        internal void UpdateScale() {
             if (GameObject == null || Parent == null || Parent.GameObject == null)
                 return;
 
@@ -510,6 +521,20 @@ namespace Harion.CustomOptions {
                     Children.ShowSelf(show, ChangeHudVisibleValue, ChangeMenuVisibleValue);
                 }
             }
+        }
+
+        public int GetChildLevel() {
+            int NumberParent = 0;
+            TryGetParent(this);
+
+            void TryGetParent(CustomOption Option) {
+                if (Option.Parent != null) {
+                    NumberParent++;
+                    TryGetParent(Option.Parent);
+                }
+            }
+
+            return NumberParent;
         }
     }
 }

@@ -242,6 +242,8 @@ namespace Harion.Cooldown {
                 gameObject.renderer.material.SetFloat("_Desat", 0f);
                 gameObject.SetCoolDown(Timer, MaxTimer);
             }
+
+            OnPostUpdate();
         }
 
         internal void UpdatePosition() {
@@ -270,15 +272,6 @@ namespace Harion.Cooldown {
             Sprite Sprite = SpriteHelper.LoadSpriteFromEmbeddedResources(EmbeddedName, PixelPerUnit, assembly);
             this.PixelPerUnit = PixelPerUnit;
             this.Sprite = Sprite;
-        }
-
-        public void SendRpc(PlayerControl Sender = null, SendOption Options = SendOption.Reliable, int TargetClientId = -1) {
-            uint SenderPlayer = Sender == null ? PlayerControl.LocalPlayer.NetId : Sender.NetId;
-
-            MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(SenderPlayer, (byte) CustomRPC.SyncroButton, Options, TargetClientId);
-            messageWriter.Write(ButtonId);
-            SendData(messageWriter);
-            AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
         }
 
         public void ForceClick(bool DoAction) {
@@ -351,6 +344,15 @@ namespace Harion.Cooldown {
         public virtual void OnForceEndEffect() { }
 
         // Rpc Automatisation
+        public void SendRpc(PlayerControl Sender = null, SendOption Options = SendOption.Reliable, int TargetClientId = -1) {
+            uint SenderPlayer = Sender == null ? PlayerControl.LocalPlayer.NetId : Sender.NetId;
+
+            MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(SenderPlayer, (byte) CustomRPC.SyncroButton, Options, TargetClientId);
+            messageWriter.Write(ButtonId);
+            SendData(messageWriter);
+            AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
+        }
+
         public virtual void SendData(MessageWriter messageWriter) { }
 
         public virtual void ReadData(MessageReader messageReader) { }

@@ -23,6 +23,10 @@ namespace Harion.CustomOptions.Patch {
                     Children.transform.localScale.z
                 );
             }
+
+            foreach (CustomOption Option in CustomOption.Options) {
+                Option.UpdateScale();
+            }
         }
     }
 }

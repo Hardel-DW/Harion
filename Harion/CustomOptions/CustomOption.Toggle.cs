@@ -35,6 +35,7 @@ namespace Harion.CustomOptions {
             SetValue(ConfigEntry?.Value ?? GetDefaultValue(), false);
 
             ValueStringFormat = (sender, value) => ((bool) value) ? "On" : "Off";
+            ShowChildrenConidtion = () => GetValue();
         }
 
         protected override OptionOnValueChangedEventArgs OnValueChangedEventArgs(object value, object oldValue) {
@@ -50,11 +51,6 @@ namespace Harion.CustomOptions {
         /// </summary>
         public virtual void Toggle() {
             SetValue(!GetValue());
-        }
-
-        public override Func<bool> ShowChildrenConidtion {
-            get => () => GetValue();
-            set => base.ShowChildrenConidtion = value;
         }
 
         protected virtual void SetValue(bool value, bool raiseEvents) {

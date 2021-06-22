@@ -146,7 +146,7 @@ namespace Harion.CustomOptions {
 
                 foreach (CustomOption option in Options)
                     if (option.HudVisible)
-                        sb.AppendLine(option.ToString());
+                        sb.AppendLine(new string(' ', option.GetChildLevel() * 4) + option.ToString());
 
                 __result = sb.ToString();
 
