@@ -23,7 +23,7 @@ namespace Harion.Utility.Utils {
             PopUp.gameObject.name = "Popup Generic";
             Button = PopUp.gameObject.transform.Find("ExitGame").gameObject;
             Renderer = PopUp.gameObject.transform.Find("Background").gameObject.GetComponent<SpriteRenderer>();
-            Renderer.size = new Vector3(7f, 2f);
+            Renderer.size = new Vector3(9f, 2f);
             PopUp.TextAreaTMP.enableAutoSizing = false;
             PopUp.TextAreaTMP.fontSize = 2;
 

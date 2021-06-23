@@ -19,6 +19,7 @@ namespace Harion.ModsManagers {
         // Auto Updater
         public string GithubRepository { get; set; }
         public string GithubAuthor { get; set; }
+
         public GithubVisibility GithubRepositoryVisibility { get; set; }
         public string GithubToken { get; set; }
         public string UpdateLink { get; set; }

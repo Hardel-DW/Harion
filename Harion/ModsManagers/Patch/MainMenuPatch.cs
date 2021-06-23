@@ -186,24 +186,29 @@ namespace Harion.ModsManagers.Patch {
             }
 
             private static void CreateModEntrie(object MainClass, GlobalInformation Data) {
-                Data.Description = PluginHelper.GetIModData<string, IModManager>(MainClass, "Description") ?? Data.Description;
-                Data.Name = PluginHelper.GetIModData<string, IModManager>(MainClass, "DisplayName") ?? Data.Name;
-                Data.Version = PluginHelper.GetIModData<string, IModManager>(MainClass, "Version") ?? Data.Version;
-                Data.Credit = PluginHelper.GetIModData<string, IModManager>(MainClass, "Credit") ?? Data.Credit;
-                Data.SmallDescription = PluginHelper.GetIModData<string, IModManager>(MainClass, "SmallDescription") ?? Data.SmallDescription;
+                if (MainClass != null) {
+                    Data.Description = PluginHelper.GetIModData<string, IModManager>(MainClass, "Description") ?? Data.Description;
+                    Data.Name = PluginHelper.GetIModData<string, IModManager>(MainClass, "DisplayName") ?? Data.Name;
+                    Data.Version = PluginHelper.GetIModData<string, IModManager>(MainClass, "Version") ?? Data.Version;
+                    Data.Credit = PluginHelper.GetIModData<string, IModManager>(MainClass, "Credit") ?? Data.Credit;
+                    Data.SmallDescription = PluginHelper.GetIModData<string, IModManager>(MainClass, "SmallDescription") ?? Data.SmallDescription;
+                }
 
                 ModManagerData ModData = new ModManagerData(Data.Name, Data.Description, Data.SmallDescription, Data.Version, Data.Credit);
-                ModData.GithubRepository = PluginHelper.GetIModData<string, IModManagerUpdater>(MainClass, "GithubRepositoryName");
-                ModData.GithubAuthor = PluginHelper.GetIModData<string, IModManagerUpdater>(MainClass, "GithubAuthorName");
-                ModData.GithubRepositoryVisibility = PluginHelper.GetIModData<GithubVisibility, IModManagerUpdater>(MainClass, "GithubRepositoryVisibility");
-                ModData.GithubToken = PluginHelper.GetIModData<string, IModManagerUpdater>(MainClass, "GithubAccessToken");
-                ModData.ModsLinks = PluginHelper.GetIModData<Dictionary<string, Sprite>, IModManagerLink>(MainClass, "ModsLinks");
-                ModData.IsModActive = Data.IsActive;
-                ModData.AssemblyPathDirectory = PluginHelper.AssemblyDirectory(Assembly.GetAssembly(MainClass.GetType()));
-                ModData.FileName = Path.GetFileName(Assembly.GetAssembly(MainClass.GetType()).Location);
-                ModData.Assembly = Assembly.GetAssembly(MainClass.GetType());
+                if (MainClass != null) {
+                    ModData.GithubRepository = PluginHelper.GetIModData<string, IModManagerUpdater>(MainClass, "GithubRepositoryName");
+                    ModData.GithubAuthor = PluginHelper.GetIModData<string, IModManagerUpdater>(MainClass, "GithubAuthorName");
+                    ModData.GithubRepositoryVisibility = PluginHelper.GetIModData<GithubVisibility, IModManagerUpdater>(MainClass, "GithubRepositoryVisibility");
+                    ModData.GithubToken = PluginHelper.GetIModData<string, IModManagerUpdater>(MainClass, "GithubAccessToken");
+                    ModData.ModsLinks = PluginHelper.GetIModData<Dictionary<string, Sprite>, IModManagerLink>(MainClass, "ModsLinks");
+                    ModData.AssemblyPathDirectory = PluginHelper.AssemblyDirectory(Assembly.GetAssembly(MainClass.GetType()));
+                    ModData.FileName = Path.GetFileName(Assembly.GetAssembly(MainClass.GetType()).Location);
+                    ModData.Assembly = Assembly.GetAssembly(MainClass.GetType());
+                    ModData.MainTypeClass = MainClass.GetType();
+                }
+
                 ModData.MainClass = MainClass;
-                ModData.MainTypeClass = MainClass.GetType();
+                ModData.IsModActive = Data.IsActive;
 
                 string Text = $"{Data.Name} - {Data.Version}\n{Data.SmallDescription}";
                 new ModEntry(Instance, new Vector2(0f, -0.85f * ModEntry.CountModEntries), Text, InnerEntries, ModData);
@@ -213,7 +218,7 @@ namespace Harion.ModsManagers.Patch {
             private static void AddActiveEntries() {
                 for (int i = 0; i < IL2CPPChainloader.Instance.Plugins.Count; i++) {
                     KeyValuePair<string, BepInEx.PluginInfo> Mod = IL2CPPChainloader.Instance.Plugins.ElementAt(i);
-                    object MainClass = Mod.Value.Instance;
+                    object MainClass = GetRoleManagerClass(Mod.Value.Instance.GetType().Assembly);
 
                     GlobalInformation Data = new GlobalInformation {
                         Description = "No Description found.",
@@ -230,25 +235,30 @@ namespace Harion.ModsManagers.Patch {
 
             private static void AddDisableEntries() {
                 foreach (Assembly Assembly in Disable.GetDisableModData()) {
-                    foreach (Type type in Assembly.GetTypes()) {
-                        if (type.IsClass && type.IsSubclassOf(typeof(ModRegistry))) {
-                            HarionPlugin.Logger.LogInfo($"{type.Name}");
-                            GlobalInformation Data = new GlobalInformation {
-                                Name = $"{Assembly.GetName().Name}",
-                                Version = $"",
-                                Credit = $"No Credits found.",
-                                Description = $"No Description found.",
-                                SmallDescription = $"No Description found.",
-                                IsActive = false
-                            };
+                    GlobalInformation Data = new GlobalInformation {
+                        Name = $"{Assembly.GetName().Name}",
+                        Version = $"",
+                        Credit = $"No Credits found.",
+                        Description = $"No Description found.",
+                        SmallDescription = $"No Description found.",
+                        IsActive = false
+                    };
 
-                            object MainClass = Activator.CreateInstance(type);
-                            CreateModEntrie(MainClass, Data);
-                        }
-                    }
+                    object MainClass = GetRoleManagerClass(Assembly);
+                    CreateModEntrie(MainClass, Data);
                 }
             }
-                
+
+            private static object GetRoleManagerClass(Assembly Assembly) {
+                object value = null;
+
+                foreach (Type type in Assembly.GetTypes())
+                    if (type.IsClass && type.IsSubclassOf(typeof(ModRegistry)))
+                        value = Activator.CreateInstance(type);
+
+                return value;
+            }
+            
             private static void ClearOldVersion() {
                 try {
                     DirectoryInfo directory = new DirectoryInfo(Path.GetDirectoryName(Application.dataPath) + @"\BepInEx\plugins");

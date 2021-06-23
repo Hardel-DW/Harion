@@ -10,15 +10,17 @@ using UnityEngine;
 using UnityEngine.Events;
 using Object = UnityEngine.Object;
 using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace Harion.ModsManagers.Mods {
     internal class ModSelection {
 
         internal List<GameObject> Button = new List<GameObject>();
-        internal Dictionary<string, string> Tags = new Dictionary<string, string>();
+        internal List<VersionUpdate> Versions = new List<VersionUpdate>();
         internal GameObject Slider;
         internal GameObject Inner;
         internal GameObject Backdrop;
+        internal GameObject Mask;
         internal static ModSelection Instance = null;
 
         public ModSelection(GameObject Parent, GameObject Template) {
@@ -38,6 +40,8 @@ namespace Harion.ModsManagers.Mods {
             SpriteRenderer Renderer = Backdrop.GetComponent<SpriteRenderer>();
             Renderer.color = new Color(0f, 0f, 0f, 0.9f);
 
+            Slider.GetComponent<SpriteRenderer>().size = new Vector2(5.5f, 5.5f);
+
             Inner = Slider.gameObject.FindObject("Inner");
             Inner.transform.localPosition = new Vector3(0f, 0f, -2f);
 
@@ -48,6 +52,9 @@ namespace Harion.ModsManagers.Mods {
             Scroll.ScrollerYRange = new FloatRange(0f, 0f);
             Scroll.YBounds = new FloatRange(0f, 3f);
             Scroll.Inner = Inner.transform;
+
+            Mask = Slider.transform.FindChild("Mask").gameObject;
+            Mask.transform.localScale = new Vector3(5.25f, 5.25f, 1f);
         }
 
         internal void ShowUpdateSelection(ModManagerData ModData, MainMenuManager instance) {
@@ -58,24 +65,25 @@ namespace Harion.ModsManagers.Mods {
                 Button.ForEach(button => Object.Destroy(button));
 
             Button = new List<GameObject>();
-            Tags = new Dictionary<string, string>();
+            Versions = new();
 
             bool success = GetAllTags(ModData).GetAwaiter().GetResult();
             if (!success)
                 return;
 
             Slider.SetActive(true);
-            foreach (var Tag in Tags)
-                CreateButton(instance, Inner, Tag, ModData);
+
+            foreach (VersionUpdate Version in Versions)
+                CreateButton(instance, Inner, Version, ModData);
 
             UpdateScroll();
         }
 
-        internal void CreateButton(MainMenuManager instance, GameObject Parent, KeyValuePair<string, string> Tag, ModManagerData ModData) {
+        internal void CreateButton(MainMenuManager instance, GameObject Parent, VersionUpdate TagVersion, ModManagerData ModData) {
             // Game Object
             GameObject Entry = Object.Instantiate(instance.Announcement.gameObject, Parent.transform);
             Entry.name = $"SelectionVersion";
-            Entry.transform.localPosition = new Vector3(0f, Button.Count * -0.7f, 0f);
+            Entry.transform.localPosition = new Vector3(0f, (Button.Count * -1.25f) + 0.725f, 0f);
 
             // Button
             GameObject Background = Entry.transform.Find("Background").gameObject;
@@ -101,18 +109,18 @@ namespace Harion.ModsManagers.Mods {
             // Renderer
             Background.transform.localPosition = new Vector3(0.000f, 1.300f, 1.000f);
             SpriteRenderer renderer = Background.gameObject.GetComponent<SpriteRenderer>();
-            renderer.size = new Vector2(3.5f, 0.6f);
+            renderer.size = new Vector2(5f, 1f);
             renderer.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
-            if (ModData.Version.ToLower().Equals(Tag.Key.ToLower()))
-                renderer.color = new Color(0.729f, 0.729f, 0.309f, 1f);
+            renderer.color = TagVersion.ButtonColor;
 
             // Text
             TextMeshPro TMP = Entry.transform.Find("Text_TMP").gameObject.GetComponent<TextMeshPro>();
-            TMP.transform.localPosition = new Vector3(0f, -0.5f, -2f);
+            TMP.transform.localPosition = new Vector3(0f, 1.3f, -2f);
             TMP.horizontalAlignment = HorizontalAlignmentOptions.Center;
+            TMP.verticalAlignment = VerticalAlignmentOptions.Middle;
             TMP.gameObject.transform.SetParent(Background.transform);
 
-            string DisplayTest = $"Version: {Tag.Key}";
+            string DisplayTest = $"Version: {TagVersion.TagName}\n<size=2>{TagVersion.NameVerion}</size>";
             instance.StartCoroutine(Effects.Lerp(0.1f, new Action<float>((p) => {
                 TMP.SetText(DisplayTest);
                 TMP.fontMaterial = ResourceLoader.Liberia;
@@ -120,14 +128,28 @@ namespace Harion.ModsManagers.Mods {
 
             // Collider
             BoxCollider2D collider = Background.gameObject.GetComponent<BoxCollider2D>();
-            collider.size = new Vector2(3.5f, 0.6f);
+            collider.size = new Vector2(5f, 1f);
 
             Entry.SetActive(true);
             Button.Add(Entry);
 
-            void OnClick() => PopupMessage.PopupUpdateMods($"Are you sure to update the mod ?\n{Tag.Value}", Tag.Value);
+            void OnClick() => ChangeVersion(TagVersion, ModData);
             void OnMouseOver() => Background.GetComponent<SpriteRenderer>().color = new Color(0.3f, 1f, 0.3f, 1f);
-            void OnMouseOut() => Background.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1, 1f);
+            void OnMouseOut() => Background.GetComponent<SpriteRenderer>().color = TagVersion.ButtonColor;
+        }
+
+        internal void ChangeVersion(VersionUpdate TagVersion, ModManagerData ModData) {
+            if (TagVersion.TagName.ToLower() == ModData.Version.ToLower()) {
+                PopupMessage.PopupText("This is currently the version you are using.", true);
+                return;
+            }
+
+            if (Versions.ElementAt(0) == TagVersion) {
+                PopupMessage.PopupUpdateMods($"You are going to update to the latest version, are you sure you want to continue ?\n{TagVersion.UrlDownload}", TagVersion.UrlDownload);
+                return;
+            }
+
+            PopupMessage.PopupUpdateMods($"You are going to update this mod, are you sure you want to continue ?\n{TagVersion.UrlDownload}", TagVersion.UrlDownload);
         }
 
         internal void UpdateScroll() {
@@ -136,8 +158,8 @@ namespace Harion.ModsManagers.Mods {
                 return;
             }
 
-            int scrollRow = Mathf.Max(Button.Count - 5, 0);
-            float YRange = scrollRow * 0.7f;
+            int scrollRow = Mathf.Max(Button.Count - 4, 0);
+            float YRange = scrollRow * 1.25f;
             Slider.GetComponent<Scroller>().YBounds = new FloatRange(0f, YRange);
         }
 
@@ -156,8 +178,21 @@ namespace Harion.ModsManagers.Mods {
 
                 foreach (JToken tagVersion in data) {
                     string tagname = tagVersion["tag_name"]?.ToString();
+                    string versionName = tagVersion["name"]?.ToString();
+                    string body = tagVersion["body"]?.ToString();
+
                     if (tagname == null) {
                         HarionPlugin.Logger.LogWarning("Tag Name Not Found: " + response.StatusCode.ToString());
+                        return false;
+                    }
+
+                    if (body == null) {
+                        HarionPlugin.Logger.LogWarning("body Not Found: " + response.StatusCode.ToString());
+                        return false;
+                    }
+
+                    if (versionName == null) {
+                        HarionPlugin.Logger.LogWarning("Name of version Not Found: " + response.StatusCode.ToString());
                         return false;
                     }
 
@@ -169,9 +204,23 @@ namespace Harion.ModsManagers.Mods {
 
                     for (JToken current = assets.First; current != null; current = current.Next) {
                         string browser_download_url = current["browser_download_url"]?.ToString();
+                        string created_at = current["created_at"]?.ToString();
+
                         if (browser_download_url != null && current["content_type"] != null) {
                             if (current["content_type"].ToString().Equals("application/x-msdownload") && browser_download_url.EndsWith(".dll")) {
-                                Tags.Add(tagname, browser_download_url);
+                                VersionUpdate VersionUpdate = new VersionUpdate(tagname, versionName, browser_download_url);
+                                VersionUpdate.ReleaseDate = DateTime.Parse(created_at);
+                                VersionUpdate.Markdown = body;
+
+                                Color Button = Color.white;
+                                if (ModData.Version.ToLower() == tagname.ToLower())
+                                    Button = new Color(0.070f, 0.929f, 0.643f, 1f);
+
+                                if (Versions.Count == 0)
+                                    Button = Color.yellow;
+
+                                VersionUpdate.ButtonColor = Button;
+                                Versions.Add(VersionUpdate);
                             }
                         }
                     }
