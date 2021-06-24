@@ -34,8 +34,11 @@ namespace Harion.Utility.Utils {
 
         public static bool SabotageActive() {
             SabotageSystemType system = ShipStatus.Instance.Systems[SystemTypes.Sabotage].Cast<SabotageSystemType>();
+            if (system == null)
+                return false;
+
             Il2CppArrayBase<IActivatable> specials = system.specials.ToArray();
-            return !(!specials.Any(s => s.IsActive) | system.dummy.IsActive);
+            return specials.Any(s => s.IsActive) & !system.dummy.IsActive;
         }
 
         public static bool RpcFixSeismic() {
