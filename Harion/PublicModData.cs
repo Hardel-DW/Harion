@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Harion {
     public class PublicModData : ModRegistry, IModManager, IModManagerUpdater, IModManagerLink {
         public string DisplayName => "Harion";
-        public string Version => typeof(HarionPlugin).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+        public string Version => "V" + typeof(HarionPlugin).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
         public string Description => "Harion is a mod API adding compatibility between mods, and various functionality, and ensures the smooth running of modding.\nAdding a ModManager, key configuration, server management, role harmonization, game options, colors and more...";
         public string Credit => "Developer: Hardel";
         public string SmallDescription => "Harion is an Framework.";

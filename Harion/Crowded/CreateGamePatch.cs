@@ -32,11 +32,11 @@ namespace Harion.Crowded {
 
                 void plusListener() {
                     byte curHighest = byte.Parse(playerButtons[__instance.MaxPlayerButtons.ToArray().Length - 2].name);
-                    int delta = Mathf.Clamp(curHighest + 7, curHighest, maxPlayers) - curHighest;
+                    int delta = Mathf.Clamp(curHighest + 12, curHighest, maxPlayers) - curHighest;
                     if (delta == 0)
                         return;
 
-                    for (byte i = 1; i < 8; i++) {
+                    for (byte i = 1; i < 13; i++) {
                         SpriteRenderer button = __instance.MaxPlayerButtons[i];
                         button.name =
                             button.GetComponentInChildren<TextMeshPro>().text =
@@ -55,10 +55,10 @@ namespace Harion.Crowded {
 
                 void minusListener() {
                     byte curLowest = byte.Parse(playerButtons[1].name);
-                    int delta = curLowest - Mathf.Clamp(curLowest - 7, 4, curLowest);
+                    int delta = curLowest - Mathf.Clamp(curLowest - 12, 4, curLowest);
                     if (delta == 0)
                         return; // fast skip
-                    for (byte i = 1; i < 8; i++) {
+                    for (byte i = 1; i < 13; i++) {
                         SpriteRenderer button = __instance.MaxPlayerButtons[i];
                         button.name =
                             button.GetComponentInChildren<TextMeshPro>().text =

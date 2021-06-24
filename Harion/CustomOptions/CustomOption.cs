@@ -523,7 +523,12 @@ namespace Harion.CustomOptions {
             if (Option.Childrens != null && Option.Childrens.Count > 0) {
                 for (int i = 0; i < Option.Childrens.Count; i++) {
                     CustomOption Children = Option.Childrens[i];
-                    Children.ShowSelf(Option._ShowChildrenConidtion(), ChangeHudVisibleValue, ChangeMenuVisibleValue);
+                    if (!Children.Parent.IsMenuVisible()) {
+                        Children.CollapseSelf(true);
+                    } else {
+                        Children.ShowSelf(Option._ShowChildrenConidtion(), ChangeHudVisibleValue, ChangeMenuVisibleValue);
+                    }
+
                     TryShowChildren(Children, ChangeHudVisibleValue, ChangeMenuVisibleValue);
                 }
             }
