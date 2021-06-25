@@ -12,8 +12,9 @@ namespace Harion.Data.Patch {
     [HarmonyPatch(typeof(ShipStatus), nameof(ShipStatus.Begin))]
     public static class OnSpawnPlayer {
         public static void Postfix() {
+            InitialPlayerApparence.PlayersApparences = new();
             foreach (var Player in PlayerControl.AllPlayerControls) {
-                new InitialPlayerApparence(Player);
+                InitialPlayerApparence.AddPlayer(Player);
             }
         }
     }

@@ -26,5 +26,7 @@ namespace Harion.Data {
             PlayersApparences.FirstOrDefault(PIA => PIA.Key == Player.PlayerId).Value;
 
         public static InitialPlayerApparence GetLocalPlayerData() => GetPlayerData(PlayerControl.LocalPlayer);
+
+        public static void AddPlayer(PlayerControl Player) => new InitialPlayerApparence(Player);
     }
 }

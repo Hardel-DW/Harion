@@ -149,6 +149,9 @@ namespace Harion.Cooldown {
             if (UseNumber <= 0)
                 CouldUse = false;
 
+            if (PlayerControl.LocalPlayer.Data.IsDead)
+                CouldUse = false;
+
             CanUse = CouldUse && HasRole;
             
             if (!UsableButton)

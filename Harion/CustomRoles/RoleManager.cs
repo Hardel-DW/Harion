@@ -279,7 +279,7 @@ namespace Harion.CustomRoles {
                     roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => p.Data.IsImpostor).ToList();
                 break;
                 case VisibleBy.Crewmate:
-                roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => !p.Data.IsImpostor).ToList();
+                    roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => !p.Data.IsImpostor).ToList();
                 break;
                 case VisibleBy.Everyone:
                     roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().ToList();
