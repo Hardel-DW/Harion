@@ -38,6 +38,7 @@ namespace Harion.ModsManagers {
         public object MainClass { get; set; }
         public Type MainTypeClass { get; set; }
         public Assembly Assembly { get; set; }
+        public bool HasModData { get; set; }
 
         internal ModManagerData(string name, string description, string smallDescription, string version, string credit) {
             Name = name;

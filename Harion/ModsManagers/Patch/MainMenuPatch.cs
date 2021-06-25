@@ -201,12 +201,13 @@ namespace Harion.ModsManagers.Patch {
                     ModData.GithubRepositoryVisibility = PluginHelper.GetIModData<GithubVisibility, IModManagerUpdater>(MainClass, "GithubRepositoryVisibility");
                     ModData.GithubToken = PluginHelper.GetIModData<string, IModManagerUpdater>(MainClass, "GithubAccessToken");
                     ModData.ModsLinks = PluginHelper.GetIModData<Dictionary<string, Sprite>, IModManagerLink>(MainClass, "ModsLinks");
-                    ModData.AssemblyPathDirectory = PluginHelper.AssemblyDirectory(Assembly.GetAssembly(MainClass.GetType()));
-                    ModData.FileName = Path.GetFileName(Assembly.GetAssembly(MainClass.GetType()).Location);
-                    ModData.Assembly = Assembly.GetAssembly(MainClass.GetType());
                     ModData.MainTypeClass = MainClass.GetType();
                 }
 
+                ModData.HasModData = MainClass != null;
+                ModData.Assembly = Data.Assembly;
+                ModData.AssemblyPathDirectory = PluginHelper.AssemblyDirectory(Data.Assembly);
+                ModData.FileName = Path.GetFileName(Data.Assembly.Location);
                 ModData.MainClass = MainClass;
                 ModData.IsModActive = Data.IsActive;
 
@@ -218,6 +219,7 @@ namespace Harion.ModsManagers.Patch {
             private static void AddActiveEntries() {
                 for (int i = 0; i < IL2CPPChainloader.Instance.Plugins.Count; i++) {
                     KeyValuePair<string, BepInEx.PluginInfo> Mod = IL2CPPChainloader.Instance.Plugins.ElementAt(i);
+                    Assembly assembly = Assembly.GetAssembly(Mod.Value.Instance.GetType());
                     object MainClass = GetRoleManagerClass(Mod.Value.Instance.GetType().Assembly);
 
                     GlobalInformation Data = new GlobalInformation {
@@ -226,7 +228,8 @@ namespace Harion.ModsManagers.Patch {
                         Version = $"{Mod.Value.Metadata.Version}",
                         Credit = "",
                         SmallDescription = "No Description found.",
-                        IsActive = true
+                        IsActive = true,
+                        Assembly = assembly
                     };
 
                     CreateModEntrie(MainClass, Data);
@@ -241,7 +244,8 @@ namespace Harion.ModsManagers.Patch {
                         Credit = $"No Credits found.",
                         Description = $"No Description found.",
                         SmallDescription = $"No Description found.",
-                        IsActive = false
+                        IsActive = false,
+                        Assembly = Assembly
                     };
 
                     object MainClass = GetRoleManagerClass(Assembly);
