@@ -24,7 +24,10 @@ namespace Harion.Utility.Utils {
         }
 
         internal static IEnumerator CleanCoroutine(DeadBody body, float duration) {
-            SpriteRenderer renderer = body.GetComponent<SpriteRenderer>();
+            if (body == null)
+                yield return true;
+
+            SpriteRenderer renderer = body.bodyRenderer;
             Color backColor = renderer.material.GetColor(BackColor);
             Color bodyColor = renderer.material.GetColor(BodyColor);
             Color newColor = new Color(1f, 1f, 1f, 0f);
@@ -41,7 +44,6 @@ namespace Harion.Utility.Utils {
         }
 
         public static DeadBody FromParentId(byte id) => Object.FindObjectsOfType<DeadBody>().FirstOrDefault(b => b.ParentId == id);
-        
         public static void CleanBody(PlayerControl player) => CleanBody(player.PlayerId);
         public static void CleanBody(byte playerId) => Object.Destroy(Object.FindObjectsOfType<DeadBody>().FirstOrDefault(b => b.ParentId == playerId).gameObject);
     }

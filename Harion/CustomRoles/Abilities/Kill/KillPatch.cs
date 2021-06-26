@@ -12,25 +12,34 @@ namespace Harion.CustomRoles.Abilities.Kill {
             if (!PlayerControl.LocalPlayer.CanMove || PlayerControl.LocalPlayer.Data.IsDead)
                 return false;
 
-            if (PlayerControl.LocalPlayer.Data.IsImpostor)
-                return true;
+            RoleManager Role = RoleManager.GetMainRole(PlayerControl.LocalPlayer);
+            bool HasRole = Role != null;
 
-            foreach (var Role in RoleManager.AllRoles) {
+            if (HasRole) {
+                if (PlayerControl.LocalPlayer.Data.IsImpostor) {
+                    if (Role.GetType().GetMethod("OnLocalAttempKill").DeclaringType == Role.GetType()) {
+                        Role.OnLocalAttempKill(PlayerControl.LocalPlayer, __instance.CurrentTarget);
+                        return false;
+                    }
+                }
+
                 KillAbility KillAbility = Role.GetAbility<KillAbility>();
                 if (KillAbility == null)
-                    continue;
+                    return false;
 
-                if (KillAbility.WhiteListKill == null || !Role.HasRole(PlayerControl.LocalPlayer) || KillAbility.WhiteListKill == null)
-                    continue;
-
+                if (KillAbility.WhiteListKill == null)
+                    return false;
+                
                 PlayerControl ClosestPlayer = KillAbility.GetClosestTarget(PlayerControl.LocalPlayer);
                 bool CanKill = Vector2.Distance(PlayerControl.LocalPlayer.transform.position, ClosestPlayer.transform.position) < GameOptionsData.KillDistances[PlayerControl.GameOptions.KillDistance];
-                
                 if (KillAbility.KillTimer() == 0f && __instance.enabled && CanKill) {
                     Role.OnLocalAttempKill(PlayerControl.LocalPlayer, ClosestPlayer);
                     KillAbility.LastKilled = DateTime.UtcNow;
                 }
             }
+
+            if (PlayerControl.LocalPlayer.Data.IsImpostor)
+                return true;
 
             return false;
         }

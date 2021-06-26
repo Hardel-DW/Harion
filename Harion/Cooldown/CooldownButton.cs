@@ -57,6 +57,7 @@ namespace Harion.Cooldown {
 
         // Closest Element
         public ClosestElement? Closest { get; set; } = null;
+        public SpriteRenderer ClosestRenderer { get; set; } = null;
         public GameObject ClosestElement { get; set; } = null;
         public List<PlayerControl> AllPlayersTargetable { get; set; } = new List<PlayerControl>();
         public Color ColorOutline { get; set; } = Color.white;
@@ -162,9 +163,9 @@ namespace Harion.Cooldown {
         }
 
         private void UpdateClosestElement(bool CanUse) {
-            if (ClosestElement != null) {
-                ClosestElement.GetComponent<SpriteRenderer>()?.material.SetFloat("_Outline", 0f);
-                ClosestElement = null;
+            if (ClosestRenderer != null) {
+                ClosestRenderer.material.SetFloat("_Outline", 0f);
+                ClosestRenderer = null;
             }
 
             if (Closest == null || Closest == Cooldown.ClosestElement.Empty)
@@ -175,8 +176,10 @@ namespace Harion.Cooldown {
                 switch (Closest) {
                     case Cooldown.ClosestElement.DeadBody:
                         DeadBody targetedBody = PlayerControlUtils.GetClosestDeadBody(PlayerControl.LocalPlayer);
-                        if (targetedBody != null)
+                        if (targetedBody != null) {
                             ClosestElement = targetedBody.gameObject;
+                            ClosestRenderer = targetedBody.bodyRenderer;
+                        }
 
                         break;
                     case Cooldown.ClosestElement.Player:
@@ -184,21 +187,25 @@ namespace Harion.Cooldown {
                             AllPlayersTargetable = PlayerControl.AllPlayerControls.ToArray().ToList();
 
                         PlayerControl targetedPlayer = PlayerControlUtils.GetClosestPlayer(PlayerControl.LocalPlayer, AllPlayersTargetable, Disntance);
-                        if (targetedPlayer != null)
+                        if (targetedPlayer != null) {
                             ClosestElement = targetedPlayer.gameObject;
+                            ClosestRenderer = ClosestElement.GetComponent<SpriteRenderer>();
+                        }
 
                         break;
                     case Cooldown.ClosestElement.Vent:
                         Vent targetedVent = VentUtils.GetClosestVent(PlayerControl.LocalPlayer);
-                        if (targetedVent != null)
+                        if (targetedVent != null) {
                             ClosestElement = targetedVent.gameObject;
+                            ClosestRenderer = ClosestElement.GetComponent<SpriteRenderer>();
+                        }
 
                         break;
                 }
 
-                if (ClosestElement != null) {
-                    ClosestElement.GetComponent<SpriteRenderer>()?.material.SetFloat("_Outline", 1f);
-                    ClosestElement.GetComponent<SpriteRenderer>()?.material.SetColor("_OutlineColor", outline);
+                if (ClosestRenderer != null) {
+                    ClosestRenderer?.material.SetFloat("_Outline", 1f);
+                    ClosestRenderer?.material.SetColor("_OutlineColor", outline);
                 }
             }
 
