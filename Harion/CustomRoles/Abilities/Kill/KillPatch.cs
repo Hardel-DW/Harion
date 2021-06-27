@@ -12,6 +12,9 @@ namespace Harion.CustomRoles.Abilities.Kill {
             if (!PlayerControl.LocalPlayer.CanMove || PlayerControl.LocalPlayer.Data.IsDead)
                 return false;
 
+            if (__instance != DestroyableSingleton<HudManager>.Instance.KillButton)
+                return true;
+
             RoleManager Role = RoleManager.GetMainRole(PlayerControl.LocalPlayer);
             bool HasRole = Role != null;
 
@@ -23,7 +26,7 @@ namespace Harion.CustomRoles.Abilities.Kill {
                     }
                 }
 
-                KillAbility KillAbility = Role.GetAbility<KillAbility>();
+                KillAbility KillAbility = Role?.GetAbility<KillAbility>();
                 if (KillAbility == null)
                     return false;
 

@@ -29,7 +29,7 @@ namespace Harion.CustomRoles.Patch {
 
                         string NamePlayer = Role.NameText(PlayerHasRole);
 
-                        if (Role.roleVisibleByWhitelist.ContainsPlayer(PlayerControl.LocalPlayer))
+                        if (Role.RoleVisibleByWhitelist.ContainsPlayer(PlayerControl.LocalPlayer))
                             DefineName(PlayerHasRole, Role.Color, NamePlayer);
                     }
                 }
@@ -103,7 +103,7 @@ namespace Harion.CustomRoles.Patch {
 
                     string NamePlayer = Role.NameText(PlayerHasRole, PlayerVA);
 
-                    if (Role.roleVisibleByWhitelist.ContainsPlayer(PlayerControl.LocalPlayer))
+                    if (Role.RoleVisibleByWhitelist.ContainsPlayer(PlayerControl.LocalPlayer))
                         DefineMeetingName(PlayerVA, Role.Color, NamePlayer);
                 }
             }

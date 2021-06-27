@@ -15,7 +15,7 @@ namespace Harion.CustomRoles {
         public static List<RoleManager> AllRoles = new List<RoleManager>();
         public static List<PlayerControl> WinPlayer = new List<PlayerControl>();
         public List<PlayerControl> AllPlayers = new List<PlayerControl>();
-        public List<PlayerControl> roleVisibleByWhitelist = new List<PlayerControl>();
+        public List<PlayerControl> RoleVisibleByWhitelist = new List<PlayerControl>();
         public byte RoleId;
         public string Name = "Not Defined";
         public string TasksDescription = "Task Description is not defined go to\n your class and defined 'TasksDescription'.";
@@ -265,36 +265,36 @@ namespace Harion.CustomRoles {
 
         // Whitelist visible List
         public virtual void DefineVisibleByWhitelist() {
-            roleVisibleByWhitelist = new List<PlayerControl>();
+            RoleVisibleByWhitelist = new List<PlayerControl>();
 
             switch (VisibleBy) {
                 case VisibleBy.Nobody:
-                    roleVisibleByWhitelist = new List<PlayerControl>();
+                    RoleVisibleByWhitelist = new List<PlayerControl>();
                 break;
                 case VisibleBy.Self:
                     if (HasRole(PlayerControl.LocalPlayer))
-                        roleVisibleByWhitelist = new List<PlayerControl>() { PlayerControl.LocalPlayer };
+                        RoleVisibleByWhitelist = new List<PlayerControl>() { PlayerControl.LocalPlayer };
                 break;
                 case VisibleBy.Impostor:
-                    roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => p.Data.IsImpostor).ToList();
+                    RoleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => p.Data.IsImpostor).ToList();
                 break;
                 case VisibleBy.Crewmate:
-                    roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => !p.Data.IsImpostor).ToList();
+                    RoleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => !p.Data.IsImpostor).ToList();
                 break;
                 case VisibleBy.Everyone:
-                    roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().ToList();
+                    RoleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().ToList();
                 break;
                 case VisibleBy.Dead:
-                    roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => p.Data.IsDead).ToList();
+                    RoleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => p.Data.IsDead).ToList();
                 break;
                 case VisibleBy.DeadCrewmate:
-                    roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => p.Data.IsDead && !p.Data.IsImpostor).ToList();
+                    RoleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => p.Data.IsDead && !p.Data.IsImpostor).ToList();
                 break;
                 case VisibleBy.DeadImpostor:
-                    roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => p.Data.IsDead && p.Data.IsImpostor).ToList();
+                    RoleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => p.Data.IsDead && p.Data.IsImpostor).ToList();
                 break;
                 case VisibleBy.SameRole:
-                    roleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => HasRole(p)).ToList();
+                    RoleVisibleByWhitelist = PlayerControl.AllPlayerControls.ToArray().Where(p => HasRole(p)).ToList();
                 break;
             }
         }
@@ -600,4 +600,3 @@ namespace Harion.CustomRoles {
         }
     }
 }
-        

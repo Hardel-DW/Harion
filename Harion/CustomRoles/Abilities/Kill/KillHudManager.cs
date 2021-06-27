@@ -1,4 +1,5 @@
-﻿using Harion.Enumerations;
+﻿using Harion.CustomKeyBinds.Patch;
+using Harion.Enumerations;
 using HarmonyLib;
 using InnerNet;
 using UnityEngine;
@@ -14,52 +15,49 @@ namespace Harion.CustomRoles.Abilities.Kill {
             if (PlayerControl.LocalPlayer == null || PlayerControl.AllPlayerControls == null)
                 return;
 
-            if (PlayerControl.LocalPlayer.Data == null || !(PlayerControl.AllPlayerControls.Count > 1))
+            if (PlayerControl.LocalPlayer.Data == null || PlayerControl.AllPlayerControls.Count < 1)
                 return;
-            
-            foreach (var Role in RoleManager.AllRoles) {
-                KillAbility KillAbility = Role.GetAbility<KillAbility>();
-                if (KillAbility == null)
-                    continue;
 
-                if (KillAbility.WhiteListKill == null)
-                    if (KillAbility.CanKill != VisibleBy.Nobody || PlayerControl.LocalPlayer.Data.IsImpostor)
-                        KillAbility.DefineKillWhiteList();
+            RoleManager Role = RoleManager.GetMainRole(PlayerControl.LocalPlayer);
+            KillAbility KillAbility = Role?.GetAbility<KillAbility>();
+            if (KillAbility == null)
+                return;
 
-                if (KillAbility.KillCooldown == 0f && PlayerControl.LocalPlayer.Data.IsImpostor)
-                    KillAbility.KillCooldown = PlayerControl.GameOptions.KillCooldown;
+            if (KillAbility.WhiteListKill == null)
+                if (KillAbility.CanKill != Killable.Nobody || PlayerControl.LocalPlayer.Data.IsImpostor)
+                    KillAbility.DefineKillWhiteList();
 
-                if ((AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Started) || (AmongUsClient.Instance.GameMode == GameModes.FreePlay)) {
-                    if (Role.HasRole(PlayerControl.LocalPlayer) && KillAbility.WhiteListKill != null) {
-                        PlayerControl ClosestPlayer = KillAbility.GetClosestTarget(PlayerControl.LocalPlayer);
+            if (KillAbility.KillCooldown == 0f && PlayerControl.LocalPlayer.Data.IsImpostor)
+                KillAbility.KillCooldown = PlayerControl.GameOptions.KillCooldown;
+
+            if ((AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Started) || (AmongUsClient.Instance.GameMode == GameModes.FreePlay)) {
+                if (KillAbility.WhiteListKill != null) {
+                    PlayerControl ClosestPlayer = KillAbility.GetClosestTarget(PlayerControl.LocalPlayer);
                         
-                        if (PlayerControl.LocalPlayer.Data.IsDead) {
-                            KillButton.gameObject.SetActive(false);
-                            KillButton.isActive = false;
-                        } else {
-                            KillButton.gameObject.SetActive(!MeetingHud.Instance);
-                            KillButton.isActive = !MeetingHud.Instance;
-                            KillButton.SetCoolDown(KillAbility.KillTimer(), KillAbility.KillCooldown);
-
-                            if (Input.GetKeyDown(CustomKeyBinds.Patch.KeyBindPatch.Kill.Key))
-                                KillButton.PerformKill();
-                            
-                            float distBetweenPlayers = Vector3.Distance(PlayerControl.LocalPlayer.transform.position, ClosestPlayer.transform.position);
-
-                            if ((distBetweenPlayers < GameOptionsData.KillDistances[PlayerControl.GameOptions.KillDistance]) && KillButton.enabled)
-                                KillButton.SetTarget(ClosestPlayer);
-                        }
-
-                        break;
-                    } else if (PlayerControl.LocalPlayer.Data.IsImpostor && !PlayerControl.LocalPlayer.Data.IsDead) {
-                        __instance.KillButton.gameObject.SetActive(!MeetingHud.Instance);
-                        __instance.KillButton.isActive = !MeetingHud.Instance;
-
-                        break;
-                    } else {
+                    if (PlayerControl.LocalPlayer.Data.IsDead) {
                         KillButton.gameObject.SetActive(false);
                         KillButton.isActive = false;
+                    } 
+                    else {
+                        KillButton.gameObject.SetActive(!MeetingHud.Instance);
+                        KillButton.isActive = !MeetingHud.Instance;
+                        KillButton.SetCoolDown(KillAbility.KillTimer(), KillAbility.KillCooldown);
+
+                        if (Input.GetKeyDown(KeyBindPatch.Kill.Key))
+                            KillButton.PerformKill();
+                            
+                        float distBetweenPlayers = Vector3.Distance(PlayerControl.LocalPlayer.transform.position, ClosestPlayer.transform.position);
+                        if ((distBetweenPlayers < GameOptionsData.KillDistances[PlayerControl.GameOptions.KillDistance]) && KillButton.enabled)
+                            KillButton.SetTarget(ClosestPlayer);
                     }
+
+                } else if (PlayerControl.LocalPlayer.Data.IsImpostor && !PlayerControl.LocalPlayer.Data.IsDead) {
+                    __instance.KillButton.gameObject.SetActive(!MeetingHud.Instance);
+                    __instance.KillButton.isActive = !MeetingHud.Instance;
+                } 
+                else {
+                    KillButton.gameObject.SetActive(false);
+                    KillButton.isActive = false;
                 }
             }
         }

@@ -168,6 +168,9 @@ namespace Harion.Cooldown {
                 ClosestRenderer = null;
             }
 
+            if (ClosestElement != null)
+                ClosestElement = null;
+
             if (Closest == null || Closest == Cooldown.ClosestElement.Empty)
                 return;
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Harion.CustomRoles.Patch {
 
-    [HarmonyPatch(typeof(ShipStatus), nameof(ShipStatus.Start))]
+    [HarmonyPatch(typeof(ShipStatus), nameof(ShipStatus.Begin))]
     public static class ShipStatusStart {
         public static void Postfix(ShipStatus __instance) {
             foreach (var Role in RoleManager.AllRoles) {
