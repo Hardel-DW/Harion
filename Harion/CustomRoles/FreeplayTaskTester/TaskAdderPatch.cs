@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -28,6 +27,25 @@ namespace Harion.CustomRoles.FreeplayTaskTester {
             Folders.ForEach(b => NewArray.Add(b));
             __instance.Root.SubFolders = NewArray;
             __instance.GoToRoot();
+
+            CreateScroller(__instance);
+        }
+
+        private static void CreateScroller(TaskAdderGame Instance) {
+            GameObject ScrollerEntries = new GameObject { name = "ScrollerEntries", layer = 5 };
+            ScrollerEntries.transform.localPosition = new Vector3(0f, 0f, 0f);
+            ScrollerEntries.transform.localScale = new Vector3(1f, 1f, 1f);
+            ScrollerEntries.transform.SetParent(Instance.transform);
+
+            Scroller scrollEntries = ScrollerEntries.AddComponent<Scroller>();
+            scrollEntries.allowX = false;
+            scrollEntries.allowY = true;
+            scrollEntries.velocity = new Vector2(0.008f, 0.005f);
+            scrollEntries.ScrollerYRange = new FloatRange(0f, 0f);
+            scrollEntries.YBounds = new FloatRange(1.5f, 3f);
+            scrollEntries.Inner = Instance.TaskParent;
+            ScrollerEntries.SetActive(true);
+
         }
     }
 }
