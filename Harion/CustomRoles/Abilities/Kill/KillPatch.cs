@@ -24,6 +24,8 @@ namespace Harion.CustomRoles.Abilities.Kill {
                         Role.OnLocalAttempKill(PlayerControl.LocalPlayer, __instance.CurrentTarget);
                         return false;
                     }
+
+                    return true;
                 }
 
                 KillAbility KillAbility = Role?.GetAbility<KillAbility>();

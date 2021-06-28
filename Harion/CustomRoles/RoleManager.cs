@@ -34,7 +34,7 @@ namespace Harion.CustomRoles {
         public bool HasWin = false;
         public Color Color = new Color(1f, 0f, 0f, 1f);
         public IntroCutSceneTeam TeamIntro = IntroCutSceneTeam.Default;
-        public RoleType RoleType = RoleType.Default;
+        public RoleType RoleType = RoleType.Crewmate;
         public PlayerSide Side = PlayerSide.Crewmate;
         public VisibleBy VisibleBy = VisibleBy.Self;
         public Moment GiveTasksAt = Moment.StartGame;
@@ -264,6 +264,8 @@ namespace Harion.CustomRoles {
 
 
         // Whitelist visible List
+        public static List<RoleManager> GetRolesBySide(RoleType Side) => AllRoles.Where(Role => Role.RoleType == Side).ToList();
+
         public virtual void DefineVisibleByWhitelist() {
             RoleVisibleByWhitelist = new List<PlayerControl>();
 
@@ -303,11 +305,12 @@ namespace Harion.CustomRoles {
             return AllRoles.FirstOrDefault(r => r.RoleId == RoleId);
         }
 
+        public static bool HasMainRole(PlayerControl Player) => GetMainRole(Player) != null;
+
+        public static bool HasRoles(PlayerControl Player) => GetAllRoles(Player).Count > 0;
+
         public static RoleManager GetMainRole(PlayerControl PlayerToCheck) {
-            if (GetAllRoles(PlayerToCheck).Count > 0)
-                return GetAllRoles(PlayerToCheck).FirstOrDefault(role => role.IsMainRole);
-            else
-                return null;
+            return GetAllRoles(PlayerToCheck).FirstOrDefault(role => role.IsMainRole);
         }
 
         public static List<RoleManager> GetAllRoles(PlayerControl PlayerToCheck) {

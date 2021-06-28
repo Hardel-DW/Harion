@@ -1,8 +1,9 @@
 ﻿namespace Harion.Enumerations {
     public enum RoleType : byte {
-        Default,
-        Good,
+        Crewmate,
         Neutral,
-        Bad
+        Impostor,
+        Dead,
+        Undefined
     }
 }

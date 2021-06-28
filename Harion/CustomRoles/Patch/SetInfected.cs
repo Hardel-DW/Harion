@@ -20,6 +20,9 @@ namespace Harion.CustomRoles.Patch {
         }
 
         public static void Postfix() {
+            if (AmongUsClient.Instance.GameMode == GameModes.FreePlay)
+                return;
+
             List<PlayerControl> playersList = PlayerControl.AllPlayerControls.ToArray().ToList();
             RoleManager.ClearAllRoles();
             List<RoleManager> Roles = RoleManager.AllRoles.OrderBy(e => random.Next()).ToList();
@@ -66,24 +69,15 @@ namespace Harion.CustomRoles.Patch {
                     AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
                 }
             }
-
-            if (AmongUsClient.Instance.AmHost) {
-                foreach (var Role in RoleManager.AllRoles) {
-                    Role.OnInfectedEnd();
-                    Role.DefineVisibleByWhitelist();
-                }
-            }
         }
     }
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.SetInfected))]
     public static class LocalSetInfectedPatch {
         public static void Postfix(PlayerControl __instance) {
-            if (!AmongUsClient.Instance.AmHost) {
-                foreach (var Role in RoleManager.AllRoles) {
-                    Role.OnInfectedEnd();
-                    Role.DefineVisibleByWhitelist();
-                }
+            foreach (var Role in RoleManager.AllRoles) {
+                Role.OnInfectedEnd();
+                Role.DefineVisibleByWhitelist();
             }
         }
     }

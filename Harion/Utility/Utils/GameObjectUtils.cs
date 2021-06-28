@@ -126,6 +126,17 @@ namespace Harion.Utility.Utils {
             return null;
         }
 
+        public static GameObject FindObjectSiblings(this GameObject parent, string name) {
+            Transform[] transforms = parent.transform.parent.GetComponentsInChildren<Transform>(true);
+            foreach (Transform transform in transforms) {
+                if (transform.name == name) {
+                    return transform.gameObject;
+                }
+            }
+
+            return null;
+        }
+
         public static void ChangeX(this ref Vector3 v, float x) {
             v = new Vector3(x, v.y, v.z);
         }   
