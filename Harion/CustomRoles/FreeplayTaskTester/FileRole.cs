@@ -67,12 +67,12 @@ namespace Harion.CustomRoles.FreeplayTaskTester {
         private static void OnClick(TaskAddButton taskFolder, RoleManager role) {
             GameData.PlayerInfo data = PlayerControl.LocalPlayer.Data;
             if (role.HasRole(data.Object)) {
+                role.RpcRemovePlayer(data.Object);
+                taskFolder.Overlay.enabled = false;
+
                 if (data.IsImpostor) {
                     PlayerControl.LocalPlayer.RemoveInfected();
                 }
-
-                role.RpcRemovePlayer(data.Object);
-                taskFolder.Overlay.enabled = false;
             } else {
                 if (RoleManager.HasMainRole(data.Object)) {
                     RoleManager Role = RoleManager.GetMainRole(data.Object);

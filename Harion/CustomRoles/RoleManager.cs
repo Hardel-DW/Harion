@@ -135,8 +135,10 @@ namespace Harion.CustomRoles {
             if (Player != null) {
                 RoleManager MainRole = GetMainRole(Player);
 
-                if (MainRole == null || !IsMainRole)
+                if (MainRole == null || !IsMainRole) {
                     AllPlayers.Add(Player);
+                    AddImportantTasks(Player);
+                }
             }
 
             DefineVisibleByWhitelist();
@@ -185,6 +187,9 @@ namespace Harion.CustomRoles {
 
         // Remove method
         private void RemovePlayer(byte PlayerId) {
+            if (PlayerId == PlayerControl.LocalPlayer.PlayerId)
+                RemoveImportantTasks(PlayerControl.LocalPlayer);
+
             AllPlayers.RemovePlayer(PlayerId);
             DefineVisibleByWhitelist();
         }
