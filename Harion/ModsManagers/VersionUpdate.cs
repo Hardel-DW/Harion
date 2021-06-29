@@ -7,14 +7,15 @@ namespace Harion.ModsManagers {
         public string TagName { get; set; }
         public string NameVerion { get; set; }
         public string Markdown { get; set; }
-        public string UrlDownload { get; set; }
+        public string IdAsset { get; set; }
+        public string DonwloadUrl { get; set; }
         public DateTime ReleaseDate { get; set; }
         public Color ButtonColor { get; set; }
 
-        public VersionUpdate(string tagName, string nameVerion, string urlDownload) {
+        public VersionUpdate(string tagName, string nameVerion, string idAsset) {
             TagName = tagName;
             NameVerion = nameVerion;
-            UrlDownload = urlDownload;
+            IdAsset = idAsset;
         }
 
         public static bool operator == (VersionUpdate a, VersionUpdate b) {

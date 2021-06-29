@@ -99,7 +99,7 @@ namespace Harion.Utility.Utils {
             void OnClick() => System.Diagnostics.Process.Start(URL);
         }
 
-        internal static void PopupUpdateMods(string text, string URL) {
+        internal static void PopupUpdateMods(string text, string AssetId) {
             if (ItsInitialize()) {
                 Coroutines.Start(UpdateText());
                 PassiveButton[] PassivesButtons = Follow.GetComponents<PassiveButton>();
@@ -121,7 +121,11 @@ namespace Harion.Utility.Utils {
 
             void OnMouseOver() => Follow.GetComponent<SpriteRenderer>().color = new Color(0.3f, 1f, 0.3f, 1f);
             void OnMouseOut() => Follow.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1, 1f);
-            void OnClick() => ModsManagers.Mods.ModsInformation.Instance.UpdateMods();
+            void OnClick() {
+                Close();
+                ModsManagers.Mods.ModSelection.Instance.CloseModsMenuActive();
+                ModsManagers.Mods.ModsInformation.Instance.UpdateMods(AssetId);
+            }
         }
 
 

@@ -1,16 +1,19 @@
 ﻿using BepInEx;
 using Harion.Utility.Helper;
 using Harion.Utility.Utils;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using Object = UnityEngine.Object;
 
 namespace Harion.ModsManagers.Mods {
 
@@ -273,15 +276,19 @@ namespace Harion.ModsManagers.Mods {
 
             // Update
             TextMeshPro tmpUpdate = UpdateText.GetComponent<TextMeshPro>();
-            tmpUpdate.autoSizeTextContainer = true;
+            tmpUpdate.autoSizeTextContainer = false;
+            tmpUpdate.enableAutoSizing = true;
+            tmpUpdate.fontSizeMin = 1;
+            tmpUpdate.fontSizeMax = 2;
             tmpUpdate.fontSize = 2;
-            tmpUpdate.alignment = TextAlignmentOptions.Top;
+            tmpUpdate.verticalAlignment = VerticalAlignmentOptions.Middle;
+            tmpUpdate.horizontalAlignment = HorizontalAlignmentOptions.Center;
 
             RectTransform rectUpdate = UpdateText.GetComponent<RectTransform>();
             rectUpdate.anchorMin = new Vector2(0.5f, 0.5f);
             rectUpdate.anchorMax = new Vector2(0.5f, 0.5f);
-            rectUpdate.offsetMin = new Vector2(2f, 2.14825f);
-            rectUpdate.offsetMax = new Vector2(-2f, -2.14825f);
+            rectUpdate.offsetMin = new Vector2(2.5f, 2.14825f);
+            rectUpdate.offsetMax = new Vector2(-2.5f, -2.14825f);
             rectUpdate.sizeDelta = new Vector2(5.0469f, 4.2965f);
             UpdateText.transform.localPosition = new Vector3(0f, -3.25f, -2f);
 
@@ -335,20 +342,25 @@ namespace Harion.ModsManagers.Mods {
             Instance = new ModsInformation(instance, Parent);
         }
 
-        public async Task<bool> DownloadUpdate() {
+        public async Task<bool> DownloadUpdate(string AssetId) {
             try {
                 HttpClient http = new HttpClient();
-                http.DefaultRequestHeaders.Add("User-Agent", "Mod Getter");
-                http.DefaultRequestHeaders.Add("Authorization", ModData.GithubToken);
-                var response = await http.GetAsync(new System.Uri(ModData.UpdateLink), HttpCompletionOption.ResponseContentRead);
+                
+                http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue($"HarionUpdater-{ModData.Name}", ModData.Version));
+                if (ModData.GithubRepositoryVisibility == Configuration.GithubVisibility.Private) {
+                    http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/octet-stream"));
+                    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", ModData.GithubToken);
+                }
+
+                var response = await http.GetAsync(new Uri(ModData.GithubUpdate(AssetId)));
                 if (response.StatusCode != HttpStatusCode.OK || response.Content == null) {
-                    System.Console.WriteLine("Server returned no data: " + response.StatusCode.ToString());
+                    System.Console.WriteLine("Server returned no data: " +  response.StatusCode.ToString() + " " + response.RequestMessage.RequestUri);
                     return false;
                 }
 
                 string codeBase = Assembly.GetExecutingAssembly().CodeBase;
-                System.UriBuilder uri = new System.UriBuilder(codeBase);
-                string fullname = System.Uri.UnescapeDataString(uri.Path);
+                UriBuilder uri = new UriBuilder(codeBase);
+                string fullname = Uri.UnescapeDataString(uri.Path);
                 if (File.Exists(fullname + ".old"))
                     File.Delete(fullname + ".old");
 
@@ -356,12 +368,12 @@ namespace Harion.ModsManagers.Mods {
 
                 using (var responseStream = await response.Content.ReadAsStreamAsync()) {
                     using (var fileStream = File.Create(fullname)) {
-                        responseStream.CopyTo(fileStream);
+                        responseStream.CopyTo(fileStream);  
                     }
                 }
 
                 return true;
-            } catch (System.Exception ex) {
+            } catch (Exception ex) {
                 HarionPlugin.Logger.LogError(ex.ToString());
                 System.Console.WriteLine(ex);
             }
@@ -369,11 +381,13 @@ namespace Harion.ModsManagers.Mods {
             return false;
         }
 
-        public void UpdateMods() {
+        public void UpdateMods(string URL) {
             if (ModData.CanUpdate) {
-                bool Updated = DownloadUpdate().GetAwaiter().GetResult();
+                bool Updated = DownloadUpdate(URL).GetAwaiter().GetResult();
                 if (Updated)
                     UpdateText.GetComponent<TextMeshPro>().text = "The mod has been updated with success !\nRestart the game to make the changes effective.";
+                else
+                    UpdateText.GetComponent<TextMeshPro>().text = "Update wasn't successful\nTry again later, or update manually.";
             }
         }
     }

@@ -11,6 +11,7 @@ using UnityEngine.Events;
 using Object = UnityEngine.Object;
 using Newtonsoft.Json.Linq;
 using System.Linq;
+using System.Net.Http.Headers;
 
 namespace Harion.ModsManagers.Mods {
     internal class ModSelection {
@@ -145,11 +146,11 @@ namespace Harion.ModsManagers.Mods {
             }
 
             if (Versions.ElementAt(0) == TagVersion) {
-                PopupMessage.PopupUpdateMods($"You are going to update to the latest version, are you sure you want to continue ?\n{TagVersion.UrlDownload}", TagVersion.UrlDownload);
+                PopupMessage.PopupUpdateMods($"You are going to update to the latest version, are you sure you want to continue ?\n{TagVersion.DonwloadUrl}", TagVersion.IdAsset);
                 return;
             }
 
-            PopupMessage.PopupUpdateMods($"You are going to update this mod, are you sure you want to continue ?\n{TagVersion.UrlDownload}", TagVersion.UrlDownload);
+            PopupMessage.PopupUpdateMods($"You are going to update this mod, are you sure you want to continue ?\n{TagVersion.DonwloadUrl}", TagVersion.IdAsset);
         }
 
         internal void UpdateScroll() {
@@ -166,8 +167,14 @@ namespace Harion.ModsManagers.Mods {
         internal async Task<bool> GetAllTags(ModManagerData ModData) {
             try {
                 HttpClient http = new HttpClient();
-                http.DefaultRequestHeaders.Add("User-Agent", "Mod Getter");
-                var response = await http.GetAsync(new Uri(ModData.GithubTag()), HttpCompletionOption.ResponseContentRead);
+
+                http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue($"HarionUpdater-{ModData.Name}", ModData.Version));
+                if (ModData.GithubRepositoryVisibility == Configuration.GithubVisibility.Private) {
+                    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", ModData.GithubToken);
+                    http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                }
+
+                var response = await http.GetAsync(new Uri(ModData.GithubTag()));
                 if (response.StatusCode != HttpStatusCode.OK || response.Content == null) {
                     HarionPlugin.Logger.LogWarning("Server returned no data: " + response.StatusCode.ToString());
                     return false;
@@ -203,14 +210,16 @@ namespace Harion.ModsManagers.Mods {
                     }
 
                     for (JToken current = assets.First; current != null; current = current.Next) {
+                        string assetId = current["id"]?.ToString();
                         string browser_download_url = current["browser_download_url"]?.ToString();
                         string created_at = current["created_at"]?.ToString();
 
-                        if (browser_download_url != null && current["content_type"] != null) {
+                        if (assetId != null && browser_download_url != null && current["content_type"] != null) {
                             if (current["content_type"].ToString().Equals("application/x-msdownload") && browser_download_url.EndsWith(".dll")) {
-                                VersionUpdate VersionUpdate = new VersionUpdate(tagname, versionName, browser_download_url);
+                                VersionUpdate VersionUpdate = new VersionUpdate(tagname, versionName, assetId);
                                 VersionUpdate.ReleaseDate = DateTime.Parse(created_at);
                                 VersionUpdate.Markdown = body;
+                                VersionUpdate.DonwloadUrl = browser_download_url;
 
                                 Color Button = Color.white;
                                 if (ModData.Version.ToLower() == tagname.ToLower())

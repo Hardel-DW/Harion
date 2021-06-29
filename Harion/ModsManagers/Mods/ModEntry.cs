@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -121,8 +122,14 @@ namespace Harion.ModsManagers.Mods {
         internal async Task<bool> CheckUpdate() {
             try {
                 HttpClient http = new HttpClient();
-                http.DefaultRequestHeaders.Add("User-Agent", "Mod Updater");
-                var response = await http.GetAsync(new System.Uri(ModData.GithubApiLink()), HttpCompletionOption.ResponseContentRead);
+
+                http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue($"HarionUpdater-{ModData.Name}", ModData.Version));
+                if (ModData.GithubRepositoryVisibility == Configuration.GithubVisibility.Private) {
+                    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", ModData.GithubToken);
+                    http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                }
+
+                var response = await http.GetAsync(new System.Uri(ModData.GithubApiLink()));
                 if (response.StatusCode != HttpStatusCode.OK || response.Content == null) {
                     HarionPlugin.Logger.LogWarning("Server returned no data: " + response.StatusCode.ToString());
                     return false;

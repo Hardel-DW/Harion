@@ -52,13 +52,11 @@ namespace Harion.ModsManagers {
         internal string GetModPath() => $"{AssemblyPathDirectory}/{FileName}";
 
         // Link Builder
-        internal string GithubApiLink() => GithubRepositoryVisibility == GithubVisibility.Private
-            ? $"https://api.github.com/repos/{GithubAuthor}/{GithubRepository}/releases/latest?access_token={GithubToken}"
-            : $"https://api.github.com/repos/{GithubAuthor}/{GithubRepository}/releases/latest";
+        internal string GithubApiLink() => $"https://api.github.com/repos/{GithubAuthor}/{GithubRepository}/releases/latest";
 
-        internal string GithubTag() => GithubRepositoryVisibility == GithubVisibility.Private
-            ? $"https://api.github.com/repos/{GithubAuthor}/{GithubRepository}/releases?access_token={GithubToken}"
-            : $"https://api.github.com/repos/{GithubAuthor}/{GithubRepository}/releases";
+        internal string GithubTag() =>  $"https://api.github.com/repos/{GithubAuthor}/{GithubRepository}/releases";
+
+        internal string GithubUpdate(string AssetId) => $"https://api.github.com/repos/{GithubAuthor}/{GithubRepository}/releases/assets/{AssetId}";
 
         internal string GithubLink() => $"https://github.com/{GithubAuthor}/{GithubRepository}";
 
