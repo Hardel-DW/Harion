@@ -346,7 +346,7 @@ namespace Harion.ModsManagers.Mods {
             try {
                 HttpClient http = new HttpClient();
                 
-                http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue($"HarionUpdater-{ModData.Name}", ModData.Version));
+                http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue($"HarionUpdater", ModData.Version));
                 if (ModData.GithubRepositoryVisibility == Configuration.GithubVisibility.Private) {
                     http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/octet-stream"));
                     http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", ModData.GithubToken);
