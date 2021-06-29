@@ -16,8 +16,8 @@ namespace Harion {
         // Mod Manager Github Auto Updater
         public string GithubRepositoryName => "Harion";
         public string GithubAuthorName => "Hardel-DW";
-        public GithubVisibility GithubRepositoryVisibility => GithubVisibility.Private;
-        public string GithubAccessToken => "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";
+        public GithubVisibility GithubRepositoryVisibility => GithubVisibility.Public;
+        public string GithubAccessToken => "";
 
         public Dictionary<string, Sprite> ModsLinks => new Dictionary<string, Sprite>() {
             { "https://www.patreon.com/hardel", ModsSocial.PatreonSprite },
