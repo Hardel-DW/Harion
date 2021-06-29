@@ -342,27 +342,29 @@ namespace Harion.ModsManagers.Mods {
             Instance = new ModsInformation(instance, Parent);
         }
 
-        public async Task<bool> DownloadUpdate(string AssetId) {
+        public async Task<bool> DownloadUpdate(VersionUpdate VersionInfo) {
             try {
                 HttpClient http = new HttpClient();
-                
+                string URI = VersionInfo.DonwloadUrl;
+
                 http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue($"HarionUpdater", ModData.Version));
                 if (ModData.GithubRepositoryVisibility == Configuration.GithubVisibility.Private) {
                     http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/octet-stream"));
                     http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", ModData.GithubToken);
+                    URI = ModData.GithubUpdate(VersionInfo.IdAsset);
                 }
 
-                var response = await http.GetAsync(new Uri(ModData.GithubUpdate(AssetId)));
+                var response = await http.GetAsync(new Uri(URI));
                 if (response.StatusCode != HttpStatusCode.OK || response.Content == null) {
                     System.Console.WriteLine("Server returned no data: " +  response.StatusCode.ToString() + " " + response.RequestMessage.RequestUri);
                     return false;
                 }
 
-                string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+                string codeBase = ModData.Assembly.CodeBase;
                 UriBuilder uri = new UriBuilder(codeBase);
                 string fullname = Uri.UnescapeDataString(uri.Path);
                 if (File.Exists(fullname + ".old"))
-                    File.Delete(fullname + ".old");
+                     File.Delete(fullname + ".old");
 
                 File.Move(fullname, fullname + ".old");
 
@@ -381,9 +383,9 @@ namespace Harion.ModsManagers.Mods {
             return false;
         }
 
-        public void UpdateMods(string URL) {
+        public void UpdateMods(VersionUpdate VersionInfo) {
             if (ModData.CanUpdate) {
-                bool Updated = DownloadUpdate(URL).GetAwaiter().GetResult();
+                bool Updated = DownloadUpdate(VersionInfo).GetAwaiter().GetResult();
                 if (Updated)
                     UpdateText.GetComponent<TextMeshPro>().text = "The mod has been updated with success !\nRestart the game to make the changes effective.";
                 else

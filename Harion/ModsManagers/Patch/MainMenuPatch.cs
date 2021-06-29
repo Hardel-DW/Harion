@@ -262,18 +262,6 @@ namespace Harion.ModsManagers.Patch {
 
                 return value;
             }
-            
-            private static void ClearOldVersion() {
-                try {
-                    DirectoryInfo directory = new DirectoryInfo(Path.GetDirectoryName(Application.dataPath) + @"\BepInEx\plugins");
-                    string[] files = directory.GetFiles("*.old").Select(file => file.FullName).ToArray();
-                    foreach (var file in files)
-                        File.Delete(file);
-                } catch (Exception e) {
-                    HarionPlugin.Logger.LogError("Exeption has been throw when clearing old version : " + e);
-                    throw;
-                }
-            }
         }
 
         [HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.LateUpdate))]

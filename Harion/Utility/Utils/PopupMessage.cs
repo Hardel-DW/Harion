@@ -1,4 +1,5 @@
-﻿using Harion.Reactor;
+﻿using Harion.ModsManagers;
+using Harion.Reactor;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -99,7 +100,7 @@ namespace Harion.Utility.Utils {
             void OnClick() => System.Diagnostics.Process.Start(URL);
         }
 
-        internal static void PopupUpdateMods(string text, string AssetId) {
+        internal static void PopupUpdateMods(string text, VersionUpdate VersionInfo) {
             if (ItsInitialize()) {
                 Coroutines.Start(UpdateText());
                 PassiveButton[] PassivesButtons = Follow.GetComponents<PassiveButton>();
@@ -124,7 +125,7 @@ namespace Harion.Utility.Utils {
             void OnClick() {
                 Close();
                 ModsManagers.Mods.ModSelection.Instance.CloseModsMenuActive();
-                ModsManagers.Mods.ModsInformation.Instance.UpdateMods(AssetId);
+                ModsManagers.Mods.ModsInformation.Instance.UpdateMods(VersionInfo);
             }
         }
 

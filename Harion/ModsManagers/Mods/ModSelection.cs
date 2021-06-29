@@ -146,11 +146,11 @@ namespace Harion.ModsManagers.Mods {
             }
 
             if (Versions.ElementAt(0) == TagVersion) {
-                PopupMessage.PopupUpdateMods($"You are going to update to the latest version, are you sure you want to continue ?\n{TagVersion.DonwloadUrl}", TagVersion.IdAsset);
+                PopupMessage.PopupUpdateMods($"You are going to update to the latest version, are you sure you want to continue ?\n{TagVersion.DonwloadUrl}", TagVersion);
                 return;
             }
 
-            PopupMessage.PopupUpdateMods($"You are going to update this mod, are you sure you want to continue ?\n{TagVersion.DonwloadUrl}", TagVersion.IdAsset);
+            PopupMessage.PopupUpdateMods($"You are going to update this mod, are you sure you want to continue ?\n{TagVersion.DonwloadUrl}", TagVersion);
         }
 
         internal void UpdateScroll() {
