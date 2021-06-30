@@ -14,6 +14,9 @@ namespace Harion.CustomRoles.Patch {
     [HarmonyPatch(typeof(ExileController), nameof(ExileController.Begin))]
     public static class ExileControllerPatch {
         public static void Postfix([HarmonyArgument(0)] GameData.PlayerInfo exiled, ExileController __instance) {
+            if (exiled == null)
+                return;
+
             RoleManager Role = RoleManager.GetMainRole(exiled.Object);
             if (Role != null && PlayerControl.GameOptions != null) {
                 if (PlayerControl.GameOptions.ConfirmImpostor || Role.ForceExiledReveal) {
