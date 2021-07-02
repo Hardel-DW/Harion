@@ -21,6 +21,7 @@
         FixLights,
         CleanBody,
         SetColor,
-        VotingComplete
+        VotingComplete,
+        PickupObject
     }
 }
