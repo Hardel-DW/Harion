@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -147,6 +148,36 @@ namespace Harion.Utility.Utils {
 
         public static void ChangeZ(this ref Vector3 v, float z) {
             v = new Vector3(v.x, v.y, z);
+        }
+
+        public static void IterateChildren(GameObject gameObject, bool recursive, Action<GameObject> action) => DoIterate(gameObject, recursive, action);
+
+        private static void DoIterate(GameObject gameObject, bool recursive, Action<GameObject> action) {
+            for (int i = 0; i < gameObject.transform.childCount; i++) {
+                Transform child = gameObject.transform.GetChild(i);
+                if (recursive) {
+                    action(child.gameObject);
+                    DoIterate(child.gameObject, true, action);
+                }
+            }
+        }
+
+        public static List<GameObject> GetGameObjects(Vector2 Position) {
+            List<GameObject> Objets = new();
+            if (ShipStatus.Instance == null)
+                return null;
+
+            IterateChildren(ShipStatus.Instance.gameObject, true, (GameObject go) => {
+                if (go.GetComponent<SpriteRenderer>() == null)
+                    return;
+
+                Vector3 Postions = new Vector3(Position.x, Position.y, go.transform.position.z);
+                Bounds bounds = go.GetComponent<SpriteRenderer>().bounds;
+                if (bounds.Contains(Postions))
+                    Objets.Add(go);
+            });
+
+            return Objets;
         }
     }
 }
