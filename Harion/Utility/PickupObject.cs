@@ -4,11 +4,12 @@ using UnityEngine;
 using Harion.Utility.Utils;
 using Harion.Reactor;
 using UnhollowerBaseLib.Attributes;
+using InnerNet;
 
 namespace Harion.Utility {
 
     [RegisterInIl2Cpp]
-    public class PickupObject : MonoBehaviour {
+    public class PickupObject : InnerNetObject {
 
         [HideFromIl2Cpp]
         public Action OnPickup { get; set; } = null;
