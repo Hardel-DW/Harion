@@ -43,6 +43,7 @@ namespace Harion.ModsManagers.Mods {
 
             Object.Destroy(Entry.GetComponent<AnnouncementPopUp>());
             Object.Destroy(Entry.transform.Find("announcementsBanner").gameObject);
+            Object.Destroy(Entry.FindObject("Title_Text"));
             InstanceManager = instance;
 
             Entry.name = $"Mods Information";

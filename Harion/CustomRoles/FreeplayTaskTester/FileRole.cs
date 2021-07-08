@@ -93,7 +93,7 @@ namespace Harion.CustomRoles.FreeplayTaskTester {
                 TaskAddButton taskAddButton = Object.Instantiate(Instance.InfectedButton);
                 taskAddButton.name = $"FileRolesHarion - {role.Name}";
                 taskAddButton.Text.text = $"{role.Name}.exe";
-                taskAddButton.Text.font = Resources.Load("ARIAL SDF") as TMP_FontAsset;
+                taskAddButton.Text.font = ResourceLoader.FontLiberation;
                 taskAddButton.Text.fontMaterial = ResourceLoader.Liberia;
                 taskAddButton.Overlay.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
                 taskAddButton.Overlay.enabled = false;

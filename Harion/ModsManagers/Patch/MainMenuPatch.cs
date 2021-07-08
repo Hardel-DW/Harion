@@ -13,6 +13,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using Object = UnityEngine.Object;
 using Type = System.Type;
+using TMPro;
 
 namespace Harion.ModsManagers.Patch {
 
@@ -59,9 +60,10 @@ namespace Harion.ModsManagers.Patch {
                 ModsButton.name = "ModsButton";
                 ModsButton.transform.localPosition = new Vector3(ModsButton.transform.localPosition.x, 0f, ModsButton.transform.localPosition.z);
                 Object.Destroy(ModsButton.GetComponent<ImageTranslator>());
-                SpriteRenderer RendererMods = ModsButton.GetComponent<SpriteRenderer>();
-                if (RendererMods != null)
-                    RendererMods.sprite = SpriteHelper.LoadSpriteFromEmbeddedResources("Harion.Resources.ModsButton.png", 100f);
+
+                GameObject TMPText = ModsButton.FindObject("Text_TMP");
+                TMPText.GetComponent<TextMeshPro>().text = "Mods";
+                Object.Destroy(TMPText.GetComponent<TextTranslatorTMP>());
 
                 PassiveButton[] buttonLeft = ModsButton.gameObject.GetComponents<PassiveButton>();
                 foreach (PassiveButton passive in buttonLeft)
@@ -75,8 +77,8 @@ namespace Harion.ModsManagers.Patch {
                 ButtonPassiveLeft.OnMouseOut = new UnityEvent();
                 ButtonPassiveLeft.OnMouseOut.AddListener((UnityAction) OnMouseOut);
 
-                void OnMouseOver() => ModsButton.GetComponent<SpriteRenderer>().color = new Color(0.3f, 1f, 0.3f, 1f);
-                void OnMouseOut() => ModsButton.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1, 1f);
+                void OnMouseOver() => ModsButton.GetComponent<SpriteRenderer>().color = new Color(0f, 1f, 0f, 1f);
+                void OnMouseOut() => ModsButton.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 1f);
             }
 
             private static void CreatePopup(MainMenuManager __instance) {
@@ -88,6 +90,7 @@ namespace Harion.ModsManagers.Patch {
 
                 Object.Destroy(Popup.GetComponent<AnnouncementPopUp>());
                 Object.Destroy(Popup.transform.Find("Text_TMP").gameObject);
+                Object.Destroy(Popup.FindObject("Title_Text"));
                 CloseButton = Popup.transform.Find("CloseButton").gameObject;
                 Background = Popup.transform.Find("Background").gameObject;
 

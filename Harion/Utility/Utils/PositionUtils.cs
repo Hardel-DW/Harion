@@ -1,5 +1,6 @@
 ﻿using Harion.Enumerations;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Harion.Utility.Utils {
@@ -173,8 +174,26 @@ namespace Harion.Utility.Utils {
             new PositionData(MapType.Airship, new Vector2(13.878f, 5.978f), SystemTypes.Office),
             new PositionData(MapType.Airship, new Vector2(24.091f, -16.289f), SystemTypes.Office),
             new PositionData(MapType.Airship, new Vector2(24.091f, -16.289f), SystemTypes.Office),
-            new PositionData(MapType.Airship, new Vector2(24.091f, -16.289f), SystemTypes.Office),
+            new PositionData(MapType.Airship, new Vector2(24.091f, -16.289f), SystemTypes.Office)
         };
+
+        public static List<PositionData> GetLocationsByMap(MapType Map) => MapLocations.Where(location => location.map == Map).ToList();
+        public static List<PositionData> GetLocationByRoom(MapType Map, SystemTypes Room) => MapLocations.Where(location => location.room == Room && location.map == Map).ToList();
+
+        // List Management
+        public static List<PositionData> GetLocationsByMap(List<PositionData> Positons, MapType Map) => Positons.Where(location => location.map == Map).ToList();
+        public static List<PositionData> GetLocationByRoom(List<PositionData> Positons, MapType Map, SystemTypes Room) => Positons.Where(location => location.room == Room && location.map == Map).ToList();
+
+        public static PositionData GetRandomPosition(MapType Map) => GetLocationsByMap(Map)?.PickRandom();
+        public static PositionData GetRandomPositionByRoom(MapType Map, SystemTypes Room) => GetLocationByRoom(Map, Room)?.PickRandom();
+        public static PositionData GetRandomPosition(List<PositionData> Positions, MapType Map) => GetLocationsByMap(Positions, Map)?.PickRandom();
+        public static PositionData GetRandomPositionByRoom(List<PositionData> Positions, MapType Map, SystemTypes Room) => GetLocationByRoom(Positions, Map, Room)?.PickRandom();
+        public static MapType GetCurrentMap() {
+            if (PlayerControl.GameOptions == null)
+                return MapType.Skeld;
+
+            return (MapType) PlayerControl.GameOptions.MapId;
+        }
     }
 
     public sealed class PositionData {

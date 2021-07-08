@@ -1,6 +1,7 @@
 ﻿using Harion.Utility.Helper;
 using Harion.Utility.Utils;
 using HarmonyLib;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -16,10 +17,9 @@ namespace Harion.ModsManagers.Patch {
             CreditsButton.name = "CreditsButton";
             CreditsButton.transform.localPosition = new Vector3(1.025f, 0f, CreditsButton.transform.localPosition.z);
             Object.Destroy(CreditsButton.GetComponent<ImageTranslator>());
-
-            SpriteRenderer RendererCredits = CreditsButton.GetComponent<SpriteRenderer>();
-            if (RendererCredits != null)
-                RendererCredits.sprite = SpriteHelper.LoadSpriteFromEmbeddedResources("Harion.Resources.CreditsButton.png", 100f);
+            GameObject TMPText = CreditsButton.FindObject("Text_TMP");
+            TMPText.GetComponent<TextMeshPro>().text = "Credits";
+            Object.Destroy(TMPText.GetComponent<TextTranslatorTMP>());
 
             PassiveButton[] Passives = CreditsButton.gameObject.GetComponents<PassiveButton>();
             foreach (PassiveButton passive in Passives)
@@ -34,7 +34,7 @@ namespace Harion.ModsManagers.Patch {
             ButtonPassiveLeft.OnMouseOut.AddListener((UnityAction) OnMouseOut);
 
             void OnClick() => PopupMessage.PopupText("Comming Soon", true);
-            void OnMouseOver() => CreditsButton.GetComponent<SpriteRenderer>().color = new Color(0.3f, 1f, 0.3f, 1f);
+            void OnMouseOver() => CreditsButton.GetComponent<SpriteRenderer>().color = new Color(0f, 1f, 0f, 1f);
             void OnMouseOut() => CreditsButton.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1, 1f);
         }
     }

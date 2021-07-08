@@ -6,6 +6,9 @@ namespace Harion.CustomRoles.Patch {
     class PlayerUpdatePatch {
 
         public static void Postfix(PlayerControl __instance) {
+            if (__instance == null)
+                return;
+
             foreach (var Role in RoleManager.AllRoles)
                 Role.OnUpdate(__instance);
         } 

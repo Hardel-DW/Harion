@@ -103,6 +103,7 @@ namespace Harion.ModsManagers.Mods {
             // Destroy
             Object.Destroy(Entry.GetComponent<AnnouncementPopUp>());
             Object.Destroy(Entry.GetComponent<TransitionOpen>());
+            Object.Destroy(Entry.FindObject("Title_Text"));
             Object.Destroy(Entry.transform.Find("CloseButton").gameObject);
             Object.Destroy(Entry.transform.Find("announcementsBanner").gameObject);
             Object.Destroy(Background.transform.Find("IgnoreClicks").gameObject);
@@ -124,6 +125,7 @@ namespace Harion.ModsManagers.Mods {
             string DisplayTest = $"Version: {TagVersion.TagName}\n<size=2>{TagVersion.NameVerion}</size>";
             instance.StartCoroutine(Effects.Lerp(0.1f, new Action<float>((p) => {
                 TMP.SetText(DisplayTest);
+                TMP.font = ResourceLoader.FontLiberation;
                 TMP.fontMaterial = ResourceLoader.Liberia;
             })));
 

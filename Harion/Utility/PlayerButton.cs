@@ -54,6 +54,7 @@ namespace Harion.Utility {
             killButtonManager.gameObject.SetActive(true);
             killButtonManager.TimerText.enabled = false;
             UnityEngine.Object.Destroy(killButtonManager.GetComponent<SpriteRenderer>());
+            UnityEngine.Object.Destroy(killButtonManager.killText);
             PassiveButton button = killButtonManager.GetComponent<PassiveButton>();
             button.OnClick.RemoveAllListeners();
             button.OnClick.AddListener((UnityEngine.Events.UnityAction) listner);

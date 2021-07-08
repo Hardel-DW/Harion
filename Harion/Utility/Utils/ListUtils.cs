@@ -21,9 +21,23 @@ namespace Harion.Utility.Utils {
 
         public static void ShuffleByOrder<T>(this IList<T> list) => list.OrderBy(e => random.Next());
 
-        public static T PickRandom<T>(this IEnumerable<T> source) => source.PickRandom(1).Single();
+        public static T PickRandom<T>(this IEnumerable<T> source) {
+            if (source == null || source.Count() == 0)
+                return default;
 
-        public static IEnumerable<T> PickRandom<T>(this IEnumerable<T> source, int count) => source.Shuffle().Take(count);
+            IEnumerable<T> RandomElements = source.PickRandom(1);
+            if (RandomElements == null)
+                return default;
+            
+            return RandomElements.Single();
+        }
+
+        public static IEnumerable<T> PickRandom<T>(this IEnumerable<T> source, int count) {
+            if (source.Count() == 0)
+                return null;
+
+            return source.Shuffle().Take(count);
+        }
 
         public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source) => source.OrderBy(x => Guid.NewGuid());
     }

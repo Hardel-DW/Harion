@@ -51,9 +51,14 @@ namespace Harion.Cooldown {
         public int UseNumber { get; set; } = int.MaxValue;
         public UseNumberDecremantion DecreamteUseNimber { get; set; } = UseNumberDecremantion.Never;
 
-        // Text Renderer
+        // Text Cooldown Renderer
         public GameObject TextObject { get; set; }
         public TextMeshPro TextMeshPro { get; set; }
+
+        // Text Description Renderer*
+        public TextMeshPro TMP_Description { get; set; }
+        public Vector2 OffsetDescription { get; set; } = Vector2.zero;
+        public bool ActiveDescription { get; set; } = false;
 
         // Closest Element
         public ClosestElement? Closest { get; set; } = null;
@@ -90,6 +95,8 @@ namespace Harion.Cooldown {
             TextObject.name = "Information Text";
             TextMeshPro = TextObject.GetComponent<TextMeshPro>();
             TextMeshPro.transform.localPosition = new Vector3(0.35f, -0.35f, 0f);
+
+            TMP_Description = gameObject.killText;
 
             OnCreateButton();
         }
@@ -219,6 +226,9 @@ namespace Harion.Cooldown {
         private void UpdateText() {
             if (UseNumber != int.MaxValue && UseNumber > 0)
                 SetText(UseNumber.ToString());
+            
+            TMP_Description.gameObject.SetActive(ActiveDescription);
+            TMP_Description.gameObject.transform.localPosition = OffsetDescription;
         }
 
         private void DefineButtonColor(float alpha) => gameObject.renderer.color = new Color(ColorButton.r, ColorButton.g, ColorButton.b, alpha);
@@ -314,6 +324,13 @@ namespace Harion.Cooldown {
         public void SetText(string text) {
             if (TextMeshPro != null)
                 TextMeshPro.text = text;
+            else
+                HarionPlugin.Logger.LogError("TextMeshPro is not defined for this CooldownButton !");
+        }
+
+        public void SetDescriptionText(string text) {
+            if (TMP_Description != null)
+                TMP_Description.text = text;
             else
                 HarionPlugin.Logger.LogError("TextMeshPro is not defined for this CooldownButton !");
         }

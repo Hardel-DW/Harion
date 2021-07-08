@@ -140,7 +140,7 @@ namespace Harion.Utility.Utils {
 
         public static void ChangeX(this ref Vector3 v, float x) {
             v = new Vector3(x, v.y, v.z);
-        }   
+        }
 
         public static void ChangeY(this ref Vector3 v, float y) {
             v = new Vector3(v.x, y, v.z);
@@ -162,7 +162,7 @@ namespace Harion.Utility.Utils {
             }
         }
 
-        public static List<GameObject> GetGameObjects(Vector2 Position) {
+        public static List<GameObject> GetSpriteGameObjects(Vector2 Position) {
             List<GameObject> Objets = new();
             if (ShipStatus.Instance == null)
                 return null;
@@ -179,5 +179,7 @@ namespace Harion.Utility.Utils {
 
             return Objets;
         }
+
+        public static Vector2 RandomPositonInBounds(Bounds bound) => new Vector2(UnityEngine.Random.Range(bound.min.x, bound.max.x), UnityEngine.Random.Range(bound.min.y, bound.max.y));
     }
 }
