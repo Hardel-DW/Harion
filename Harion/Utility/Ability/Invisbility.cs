@@ -4,9 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using Harion.Utility.Utils;
 using Harion.Reactor;
+using Harion.Utility.Helper;
 
 namespace Harion.Utility.Ability {
     public static class Invisbility {
+
+        private static List<PlayerControl> InvisiblePlayer = new();
 
         public static void LaunchInvisibility(PlayerControl Player, float Duration, List<PlayerControl> whiteListVisibility = null) {
             MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.Invisibility, SendOption.Reliable, -1);
@@ -37,9 +40,15 @@ namespace Harion.Utility.Ability {
             Player.myRend.SetColorAlpha(alpha);
             Player.nameText.enabled = alpha <= 0 ? false : true;
 
-            if (Player.HatRenderer != null) {
-                Player.HatRenderer.FrontLayer.SetColorAlpha(alpha);
-                Player.HatRenderer.BackLayer.SetColorAlpha(alpha);
+            if (alpha >= 1f) {
+                InvisiblePlayer.RemovePlayer(Player);
+                Player.HatRenderer.BackLayer.enabled = true;
+                Player.HatRenderer.FrontLayer.enabled = true;
+            }
+            else {
+                Player.HatRenderer.BackLayer.enabled = false;
+                Player.HatRenderer.FrontLayer.enabled = false;
+                InvisiblePlayer.AddPlayer(Player);
             }
 
             if (Player.MyPhysics != null && Player.MyPhysics.Skin != null) {
@@ -53,11 +62,10 @@ namespace Harion.Utility.Ability {
                     Player.CurrentPet.shadowRend.SetColorAlpha(alpha);
                 }
             }
-
         }
 
-        private static void SetColorAlpha(this SpriteRenderer renderer, float alpha) {
-            renderer.color = new Color(renderer.color.r, renderer.color.g, renderer.color.b, alpha);
-        }
+        public static void StopInvisibility(PlayerControl Player) => Invisibility(Player, 1f);
+
+        public static bool IsInvisible(PlayerControl Player) => InvisiblePlayer.ContainsPlayer(Player);
     }
 }

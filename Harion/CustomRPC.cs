@@ -22,6 +22,9 @@
         CleanBody,
         SetColor,
         VotingComplete,
-        PickupObject
+        PickupObject,
+
+        OnPlaceSyncroObject,
+        OnDestroySyncroObject
     }
 }

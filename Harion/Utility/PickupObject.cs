@@ -4,15 +4,16 @@ using UnityEngine;
 using Harion.Utility.Utils;
 using Harion.Reactor;
 using UnhollowerBaseLib.Attributes;
-using InnerNet;
 
 namespace Harion.Utility {
 
     [RegisterInIl2Cpp]
-    public class PickupObject : InnerNetObject {
+    public class PickupObject : MonoBehaviour {
+
+        public PickupObject(IntPtr ptr) : base(ptr) { }
 
         [HideFromIl2Cpp]
-        public Action OnPickup { get; set; } = null;
+        public Action<PlayerControl> OnPickup { get; set; } = null;
 
         [HideFromIl2Cpp]
         public List<PlayerControl> PlayersCanPickup { get; set; } = new List<PlayerControl>() { PlayerControl.LocalPlayer };
@@ -22,8 +23,6 @@ namespace Harion.Utility {
 
         [HideFromIl2Cpp]
         public bool DeadCanPickup { get; set; } = false;
-
-        public PickupObject(IntPtr ptr) : base(ptr) { }
 
         void OnTriggerEnter2D(Collider2D collider) {
             PlayerControl player = collider.GetComponent<PlayerControl>();
@@ -36,7 +35,7 @@ namespace Harion.Utility {
             if (!DeadCanPickup && player.Data.IsDead)
                 return;
 
-            OnPickup();
+            OnPickup(player);
             if (DestroyOnPickup)
                 Destroy(gameObject);
         }

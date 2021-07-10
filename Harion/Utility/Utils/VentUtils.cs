@@ -129,8 +129,7 @@ namespace Harion.Utility.Utils {
 			if (lastVent != null)
 				ventLeft = lastVent.Id;
 
-			Vent vent = RpcSpawnVent(ventId, Position, ventLeft, ventCrnter, ventRight);
-			return vent;
+			 return RpcSpawnVent(ventId, Position, ventLeft, ventCrnter, ventRight);
 		}
 
 		private static int GetAvailableVentId() {
@@ -167,14 +166,13 @@ namespace Harion.Utility.Utils {
 
 		private static Vent RpcSpawnVent(int id, Vector3 postion, int leftVent, int centerVent, int rightVent) {
 			Vent vent = SpawnVent(id, postion, leftVent, centerVent, rightVent);
-			MessageWriter w = AmongUsClient.Instance.StartRpc(ShipStatus.Instance.NetId, (byte) CustomRPC.PlaceVent, SendOption.Reliable);
-
-			w.WritePacked(id);
-			w.WriteVector3(postion);
-			w.WritePacked(leftVent);
-			w.WritePacked(centerVent);
-			w.WritePacked(rightVent);
-			w.EndMessage();
+			MessageWriter writter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.PlaceVent, SendOption.Reliable, -1);
+			writter.Write(id);
+			writter.WriteVector3(postion);
+			writter.Write(leftVent);
+			writter.Write(centerVent);
+			writter.Write(rightVent);
+			AmongUsClient.Instance.FinishRpcImmediately(writter);
 
 			return vent;
 		}

@@ -37,10 +37,8 @@ namespace Harion.Patch {
             if (callId == (byte) CustomRPC.SealVentBuffer) {
                 List<byte> ventIds = reader.ReadBytesAndSize().ToList();
 
-                HarionPlugin.Logger.LogInfo($"ventIds: {ventIds.Count}");
                 foreach (var ventId in ventIds) {
                     Vent vent = VentUtils.IdToVent(ventId);
-                    HarionPlugin.Logger.LogInfo($"ventId: {vent.Id}, ventsToSeal: {vent.name}");
                     VentUtils.SealVent(vent);
                 }
 
@@ -48,19 +46,15 @@ namespace Harion.Patch {
             }
 
             if (callId == (byte) CustomRPC.PlaceVent) {
-                int id = reader.ReadPackedInt32();
+                int id = reader.ReadInt32();
                 Vector3 postion = reader.ReadVector3();
-                int leftVent = reader.ReadPackedInt32();
-                int centerVent = reader.ReadPackedInt32();
-                int rightVent = reader.ReadPackedInt32();
+                int leftVent = reader.ReadInt32();
+                int centerVent = reader.ReadInt32();
+                int rightVent = reader.ReadInt32();
 
-                VentUtils.SpawnVent(
-                    id: id,
-                    postion: postion,
-                    leftVent: leftVent,
-                    centerVent: centerVent,
-                    rightVent: rightVent
-                );
+                HarionPlugin.Logger.LogInfo($"id: {id}, postion: {postion.x}, {postion.y}, {postion.z}, leftVent: {leftVent}, centerVent: {centerVent}, rightVent: {rightVent}");
+
+                VentUtils.SpawnVent(id, postion, leftVent, centerVent, rightVent);
                 return false;
             }
 

@@ -35,14 +35,16 @@ namespace Harion.CustomRoles.Patch {
                 }
 
                 if (RoleManager.GetAllRoles(PlayerControl.LocalPlayer).Count == 0 && PlayerControl.LocalPlayer.Data.IsImpostor) {
-                    foreach (var Player in PlayerControl.AllPlayerControls.ToArray().ToList().Where(s => s.Data.IsImpostor)) {
-                        if (RoleManager.GetAllRoles(Player).Count == 0 && PlayerControl.LocalPlayer.Data.IsImpostor) {
-                            if (MeetingHud.Instance != null) UpdateMeetingVanillaHUD(MeetingHud.Instance, Player);
+                    foreach (PlayerControl Player in PlayerControlUtils.GetImpostors()) {
+                        if (RoleManager.GetAllRoles(Player).Count == 0) {
+                            if (MeetingHud.Instance != null) 
+                                UpdateMeetingVanillaHUD(MeetingHud.Instance, Player);
                             else DefineName(Player, Palette.ImpostorRed, RoleManager.NameTextVanilla(Player));
                         }
                         else {
                             RoleManager role = RoleManager.GetAllRoles(Player).FirstOrDefault();
-                            if (MeetingHud.Instance != null) UpdateMeetingRole(MeetingHud.Instance, Player, role);
+                            if (MeetingHud.Instance != null) 
+                                UpdateMeetingRole(MeetingHud.Instance, Player, role);
                             else DefineName(Player, role.Color, role.NameText(Player));
                         }
                     }

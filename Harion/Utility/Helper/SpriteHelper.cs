@@ -1,14 +1,12 @@
-﻿using Harion.Reactor;
-using Harion.Utility.Utils;
+﻿using Harion.Utility.Utils;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using UnhollowerBaseLib;
 using UnityEngine;
 
 namespace Harion.Utility.Helper {
-    public class SpriteHelper {
+    public static class SpriteHelper {
         private static SpriteRenderer herePoint = null;
 
         public static SpriteRenderer HerePoint {
@@ -51,6 +49,21 @@ namespace Harion.Utility.Helper {
             return null;
         }
 
+        public static Sprite LoadSpriteFromEmbeddedResources(string resource, Assembly assembly = null) {
+            try {
+                Assembly myAssembly = null;
+                myAssembly = assembly == null ? Assembly.GetCallingAssembly() : assembly;
+                Stream myStream = Assembly.Load(myAssembly.GetName()).GetManifestResourceStream(resource);
+
+                byte[] image = new byte[myStream.Length];
+                myStream.Read(image, 0, (int) myStream.Length);
+                Texture2D myTexture = new Texture2D(2, 2, TextureFormat.ARGB32, true);
+                LoadImage(myTexture, image, true);
+                return Sprite.Create(myTexture, new Rect(0, 0, myTexture.width, myTexture.height), new Vector2(0.5f, 0.5f), myTexture.width);
+            } catch { }
+            return null;
+        }
+
         public static Sprite LoadHatSprite(string resource, Assembly assembly = null) {
             try {
                 Assembly myAssembly = null;
@@ -78,6 +91,10 @@ namespace Harion.Utility.Helper {
             var il2cppArray = (Il2CppStructArray<byte>) data;
 
             return iCall_LoadImage.Invoke(tex.Pointer, il2cppArray.Pointer, markNonReadable);
+        }
+
+        public static void SetColorAlpha(this SpriteRenderer renderer, float alpha) {
+            renderer.color = new Color(renderer.color.r, renderer.color.g, renderer.color.b, alpha);
         }
     }
 }
