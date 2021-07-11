@@ -268,7 +268,9 @@ namespace Harion.Cooldown {
                 gameObject.SetCoolDown(Timer, MaxTimer);
             }
 
-            Key = CustomKeyBind();
+            if (CustomKeyBind != null)
+                Key = CustomKeyBind();
+
             OnPostUpdate();
         }
 
