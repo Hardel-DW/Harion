@@ -10,7 +10,8 @@ namespace Harion.CustomRoles.Patch {
                 return;
 
             foreach (var Role in RoleManager.AllRoles)
-                Role.OnUpdate(__instance);
+                if (Role != null)
+                    Role.OnUpdate(__instance);
         } 
     }
 }

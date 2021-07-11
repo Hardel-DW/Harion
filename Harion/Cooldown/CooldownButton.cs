@@ -8,6 +8,7 @@ using Harion.Utility.Utils;
 using Object = UnityEngine.Object;
 using Hazel;
 using System.Reflection;
+using System;
 
 namespace Harion.Cooldown {
 
@@ -33,6 +34,7 @@ namespace Harion.Cooldown {
         // Configuration
         public RoleManager Roles { get; set; } = null;
         public KeyCode Key { get; set; } = KeyCode.None;
+        public Func<KeyCode> CustomKeyBind { get; set; } = null;
 
         // Usable
         public bool CanUse { get; set; } = false;
@@ -266,6 +268,7 @@ namespace Harion.Cooldown {
                 gameObject.SetCoolDown(Timer, MaxTimer);
             }
 
+            Key = CustomKeyBind();
             OnPostUpdate();
         }
 
@@ -294,6 +297,12 @@ namespace Harion.Cooldown {
             Assembly assembly = Assembly.GetCallingAssembly();
             Sprite Sprite = SpriteHelper.LoadSpriteFromEmbeddedResources(EmbeddedName, PixelPerUnit, assembly);
             this.PixelPerUnit = PixelPerUnit;
+            this.Sprite = Sprite;
+        }
+
+        public void SetSprite(string EmbeddedName) {
+            Assembly assembly = Assembly.GetCallingAssembly();
+            Sprite Sprite = SpriteHelper.LoadSpriteFromEmbeddedResources(EmbeddedName, assembly);
             this.Sprite = Sprite;
         }
 

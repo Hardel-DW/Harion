@@ -120,7 +120,7 @@ namespace Harion.Utility.Utils {
 			return vent?.GetComponent<SpriteRenderer>()?.sprite;
 		}
 
-		public static Vent PlaceVent(Vector3 Position) {
+		public static Vent RpcPlaceVent(Vector3 Position) {
 			int ventId = GetAvailableVentId();
 			int ventLeft = int.MaxValue;
 			int ventCrnter = int.MaxValue;
@@ -129,7 +129,19 @@ namespace Harion.Utility.Utils {
 			if (lastVent != null)
 				ventLeft = lastVent.Id;
 
-			 return RpcSpawnVent(ventId, Position, ventLeft, ventCrnter, ventRight);
+			return RpcSpawnVent(ventId, Position, ventLeft, ventCrnter, ventRight);
+		}
+
+		public static Vent PlaceLocalVent(Vector3 Position, Sprite sprite = null) {
+			int ventId = GetAvailableVentId();
+			int ventLeft = int.MaxValue;
+			int ventCrnter = int.MaxValue;
+			int ventRight = int.MaxValue;
+
+			if (lastVent != null)
+				ventLeft = lastVent.Id;
+
+			return PlaceLocalVent(ventId, Position, ventLeft, ventCrnter, ventRight, sprite);
 		}
 
 		private static int GetAvailableVentId() {
@@ -143,7 +155,7 @@ namespace Harion.Utility.Utils {
 			}
 		}
 
-		internal static Vent SpawnVent(int id, Vector3 postion, int leftVent, int centerVent, int rightVent) {
+		internal static Vent PlaceLocalVent(int id, Vector3 postion, int leftVent, int centerVent, int rightVent, Sprite sprite = null) {
 			Vent ventPref = GameObject.FindObjectOfType<Vent>();
 			Vent vent = GameObject.Instantiate<Vent>(ventPref, ventPref.transform.parent);
 
@@ -153,7 +165,21 @@ namespace Harion.Utility.Utils {
 			vent.Center = centerVent == int.MaxValue ? null : ShipStatus.Instance.AllVents.FirstOrDefault(v => v.Id == centerVent);
 			vent.Right = rightVent == int.MaxValue ? null : ShipStatus.Instance.AllVents.FirstOrDefault(v => v.Id == rightVent);
 
-            List<Vent> allVents = ShipStatus.Instance.AllVents.ToList();
+			if (sprite != null) {
+				Animator animator = vent.GetComponent<Animator>();
+				PowerTools.SpriteAnim animSprite = vent.GetComponent<PowerTools.SpriteAnim>();
+				if (animator != null)
+					Object.Destroy(animator);
+
+				if (animSprite != null)
+					Object.Destroy(animSprite);
+
+				vent.GetComponent<SpriteRenderer>().sprite = sprite;
+				vent.EnterVentAnim = null;
+				vent.ExitVentAnim = null;
+			}
+
+			List<Vent> allVents = ShipStatus.Instance.AllVents.ToList();
 			allVents.Add(vent);
 			ShipStatus.Instance.AllVents = allVents.ToArray();
 
@@ -165,7 +191,7 @@ namespace Harion.Utility.Utils {
 		}
 
 		private static Vent RpcSpawnVent(int id, Vector3 postion, int leftVent, int centerVent, int rightVent) {
-			Vent vent = SpawnVent(id, postion, leftVent, centerVent, rightVent);
+			Vent vent = PlaceLocalVent(id, postion, leftVent, centerVent, rightVent);
 			MessageWriter writter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte) CustomRPC.PlaceVent, SendOption.Reliable, -1);
 			writter.Write(id);
 			writter.WriteVector3(postion);

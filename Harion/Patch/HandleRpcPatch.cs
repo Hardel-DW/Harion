@@ -52,9 +52,7 @@ namespace Harion.Patch {
                 int centerVent = reader.ReadInt32();
                 int rightVent = reader.ReadInt32();
 
-                HarionPlugin.Logger.LogInfo($"id: {id}, postion: {postion.x}, {postion.y}, {postion.z}, leftVent: {leftVent}, centerVent: {centerVent}, rightVent: {rightVent}");
-
-                VentUtils.SpawnVent(id, postion, leftVent, centerVent, rightVent);
+                VentUtils.PlaceLocalVent(id, postion, leftVent, centerVent, rightVent);
                 return false;
             }
 

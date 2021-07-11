@@ -17,6 +17,11 @@ namespace Harion.Utility.Ability {
 
             if (resetAnim && !Player.inVent)
                 Player.MyPhysics.ResetAnimState();
+
+            if (Invisbility.IsInvisible(Player)) {
+                Player.HatRenderer.BackLayer.enabled = false;
+                Player.HatRenderer.FrontLayer.enabled = false;
+            }
         }
 
         public static void Unmorph(PlayerControl Player, bool resetAnim = false) {
@@ -30,6 +35,11 @@ namespace Harion.Utility.Ability {
 
             if (resetAnim && !Player.inVent)
                 Player.MyPhysics.ResetAnimState();
+
+            if (Invisbility.IsInvisible(Player)) {
+                Player.HatRenderer.BackLayer.enabled = false;
+                Player.HatRenderer.FrontLayer.enabled = false;
+            }
         }
 
         public static bool IsMorphed(PlayerControl Player) => MorphPlayer.ContainsPlayer(Player);
