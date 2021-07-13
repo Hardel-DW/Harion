@@ -8,7 +8,7 @@ namespace Harion.ModsManagers.Mods {
 
         public Sprite Icone;
         public string Link;
-        
+
         public ModsSocial(Sprite Icone, string Link) {
             this.Icone = Icone;
             this.Link = Link;
@@ -36,7 +36,7 @@ namespace Harion.ModsManagers.Mods {
 
             BoxCollider2D collider = SocialLink.AddComponent<BoxCollider2D>();
             collider.size = new Vector2(5f, 5f);
-            
+
             PassiveButton button = SocialLink.AddComponent<PassiveButton>();
             button.OnClick.RemoveAllListeners();
             button.OnClick.AddListener((UnityAction) OnClick);

@@ -40,5 +40,13 @@ namespace Harion.Utility.Utils {
         }
 
         public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source) => source.OrderBy(x => Guid.NewGuid());
+
+        public static Il2CppSystem.Collections.Generic.List<T> CastToIl2Cpp<T>(this List<T> Elements) {
+            Il2CppSystem.Collections.Generic.List<T> NewList = new();
+            Elements.ForEach(element => NewList.Add(element));
+            return NewList;
+        }
+
+        public static List<T> CastToList<T>(this Il2CppSystem.Collections.Generic.List<T> Elements) => Elements.ToArray().ToList();
     }
 }

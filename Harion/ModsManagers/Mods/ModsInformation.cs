@@ -98,7 +98,7 @@ namespace Harion.ModsManagers.Mods {
 
             SpriteRenderer renderer = SocialBackground.GetComponent<SpriteRenderer>();
             renderer.size = new Vector2(1f, 5.5f);
-  
+
             SocialContainer = new GameObject { name = "SocialContainer", layer = 5 };
             SocialContainer.transform.SetParent(SocialBackground.transform);
             SocialContainer.transform.localPosition = new Vector3(0f, 0f, -2f);
@@ -323,8 +323,7 @@ namespace Harion.ModsManagers.Mods {
                 EnableButton.GetComponent<SpriteRenderer>().color = new Color(0.105f, 0.854f, 0.423f, 1f);
 
                 UpdateText.GetComponent<TextMeshPro>().text = "This mod is currently disabled\nand cannot be updated.";
-            }
-            else {
+            } else {
                 textDisableButton.text = "Disable";
                 EnableButton.GetComponent<ButtonRolloverHandler>().OverColor = new Color(1f, 0f, 0f, 1f);
                 EnableButton.GetComponent<ButtonRolloverHandler>().OutColor = new Color(0.901f, 0.380f, 0.360f, 1f);
@@ -357,7 +356,7 @@ namespace Harion.ModsManagers.Mods {
 
                 var response = await http.GetAsync(new Uri(URI));
                 if (response.StatusCode != HttpStatusCode.OK || response.Content == null) {
-                    System.Console.WriteLine("Server returned no data: " +  response.StatusCode.ToString() + " " + response.RequestMessage.RequestUri);
+                    System.Console.WriteLine("Server returned no data: " + response.StatusCode.ToString() + " " + response.RequestMessage.RequestUri);
                     return false;
                 }
 
@@ -365,13 +364,13 @@ namespace Harion.ModsManagers.Mods {
                 UriBuilder uri = new UriBuilder(codeBase);
                 string fullname = Uri.UnescapeDataString(uri.Path);
                 if (File.Exists(fullname + ".old"))
-                     File.Delete(fullname + ".old");
+                    File.Delete(fullname + ".old");
 
                 File.Move(fullname, fullname + ".old");
 
                 using (var responseStream = await response.Content.ReadAsStreamAsync()) {
                     using (var fileStream = File.Create(fullname)) {
-                        responseStream.CopyTo(fileStream);  
+                        responseStream.CopyTo(fileStream);
                     }
                 }
 

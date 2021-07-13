@@ -33,7 +33,7 @@ namespace Harion.CustomRoles.Patch {
                     if (MainRole != null)
                         if (!MainRole.HasTask)
                             ValidPlayer = false;
-                    
+
                     if (ValidPlayer) {
                         foreach (var task in playerInfo.Tasks) {
                             __instance.TotalTasks++;

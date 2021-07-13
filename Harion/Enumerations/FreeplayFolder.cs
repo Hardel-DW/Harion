@@ -1,5 +1,5 @@
 ﻿namespace Harion.Enumerations {
-    public enum RoleType : byte {
+    public enum FreeplayFolder : byte {
         Crewmate,
         Neutral,
         Impostor,

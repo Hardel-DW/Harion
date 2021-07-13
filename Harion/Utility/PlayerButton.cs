@@ -98,8 +98,10 @@ namespace Harion.Utility {
                 killButtonManager.transform.localPosition = new Vector3((killButtonManager.transform.localPosition.x + 1.3f) * -1, killButtonManager.transform.localPosition.y, killButtonManager.transform.localPosition.z) + new Vector3(PositionOffset.x, PositionOffset.y);
 
             float alpha = 0;
-            if ((!showDead && Player.Data.IsDead) || BlackList.Any(item => item.PlayerId == Player.PlayerId)) alpha = 0.3f;
-            else alpha = 1f;
+            if ((!showDead && Player.Data.IsDead) || BlackList.Any(item => item.PlayerId == Player.PlayerId))
+                alpha = 0.3f;
+            else
+                alpha = 1f;
 
             TMPPlaynerName.color = new Color(TMPPlaynerName.color.r, TMPPlaynerName.color.g, TMPPlaynerName.color.b, alpha);
             herePoint.color = new Color(herePoint.color.r, herePoint.color.g, herePoint.color.b, alpha);

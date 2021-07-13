@@ -44,8 +44,7 @@ namespace Harion.Utility.Ability {
                 InvisiblePlayer.RemovePlayer(Player);
                 Player.HatRenderer.BackLayer.enabled = true;
                 Player.HatRenderer.FrontLayer.enabled = true;
-            }
-            else {
+            } else {
                 Player.HatRenderer.BackLayer.enabled = false;
                 Player.HatRenderer.FrontLayer.enabled = false;
                 InvisiblePlayer.AddPlayer(Player);

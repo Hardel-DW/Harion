@@ -8,6 +8,7 @@
         Dead,
         DeadCrewmate,
         DeadImpostor,
-        SameRole
+        SameRole,
+        Undefined
     }
 }

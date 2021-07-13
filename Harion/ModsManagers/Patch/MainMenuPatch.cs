@@ -51,7 +51,7 @@ namespace Harion.ModsManagers.Patch {
                     ModsInformation.InitializeModsInformation(__instance, Popup);
 
                 GameObject LocalButton = GameObject.Find("PlayLocalButton");
-                
+
                 // Mods Button
                 GameObject ModsButton = Object.Instantiate(LocalButton);
                 if (ModsButton == null)
@@ -138,7 +138,7 @@ namespace Harion.ModsManagers.Patch {
                 passiveButton.OnMouseOut = new UnityEvent();
 
                 SpriteRenderer renderer = RefreshButton.GetComponent<SpriteRenderer>();
-                renderer.sprite =  SpriteHelper.LoadSpriteFromEmbeddedResources("Harion.Resources.Refresh.png", 100f);
+                renderer.sprite = SpriteHelper.LoadSpriteFromEmbeddedResources("Harion.Resources.Refresh.png", 100f);
 
                 void OnClick() {
                     ModEntry.RemoveDisableEntry();
@@ -268,7 +268,7 @@ namespace Harion.ModsManagers.Patch {
         }
 
         [HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.LateUpdate))]
-        public static class MainMenuUpdate  {
+        public static class MainMenuUpdate {
             public static void Prefix(MainMenuManager __instance) {
                 if (Popup == null)
                     return;

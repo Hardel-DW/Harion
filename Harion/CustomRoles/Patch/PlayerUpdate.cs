@@ -1,17 +1,21 @@
-﻿using HarmonyLib;
+﻿using Harion.Utility.Utils;
+using HarmonyLib;
 
 namespace Harion.CustomRoles.Patch {
 
-    [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]
-    class PlayerUpdatePatch {
+    [HarmonyPriority(Priority.First)]
+    [HarmonyPatch(typeof(PlayerPhysics), nameof(PlayerPhysics.FixedUpdate))]
+    public static class PlayerUpdatePatchs {
 
-        public static void Postfix(PlayerControl __instance) {
-            if (__instance == null)
+        [HarmonyPostfix]
+        public static void Test(PlayerPhysics __instance) {
+            if (__instance.myPlayer == null || !GameUtils.GameStarted || PlayerControlUtils.IsPlayerNull || RoleManager.AllRoles == null || RoleManager.AllRoles.Count == 0)
                 return;
 
-            foreach (var Role in RoleManager.AllRoles)
-                if (Role != null)
-                    Role.OnUpdate(__instance);
-        } 
+            foreach (RoleManager Role in RoleManager.AllRoles) {
+                Role.OnUpdate(__instance.myPlayer);
+                Role.DefineVisibleByWhitelist();
+            }
+        }
     }
 }

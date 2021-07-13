@@ -8,7 +8,7 @@ namespace Harion.CustomRoles.Abilities.Light {
         public static bool Prefix(ref float __result, ShipStatus __instance, [HarmonyArgument(0)] GameData.PlayerInfo PlayerData) {
             if (PlayerData == null || PlayerData.IsDead) {
                 __result = __instance.MaxLightRadius;
-                return false; 
+                return false;
             }
 
             PlayerControl Player = PlayerData.Object;
@@ -37,10 +37,10 @@ namespace Harion.CustomRoles.Abilities.Light {
 
                 if ((lightSabotage && canSeeDuringLight) || !lightSabotage) {
                     float result = (__instance.MaxLightRadius * ((Player.Data.IsImpostor ? PlayerControl.GameOptions.ImpostorLightMod : PlayerControl.GameOptions.CrewLightMod) * LightMultiplier)) + LightAdditionnal;
-                    //Plugin.Logger.LogInfo($"LightMultiplier: {LightMultiplier}, LightAdditionnal: {LightAdditionnal}, canSeeDuringLight: {canSeeDuringLight}, lightSabotage: {lightSabotage}, Result: {result}");
                     __result = result;
                     return false;
-                } else return true;
+                } else
+                    return true;
             }
 
             return true;

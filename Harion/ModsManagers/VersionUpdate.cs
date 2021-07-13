@@ -18,7 +18,7 @@ namespace Harion.ModsManagers {
             IdAsset = idAsset;
         }
 
-        public static bool operator == (VersionUpdate a, VersionUpdate b) {
+        public static bool operator ==(VersionUpdate a, VersionUpdate b) {
             if (a is null && b is null)
                 return true;
             if (a is null || b is null)
@@ -26,7 +26,7 @@ namespace Harion.ModsManagers {
             return a.TagName == b.TagName;
         }
 
-        public static bool operator != (VersionUpdate a, VersionUpdate b) {
+        public static bool operator !=(VersionUpdate a, VersionUpdate b) {
             return !(a == b);
         }
 

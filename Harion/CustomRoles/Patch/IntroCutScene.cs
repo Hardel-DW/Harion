@@ -7,7 +7,7 @@ namespace Harion.CustomRoles.Patch {
     class IntroCutScenePatch {
         public static void IntroCutSceneRole(IntroCutscene __instance, ref Il2CppSystem.Collections.Generic.List<PlayerControl> yourTeam) {
             RoleManager Role = RoleManager.GetMainRole(PlayerControl.LocalPlayer);
-            
+
             if (Role != null) {
                 Role.DefineIntroTeam(ref yourTeam);
                 Role.OnIntroCutScene();

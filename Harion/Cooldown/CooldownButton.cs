@@ -50,14 +50,29 @@ namespace Harion.Cooldown {
         public Color EffectColorText { get; set; } = new Color(0, 255, 0);
 
         // Number Use
-        public int UseNumber { get; set; } = int.MaxValue;
-        public UseNumberDecremantion DecreamteUseNimber { get; set; } = UseNumberDecremantion.Never;
+        public bool ShowCrossRed { get; set; } = false;
+        GameObject RedCrossObject { get; set; }
+        public SpriteRenderer CrossRenderer { get; set; }
+        public UseNumberDecremantion DecreamteUseNumber { get; set; } = UseNumberDecremantion.Never;
+
+        private int _UseNumber = int.MaxValue;
+        public int UseNumber {
+            get => _UseNumber;
+            set {
+                _UseNumber = value;
+                if (value != int.MaxValue)
+                    SetText(value.ToString());
+
+                if (value <= 0)
+                    SetText("");
+            }
+        }
 
         // Text Cooldown Renderer
         public GameObject TextObject { get; set; }
         public TextMeshPro TextMeshPro { get; set; }
 
-        // Text Description Renderer*
+        // Text Description Renderer
         public TextMeshPro TMP_Description { get; set; }
         public Vector2 OffsetDescription { get; set; } = Vector2.zero;
         public bool ActiveDescription { get; set; } = false;
@@ -83,22 +98,35 @@ namespace Harion.Cooldown {
             if (gameObject == null)
                 HarionPlugin.Logger.LogError($"CooldownButton in MainMenuStart does not exist !");
 
+            // General configuration
             ColorButton = gameObject.renderer.color;
             DefaultColorText = gameObject.TimerText.color;
             gameObject.gameObject.SetActive(true);
             gameObject.renderer.enabled = true;
             gameObject.renderer.sprite = Sprite;
 
+            // OnClick
             PassiveButton button = gameObject.GetComponent<PassiveButton>();
             button.OnClick.RemoveAllListeners();
             button.OnClick.AddListener((UnityEngine.Events.UnityAction) Listener);
 
+            // Use Text
             TextObject = Object.Instantiate(gameObject.transform.GetChild(1).gameObject, gameObject.transform);
             TextObject.name = "Information Text";
             TextMeshPro = TextObject.GetComponent<TextMeshPro>();
             TextMeshPro.transform.localPosition = new Vector3(0.35f, -0.35f, 0f);
 
+            // Kill Text
             TMP_Description = gameObject.killText;
+
+            // Red Cross
+            RedCrossObject = new GameObject { layer = 5, name = "Red Cross" };
+            RedCrossObject.transform.localPosition = Vector2.zero;
+            RedCrossObject.transform.SetParent(gameObject.transform);
+            RedCrossObject.SetActive(false);
+
+            CrossRenderer = RedCrossObject.AddComponent<SpriteRenderer>();
+            CrossRenderer.sprite = ResourceLoader.RedCross;
 
             OnCreateButton();
         }
@@ -110,9 +138,10 @@ namespace Harion.Cooldown {
                     IsEffectActive = true;
                     Timer = EffectDuration;
                     gameObject.TimerText.color = EffectColorText;
-                } else Timer = MaxTimer;
+                } else
+                    Timer = MaxTimer;
 
-                if (DecreamteUseNimber == UseNumberDecremantion.OnClick)
+                if (DecreamteUseNumber == UseNumberDecremantion.OnClick)
                     UseNumber--;
 
                 OnClick();
@@ -148,7 +177,8 @@ namespace Harion.Cooldown {
             if (Roles != null)
                 if (Roles.AllPlayers == null || PlayerControl.LocalPlayer == null)
                     HasRole = false;
-                else HasRole = Roles.HasRole(PlayerControl.LocalPlayer);
+                else
+                    HasRole = Roles.HasRole(PlayerControl.LocalPlayer);
 
             if (!PlayerControl.LocalPlayer.Data.IsDead)
                 CouldUse = !MeetingHud.Instance;
@@ -156,19 +186,22 @@ namespace Harion.Cooldown {
             if (HudManager.Instance == null)
                 CouldUse = false;
 
-            if (UseNumber <= 0)
-                CouldUse = false;
-
             if (PlayerControl.LocalPlayer.Data.IsDead)
                 CouldUse = false;
 
             CanUse = CouldUse && HasRole;
-            
+
             if (!UsableButton)
                 CanUse = false;
 
             if (CanUse)
-                UpdateClosestElement(CanUse);
+                UpdateClosestElement(CanUse && UseNumber > 0);
+
+            bool Disable = UseNumber <= 0;
+            ShowCrossRed = Disable;
+            IsDisable = Disable;
+            if (Disable)
+                SetText("");
         }
 
         private void UpdateClosestElement(bool CanUse) {
@@ -226,9 +259,6 @@ namespace Harion.Cooldown {
         }
 
         private void UpdateText() {
-            if (UseNumber != int.MaxValue && UseNumber > 0)
-                SetText(UseNumber.ToString());
-            
             TMP_Description.gameObject.SetActive(ActiveDescription);
             TMP_Description.gameObject.transform.localPosition = OffsetDescription;
         }
@@ -241,6 +271,9 @@ namespace Harion.Cooldown {
             UpdateText();
             OnUpdate();
 
+            if (!UsableButton)
+                CanUse = false;
+
             if (Timer < 0f) {
                 DefineButtonColor(IsDisable ? 0.3f : 1f);
 
@@ -251,9 +284,10 @@ namespace Harion.Cooldown {
 
                     OnEffectEnd();
 
-                    if (DecreamteUseNimber == UseNumberDecremantion.OnEffectEnd)
+                    if (DecreamteUseNumber == UseNumberDecremantion.OnEffectEnd)
                         UseNumber--;
-                } else OnCooldownEnd();
+                } else
+                    OnCooldownEnd();
             } else {
                 if (CanUse && (IsEffectActive || PlayerControl.LocalPlayer.CanMove))
                     Timer -= Time.deltaTime;
@@ -270,6 +304,12 @@ namespace Harion.Cooldown {
 
             if (CustomKeyBind != null)
                 Key = CustomKeyBind();
+
+            if (Input.GetKeyDown(Key))
+                Listener();
+
+            if (RedCrossObject != null)
+                RedCrossObject.SetActive(ShowCrossRed);
 
             OnPostUpdate();
         }
@@ -314,7 +354,8 @@ namespace Harion.Cooldown {
                 IsEffectActive = true;
                 Timer = EffectDuration;
                 gameObject.TimerText.color = new Color(0, 255, 0);
-            } else Timer = MaxTimer;
+            } else
+                Timer = MaxTimer;
 
             if (DoAction)
                 OnClick();

@@ -33,19 +33,18 @@ namespace Harion.CustomRoles.Abilities.Kill {
             if ((AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Started) || (AmongUsClient.Instance.GameMode == GameModes.FreePlay)) {
                 if (KillAbility.WhiteListKill != null) {
                     PlayerControl ClosestPlayer = KillAbility.GetClosestTarget(PlayerControl.LocalPlayer);
-                        
+
                     if (PlayerControl.LocalPlayer.Data.IsDead) {
                         KillButton.gameObject.SetActive(false);
                         KillButton.isActive = false;
-                    } 
-                    else {
+                    } else {
                         KillButton.gameObject.SetActive(!MeetingHud.Instance);
                         KillButton.isActive = !MeetingHud.Instance;
                         KillButton.SetCoolDown(KillAbility.KillTimer(), KillAbility.KillCooldown);
 
                         if (Input.GetKeyDown(KeyBindPatch.Kill.Key))
                             KillButton.PerformKill();
-                            
+
                         float distBetweenPlayers = Vector3.Distance(PlayerControl.LocalPlayer.transform.position, ClosestPlayer.transform.position);
                         if ((distBetweenPlayers < GameOptionsData.KillDistances[PlayerControl.GameOptions.KillDistance]) && KillButton.enabled)
                             KillButton.SetTarget(ClosestPlayer);
@@ -54,8 +53,7 @@ namespace Harion.CustomRoles.Abilities.Kill {
                 } else if (PlayerControl.LocalPlayer.Data.IsImpostor && !PlayerControl.LocalPlayer.Data.IsDead) {
                     __instance.KillButton.gameObject.SetActive(!MeetingHud.Instance);
                     __instance.KillButton.isActive = !MeetingHud.Instance;
-                } 
-                else {
+                } else {
                     KillButton.gameObject.SetActive(false);
                     KillButton.isActive = false;
                 }

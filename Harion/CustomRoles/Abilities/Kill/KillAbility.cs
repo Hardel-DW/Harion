@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 
 namespace Harion.CustomRoles.Abilities.Kill {
-    
+
     public class KillAbility : Ability {
         public List<PlayerControl> WhiteListKill = null;
         public float KillCooldown = 0f;

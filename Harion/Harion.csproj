@@ -19,10 +19,6 @@
         <EmbeddedResource Include="Resources\*" />
         <EmbeddedResource Include="Resources\Social\*" />
     </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="Resources\harion" />
-    </ItemGroup>
     
     <Target Name="Copy" AfterTargets="PostBuildEvent">
       <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll" DestinationFiles="$(AmongUs)/BepInEx/plugins/$(AssemblyName).dll" />

@@ -33,7 +33,7 @@ namespace Harion.ModsManagers.Mods {
 
             GameObject BackdropTemplate = Template.transform.parent.parent.GetChild(0).gameObject;
             Backdrop = Object.Instantiate(BackdropTemplate, Slider.transform);
-            
+
             PassiveButton button = Backdrop.GetComponent<PassiveButton>();
             button.OnClick.RemoveAllListeners();
             button.OnClick.AddListener((UnityAction) CloseModsMenuActive);

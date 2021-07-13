@@ -34,7 +34,7 @@ namespace Harion.CustomRoles.Abilities.Kill {
 
                 if (KillAbility.WhiteListKill == null)
                     return false;
-                
+
                 PlayerControl ClosestPlayer = KillAbility.GetClosestTarget(PlayerControl.LocalPlayer);
                 bool CanKill = Vector2.Distance(PlayerControl.LocalPlayer.transform.position, ClosestPlayer.transform.position) < GameOptionsData.KillDistances[PlayerControl.GameOptions.KillDistance];
                 if (KillAbility.KillTimer() == 0f && __instance.enabled && CanKill) {

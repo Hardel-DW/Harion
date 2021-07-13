@@ -8,8 +8,7 @@ using UnityEngine.Events;
 namespace Harion.Crowded {
     internal static class CreateGameOptionsPatches {
         [HarmonyPatch(typeof(CreateOptionsPicker), nameof(CreateOptionsPicker.Start))]
-        public static class CreateOptionsPicker_Start
-        {
+        public static class CreateOptionsPicker_Start {
             public const byte maxPlayers = 127;
 
             public static void Postfix(CreateOptionsPicker __instance) {

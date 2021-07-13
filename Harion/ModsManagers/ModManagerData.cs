@@ -54,7 +54,7 @@ namespace Harion.ModsManagers {
         // Link Builder
         internal string GithubApiLink() => $"https://api.github.com/repos/{GithubAuthor}/{GithubRepository}/releases/latest";
 
-        internal string GithubTag() =>  $"https://api.github.com/repos/{GithubAuthor}/{GithubRepository}/releases";
+        internal string GithubTag() => $"https://api.github.com/repos/{GithubAuthor}/{GithubRepository}/releases";
 
         internal string GithubUpdate(string AssetId) => $"https://api.github.com/repos/{GithubAuthor}/{GithubRepository}/releases/assets/{AssetId}";
 

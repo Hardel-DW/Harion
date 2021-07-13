@@ -2,7 +2,6 @@
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using Harion.Utility.Utils;
@@ -23,16 +22,16 @@ namespace Harion.CustomRoles.FreeplayTaskTester {
             if (TaskFolderName.Contains("Harion RoleManager")) {
                 switch (taskFolder.Text.text) {
                     case "Impostor":
-                        AddFiles(__instance, taskFolder, RoleManager.GetRolesBySide(RoleType.Impostor));
+                        AddFiles(__instance, taskFolder, RoleManager.GetRolesBySide(FreeplayFolder.Impostor));
                         break;
                     case "Crewmate":
-                        AddFiles(__instance, taskFolder, RoleManager.GetRolesBySide(RoleType.Crewmate));
+                        AddFiles(__instance, taskFolder, RoleManager.GetRolesBySide(FreeplayFolder.Crewmate));
                         break;
                     case "Neutral":
-                        AddFiles(__instance, taskFolder, RoleManager.GetRolesBySide(RoleType.Neutral));
+                        AddFiles(__instance, taskFolder, RoleManager.GetRolesBySide(FreeplayFolder.Neutral));
                         break;
                     case "Dead":
-                        AddFiles(__instance, taskFolder, RoleManager.GetRolesBySide(RoleType.Dead));
+                        AddFiles(__instance, taskFolder, RoleManager.GetRolesBySide(FreeplayFolder.Dead));
                         break;
                 }
 
@@ -79,7 +78,7 @@ namespace Harion.CustomRoles.FreeplayTaskTester {
                     Role.RpcRemovePlayer(data.Object);
                 }
 
-                if (role.Side == PlayerSide.Impostor || role.Side == PlayerSide.DeadImpostor) {
+                if (role.Team == Team.Impostor) {
                     PlayerControl.LocalPlayer.RpcSetInfected(new GameData.PlayerInfo[] { data });
                 }
 

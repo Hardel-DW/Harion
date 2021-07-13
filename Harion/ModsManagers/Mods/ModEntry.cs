@@ -29,7 +29,7 @@ namespace Harion.ModsManagers.Mods {
         internal ModEntry(MainMenuManager instance, Vector2 position, string AssemblyName, GameObject Parent, ModManagerData data) {
             ModData = data;
             Instance = instance;
-            
+
             // Game Object
             Entry = Object.Instantiate(instance.Announcement.gameObject, Parent.transform);
             Entry.name = $"Entry {data.Name}";
@@ -139,7 +139,7 @@ namespace Harion.ModsManagers.Mods {
 
                 string json = await response.Content.ReadAsStringAsync();
                 JObject data = JObject.Parse(json);
-                
+
                 string tagname = data["tag_name"]?.ToString();
                 if (tagname == null) {
                     HarionPlugin.Logger.LogWarning("Tag Name Not Found: " + response.StatusCode.ToString());

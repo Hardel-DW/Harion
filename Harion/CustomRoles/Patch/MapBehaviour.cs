@@ -7,7 +7,7 @@ namespace Harion.CustomRoles.Patch {
         public static void Postfix(MapBehaviour __instance) {
             foreach (var Role in RoleManager.AllRoles)
                 Role.OnMinimapOpen(PlayerControl.LocalPlayer, __instance);
-        } 
+        }
     }
 
     [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.Close))]

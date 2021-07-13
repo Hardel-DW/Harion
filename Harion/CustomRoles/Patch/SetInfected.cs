@@ -28,18 +28,18 @@ namespace Harion.CustomRoles.Patch {
             List<RoleManager> Roles = RoleManager.AllRoles.OrderBy(e => random.Next()).ToList();
 
             foreach (RoleManager Role in Roles) {
-                if (!(Role.Side == PlayerSide.Everyone || Role.Side == PlayerSide.Crewmate || Role.Side == PlayerSide.Impostor))
-                    throw new Exception($"Error in the selection of players, for the {Role.Name} Role. \n The player Side has only three possible values: Crewmate, Impostors or Everyone, Given: {Role.Side}");
+                if (!(Role.Team == Team.Everyone || Role.Team == Team.Crewmate || Role.Team == Team.Impostor))
+                    throw new Exception($"Error in the selection of players, for the {Role.Name} Role. \n The player Side has only three possible values: Crewmate, Impostors or Everyone, Given: {Role.Team}");
 
                 int PercentApparition = new Random().Next(0, 100);
 
                 if (playersList != null && playersList.Count > 0 && Role.RoleActive && Role.NumberPlayers > 0 && Role.PercentApparition > PercentApparition) {
                     int crewmateRemaining = PlayerControl.AllPlayerControls.ToArray().ToList().Count(p => !p.Data.IsImpostor);
                     int impostorRemaining = PlayerControl.AllPlayerControls.ToArray().ToList().Count(p => p.Data.IsImpostor);
-                    if (Role.Side == PlayerSide.Crewmate && crewmateRemaining < 1)
+                    if (Role.Team == Team.Crewmate && crewmateRemaining < 1)
                         continue;
 
-                    if (Role.Side == PlayerSide.Impostor && impostorRemaining < 1)
+                    if (Role.Team == Team.Impostor && impostorRemaining < 1)
                         continue;
 
                     if (Role.OnRoleSelectedInInfected(playersList))
@@ -51,10 +51,10 @@ namespace Harion.CustomRoles.Patch {
 
                     for (int i = 0; i < Role.NumberPlayers; i++) {
                         List<PlayerControl> PlayerSelectable = playersList.ToArray().ToList();
-                        if (Role.Side == PlayerSide.Impostor)
+                        if (Role.Team == Team.Impostor)
                             PlayerSelectable.RemoveAll(x => !x.Data.IsImpostor);
 
-                        if (Role.Side == PlayerSide.Crewmate)
+                        if (Role.Team == Team.Crewmate)
                             PlayerSelectable.RemoveAll(x => x.Data.IsImpostor);
 
                         if (PlayerSelectable != null && PlayerSelectable.Count > 0) {
@@ -77,7 +77,6 @@ namespace Harion.CustomRoles.Patch {
         public static void Postfix(PlayerControl __instance) {
             foreach (var Role in RoleManager.AllRoles) {
                 Role.OnInfectedEnd();
-                Role.DefineVisibleByWhitelist();
             }
         }
     }

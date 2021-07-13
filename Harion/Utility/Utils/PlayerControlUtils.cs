@@ -6,15 +6,6 @@ using UnityEngine;
 
 namespace Harion.Utility.Utils {
     public static class PlayerControlUtils {
-        public const float OffsetTruePositionX = 0;
-        public const float OffsetTruePositionY = 0.366667f;
-
-        public static Vector2 TruePositionOffset = new Vector2(OffsetTruePositionX, OffsetTruePositionY);
-
-        public static Vector2 Position(PlayerControl player) {
-            return player.GetTruePosition() + TruePositionOffset;
-        }
-
         public static PlayerControl FromNetId(uint netId) {
             foreach (var player in PlayerControl.AllPlayerControls)
                 if (player.NetId == netId)
@@ -49,7 +40,7 @@ namespace Harion.Utility.Utils {
             return players;
         }
 
-        public static IEnumerator FlashCoroutine(UnityEngine.Color color, float waitfor = 1f, float alpha = 0.3f) {
+        public static IEnumerator FlashCoroutine(Color color, float waitfor = 1f, float alpha = 0.3f) {
             color.a = alpha;
             var fullscreen = DestroyableSingleton<HudManager>.Instance.FullScreen;
             var oldcolour = fullscreen.color;
@@ -58,21 +49,6 @@ namespace Harion.Utility.Utils {
             yield return new WaitForSeconds(waitfor);
             fullscreen.enabled = false;
             fullscreen.color = oldcolour;
-        }
-
-        /// <summary>
-        /// Set the players opacity (hat bugs a bit)
-        /// </summary>
-        /// <param name="opacity">Opacity value from 0 - 1</param>
-        public static void SetOpacity(float opacity, PlayerControl player) {
-            var toSetColor = new UnityEngine.Color(1, 1, 1, opacity);
-            player.GetComponent<SpriteRenderer>().color = toSetColor;
-
-            player.HatRenderer.FrontLayer.color = toSetColor;
-            player.HatRenderer.BackLayer.color = toSetColor;
-            player.HatRenderer.color = toSetColor;
-            player.MyPhysics.Skin.layer.color = toSetColor;
-            player.nameText.color = toSetColor;
         }
 
         public static void Telportation(Vector2 position, PlayerControl player) {
@@ -84,16 +60,10 @@ namespace Harion.Utility.Utils {
                 if (player.PlayerId == murder.PlayerId)
                     continue;
 
-                float distance = Vector2.Distance(psotion, Position(player));
-
-                if (distance < size) {
-                    murder.MurderPlayer(player);
-                }
+                float distance = Vector2.Distance(psotion, player.GetTruePosition());
+                if (distance < size)
+                    player.RpcMurderPlayer(player);
             }
-        }
-
-        public static void KillSelf(PlayerControl player) {
-            player.MurderPlayer(FromPlayerId(player.PlayerId));
         }
 
         public static void KillEveryone(PlayerControl murder) {
@@ -101,7 +71,7 @@ namespace Harion.Utility.Utils {
                 if (player.PlayerId == murder.PlayerId)
                     continue;
 
-                murder.MurderPlayer(player);
+                player.MurderPlayer(player);
             }
         }
 
@@ -172,29 +142,17 @@ namespace Harion.Utility.Utils {
             Player.MyPhysics.Speed = Speed;
         }
 
-        public static void ClearPlayerList(this List<PlayerControl> list) {
-            list.Clear();
-        }
+        public static void ClearPlayerList(this List<PlayerControl> list) => list = new();
 
-        public static bool ContainsPlayer(this List<PlayerControl> list, PlayerControl player) {
-            return list.FirstOrDefault(p => p.PlayerId == player.PlayerId);
-        }
+        public static bool ContainsPlayer(this List<PlayerControl> list, PlayerControl player) => ContainsPlayer(list, player.PlayerId);
 
-        public static bool ContainsPlayer(this List<PlayerControl> list, byte PlayerId) {
-            return list.FirstOrDefault(p => p.PlayerId == PlayerId);
-        }
+        public static bool ContainsPlayer(this List<PlayerControl> list, byte PlayerId) => list.FirstOrDefault(p => p.PlayerId == PlayerId);
 
-        public static void AddPlayer(this List<PlayerControl> list, PlayerControl Player) {
-            list.Add(Player);
-        }
+        public static void AddPlayer(this List<PlayerControl> list, PlayerControl Player) => list.Add(Player);
 
-        public static void AddPlayer(this List<PlayerControl> list, byte PlayerId) {
-            list.Add(FromPlayerId(PlayerId));
-        }
+        public static void AddPlayer(this List<PlayerControl> list, byte PlayerId) => list.Add(FromPlayerId(PlayerId));
 
-        public static void AddPlayerRange(this List<PlayerControl> list, List<PlayerControl> Players) {
-            list.AddRange(Players);
-        }
+        public static void AddPlayerRange(this List<PlayerControl> list, List<PlayerControl> Players) => list.AddRange(Players);
 
         public static void AddPlayerRange(this List<PlayerControl> list, List<byte> PlayersId) {
             foreach (var PlayerId in PlayersId)
@@ -221,5 +179,11 @@ namespace Harion.Utility.Utils {
 
         public static List<PlayerControl> GetImpostors() => PlayerControl.AllPlayerControls.ToArray().Where(p => p.Data.IsImpostor).ToList();
         public static List<PlayerControl> GetCrewmate() => PlayerControl.AllPlayerControls.ToArray().Where(p => !p.Data.IsImpostor).ToList();
+        public static List<PlayerControl> GetEveryone() => PlayerControl.AllPlayerControls.ToArray().ToList();
+        public static List<PlayerControl> GetDead() => PlayerControl.AllPlayerControls.ToArray().Where(p => p.Data.IsDead).ToList();
+        public static List<PlayerControl> GetCrewamteDead() => PlayerControl.AllPlayerControls.ToArray().Where(p => p.Data.IsDead && !p.Data.IsImpostor).ToList();
+        public static List<PlayerControl> GetImpostorDead() => PlayerControl.AllPlayerControls.ToArray().Where(p => p.Data.IsDead && p.Data.IsImpostor).ToList();
+
+        public static bool IsPlayerNull => PlayerControl.AllPlayerControls == null || PlayerControl.AllPlayerControls.Count <= 0 || PlayerControl.LocalPlayer == null || PlayerControl.LocalPlayer.Data == null;
     }
 }

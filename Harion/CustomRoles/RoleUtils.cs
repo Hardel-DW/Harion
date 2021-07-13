@@ -7,7 +7,5 @@
 
             return false;
         }
-
-        //public static bool HasRole<T>(this PlayerControl player) where T : RoleManager => RoleManager.AllRoles.Any(role => (role.ClassType.GetType() == typeof(T).GetType()) && role.HasRole(player));
     }
 }
