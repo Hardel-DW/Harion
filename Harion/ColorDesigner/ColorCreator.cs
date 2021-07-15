@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 
 namespace Harion.ColorDesigner {
-    public class ColorCreator {
+    public static class ColorCreator {
         internal static Dictionary<int, string> ColorStrings = new Dictionary<int, string>();
         internal static uint pickableColors = (uint) Palette.ColorNames.Length;
         public static List<int> lighterColors = new List<int>() { 3, 4, 5, 7, 10, 11 };
@@ -49,6 +49,14 @@ namespace Harion.ColorDesigner {
             Palette.ColorNames = longlist.ToArray();
             Palette.PlayerColors = colorlist.ToArray();
             Palette.ShadowColors = shadowlist.ToArray();
+        }
+
+        public static string ColorToHexaString(Color color) {
+            return string.Format("#{0}{1}{2}{3}",
+            ((int) (color.r * 255)).ToString("X2"),
+            ((int) (color.g * 255)).ToString("X2"),
+            ((int) (color.b * 255)).ToString("X2"),
+            ((int) (color.a * 255)).ToString("X2"));
         }
     }
 }

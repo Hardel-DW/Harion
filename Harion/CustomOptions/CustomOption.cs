@@ -219,7 +219,7 @@ namespace Harion.CustomOptions {
             Parent = parent;
             if (Parent != null) {
                 Parent.Childrens.Add(this);
-                ShowSelf(Parent._ShowChildrenConidtion());
+                ShowSelf(Parent.ShowChildrenConidtion());
 
                 if (Parent is CustomOptionHolder)
                     ShowSelf(false, false, true);
@@ -403,8 +403,8 @@ namespace Harion.CustomOptions {
 
             Value = value;
 
-            if (_ShowChildrenConidtion != null)
-                ShowChildren(_ShowChildrenConidtion());
+            if (ShowChildrenConidtion != null)
+                ShowChildren(ShowChildrenConidtion());
 
             if (SendRpc && GameObject != null && AmongUsClient.Instance?.AmHost == true && PlayerControl.LocalPlayer)
                 SendSyncro(this);
@@ -526,7 +526,7 @@ namespace Harion.CustomOptions {
                     if (!Children.Parent.IsMenuVisible()) {
                         Children.CollapseSelf(true);
                     } else {
-                        Children.ShowSelf(Option._ShowChildrenConidtion(), ChangeHudVisibleValue, ChangeMenuVisibleValue);
+                        Children.ShowSelf(Option.ShowChildrenConidtion(), ChangeHudVisibleValue, ChangeMenuVisibleValue);
                     }
 
                     TryShowChildren(Children, ChangeHudVisibleValue, ChangeMenuVisibleValue);

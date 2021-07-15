@@ -11,7 +11,7 @@ using UnityEngine;
 namespace Harion.CustomRoles {
 
     public class RoleManager {
-        public static Dictionary<PlayerControl, (Color color, string name)> SpecificNameInformation = new();
+        public static List<SpecificData> SpecificNameInformation = new();
         public static List<RoleManager> AllRoles = new List<RoleManager>();
         public static List<PlayerControl> WinPlayer = new List<PlayerControl>();
         public List<PlayerControl> AllPlayers = new List<PlayerControl>();
@@ -60,6 +60,18 @@ namespace Harion.CustomRoles {
 
                 id++;
             }
+        }
+
+        // Specific Information
+        public static void AddSpecificNameInformation(PlayerControl Player, Color color, string name, PriorityRenderer priorityRenderer = PriorityRenderer.Normal) {
+            SpecificNameInformation.Add(new SpecificData(Player, color, name, priorityRenderer));
+        }
+
+        public static List<SpecificData> GetSpecificData(PlayerControl Player) {
+            if (Player == null)
+                return default;
+
+            return SpecificNameInformation.Where(Data => Data.Player.PlayerId == Player.PlayerId).OrderBy(data => data.PriorityRenderer).ToList();
         }
 
         // Player List Management
@@ -165,23 +177,21 @@ namespace Harion.CustomRoles {
 
         public static RoleManager GetRoleById(byte RoleId) => AllRoles.FirstOrDefault(r => r.RoleId == RoleId);
 
-        public static RoleManager GetRoleToDisplay(PlayerControl Player) => HasMainRole(Player) ? GetMainRole(Player) : GetAllRoles(Player).FirstOrDefault(role => !role.IsMainRole);
-
         public static bool HasMainRole(PlayerControl Player) => GetMainRole(Player) != null;
 
         public static bool HasRoles(PlayerControl Player) => GetAllRoles(Player).Count > 0;
 
         public static RoleManager GetMainRole(PlayerControl PlayerToCheck) => GetAllRoles(PlayerToCheck).FirstOrDefault(role => role.IsMainRole);
 
-        public static List<RoleManager> GetAllRoles(PlayerControl PlayerToCheck) => AllRoles.Where(Role => Role.HasRole(PlayerToCheck)).ToList();
+        public static List<RoleManager> GetAllRoles(PlayerControl PlayerToCheck) => PlayerToCheck == null ? new() : AllRoles.Where(Role => Role.HasRole(PlayerToCheck)).ToList();
 
         public static void ClearAllRoles() => AllRoles.ForEach(role => role.AllPlayers.ClearPlayerList());
 
         public bool HasRole(byte PlayerId) => AllPlayers.Any(player => player.PlayerId == PlayerId);
 
-        public bool HasRole(PlayerControl Player) => HasRole(Player.PlayerId);
+        public bool HasRole(PlayerControl Player) => Player == null ? false : HasRole(Player.PlayerId);
 
-        public bool HasRole(GameData.PlayerInfo Player) => HasRole(Player.PlayerId);
+        public bool HasRole(GameData.PlayerInfo Player) => Player == null ? false : HasRole(Player.PlayerId);
 
         public bool ContainsAbility<T>() where T : Ability => Abilities.Any(s => s.Name == typeof(T).Name);
 
@@ -194,6 +204,26 @@ namespace Harion.CustomRoles {
             foreach (var ability in Abilities)
                 if (ability.Name == typeof(T).Name)
                     return (T) ability;
+
+            return null;
+        }
+
+        public static RoleManager GetRoleToDisplay(PlayerControl Player) {
+            if (Player == null)
+                return null;
+
+            RoleManager MainRole = GetMainRole(Player);
+            List<RoleManager> SecondaryRoles = GetAllRoles(Player).Where(Role => !Role.IsMainRole).ToList();
+
+            if (MainRole != null && MainRole.RoleVisibleByWhitelist.ContainsPlayer(PlayerControl.LocalPlayer))
+                return MainRole;
+
+            if (SecondaryRoles == null || SecondaryRoles.Count == 0)
+                return null;
+
+            foreach (RoleManager Role in SecondaryRoles)
+                if (Role.RoleVisibleByWhitelist.ContainsPlayer(PlayerControl.LocalPlayer))
+                    return Role;
 
             return null;
         }
@@ -266,7 +296,7 @@ namespace Harion.CustomRoles {
             if (Player == null)
                 return ("", null);
 
-            if (!HarionPlugin.ShowRoleInName.GetValue())
+            if (!GenericGameOptions.ShowRoleInName.GetValue())
                 return (Player.name, null);
 
             if (playerVoteArea != null && (MeetingHud.Instance.state == MeetingHud.VoteStates.Proceeding || MeetingHud.Instance.state == MeetingHud.VoteStates.Results))
@@ -279,7 +309,7 @@ namespace Harion.CustomRoles {
             if (Player == null)
                 return "";
 
-            if (!HarionPlugin.ShowRoleInName.GetValue())
+            if (!GenericGameOptions.ShowRoleInName.GetValue())
                 return Player.name;
 
             if (playerVoteArea != null && (MeetingHud.Instance.state == MeetingHud.VoteStates.Proceeding || MeetingHud.Instance.state == MeetingHud.VoteStates.Results))

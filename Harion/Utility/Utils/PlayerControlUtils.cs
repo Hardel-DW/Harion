@@ -142,7 +142,7 @@ namespace Harion.Utility.Utils {
             Player.MyPhysics.Speed = Speed;
         }
 
-        public static void ClearPlayerList(this List<PlayerControl> list) => list = new();
+        public static void ClearPlayerList(this List<PlayerControl> list) => list.Clear();
 
         public static bool ContainsPlayer(this List<PlayerControl> list, PlayerControl player) => ContainsPlayer(list, player.PlayerId);
 
@@ -172,6 +172,54 @@ namespace Harion.Utility.Utils {
             if (exist != null)
                 list.Remove(list.FirstOrDefault(p => p.PlayerId == Player.PlayerId));
         }
+
+
+        // Dictionary
+        public static void ClearPlayerList<T>(this Dictionary<PlayerControl, T> list) => list.Clear();
+
+        public static bool ContainsPlayer<T>(this Dictionary<PlayerControl, T> list, PlayerControl player) => list.ContainsPlayer(player.PlayerId);
+
+        public static bool ContainsPlayer<T>(this Dictionary<PlayerControl, T> list, byte PlayerId) => list.Any(p => p.Key.PlayerId == PlayerId);
+
+        public static void RemovePlayer<T>(this Dictionary<PlayerControl, T> list, byte PlayerId) {
+            PlayerControl PlayerToRemove = list.FirstOrDefault(p => p.Key.PlayerId == PlayerId).Key;
+
+            if (PlayerToRemove != null)
+                list.Remove(PlayerToRemove);
+        }
+
+        public static void RemovePlayer<T>(this Dictionary<PlayerControl, T> list, PlayerControl Player) {
+            if (Player != null && list != null)
+                list.RemovePlayer(Player);
+        }
+
+        public static void UpdatePlayerValue<T>(this Dictionary<PlayerControl, T> list, byte PlayerId, T value) {
+            PlayerControl Player = list.FirstOrDefault(p => p.Key.PlayerId == PlayerId).Key;
+            list[Player] = value;
+        }
+
+        public static void UpdatePlayerValue<T>(this Dictionary<PlayerControl, T> list, PlayerControl Player, T value) {
+            if (Player != null && list != null)
+                list.UpdatePlayerValue(Player, value);
+        }
+
+        public static void AddOrUpdatePlayerValue<T>(this Dictionary<PlayerControl, T> list, byte PlayerId, T value) {
+            PlayerControl Player = list.FirstOrDefault(p => p.Key.PlayerId == PlayerId).Key;
+
+            if (!list.ContainsPlayer(Player))
+                list.Add(Player, value);
+            else
+                list.UpdatePlayerValue(Player, value);
+        }
+
+        public static void AddOrUpdatePlayerValue<T>(this Dictionary<PlayerControl, T> list, PlayerControl Player, T value) {
+            if (Player != null && list != null)
+                list.AddOrUpdatePlayerValue(Player.PlayerId, value);
+        }
+
+        public static T GetValueFromPlayer<T>(this Dictionary<PlayerControl, T> list, PlayerControl player) => list.GetValueFromPlayer(player.PlayerId);
+
+        public static T GetValueFromPlayer<T>(this Dictionary<PlayerControl, T> list, byte PlayerId) => list.FirstOrDefault(p => p.Key.PlayerId == PlayerId).Value;
 
         public static Color32 ToPlayerColor(this ColorType color) => Palette.PlayerColors[(byte) color];
 

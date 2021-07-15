@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Harion.CustomRoles.Patch {
 
@@ -9,8 +8,8 @@ namespace Harion.CustomRoles.Patch {
         public static void Postfix(ShipStatus __instance) {
             foreach (var Role in RoleManager.AllRoles) {
                 Role.HasWin = false;
-                RoleManager.WinPlayer = new List<PlayerControl>();
-                RoleManager.SpecificNameInformation = new Dictionary<PlayerControl, (Color color, string name)>();
+                RoleManager.WinPlayer = new();
+                RoleManager.SpecificNameInformation = new();
                 HudUpdatePatch.MeetingIsPassed = false;
                 Role.OnGameStarted();
             }

@@ -1,5 +1,7 @@
-﻿using Harion.Utility.Utils;
+﻿using Harion.ColorDesigner;
+using Harion.Utility.Utils;
 using HarmonyLib;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -8,7 +10,7 @@ namespace Harion.CustomRoles.Patch {
     [HarmonyPatch(typeof(HudManager), nameof(HudManager.Update))]
     public static class HudUpdatePatch {
         public static bool MeetingIsPassed = false;
-        public static bool CanSeeAfterMeeting => MeetingIsPassed && HarionPlugin.DeadSeeAllRoles.GetValue() && PlayerControl.LocalPlayer.Data.IsDead;
+        public static bool CanSeeAfterMeeting => MeetingIsPassed && GenericGameOptions.DeadSeeAllRoles.GetValue() && PlayerControl.LocalPlayer.Data.IsDead;
 
         public static void Postfix(HudManager __instance) {
             UpdatePlayerVoteArea(MeetingHud.Instance);
@@ -16,7 +18,6 @@ namespace Harion.CustomRoles.Patch {
                 return;
 
             foreach (PlayerControl player in PlayerControl.AllPlayerControls) {
-                RoleManager.PlayerNamePositon(player);
                 PlayerVoteArea PlayerVoteArea = PlayerVoteAreaFromPlayerControl(player);
                 RoleManager role = RoleManager.GetRoleToDisplay(player);
 
@@ -27,11 +28,13 @@ namespace Harion.CustomRoles.Patch {
                     }
                 } else if (role.RoleVisibleByWhitelist.ContainsPlayer(PlayerControl.LocalPlayer) || CanSeeAfterMeeting)
                     DefineName(player, PlayerVoteArea, role.NameText(player), role.Color);
-            }
 
-            foreach (var SpecificInformation in RoleManager.SpecificNameInformation) {
-                PlayerVoteArea PlayerVoteArea = PlayerVoteAreaFromPlayerControl(SpecificInformation.Key);
-                DefineName(SpecificInformation.Key, PlayerVoteArea, SpecificInformation.Key.name, SpecificInformation.Value.color);
+                if (!GenericGameOptions.ShowAllSecondaryRole.GetValue() || PlayerVoteArea != null) {
+                    SpecificData SpecificData = RoleManager.GetSpecificData(player).FirstOrDefault();
+                    if (SpecificData != null)
+                        DefineName(player, PlayerVoteArea, SpecificData.Name, SpecificData.Color);
+                } else
+                    AllInformations(player, role);
             }
         }
 
@@ -57,9 +60,6 @@ namespace Harion.CustomRoles.Patch {
                 Vector3 Position = Area.NameText.transform.localPosition;
                 Position.ChangeX(0.375f);
 
-                if (!Area.NameText.text.Contains("\n"))
-                    Position.ChangeY(0.125f);
-
                 Area.NameText.transform.localPosition = Position;
             }
         }
@@ -69,6 +69,27 @@ namespace Harion.CustomRoles.Patch {
                 return null;
 
             return MeetingHud.Instance.playerStates.FirstOrDefault(playerVA => playerVA.TargetPlayerId == Player.PlayerId);
+        }
+
+        private static void AllInformations(PlayerControl Player, RoleManager ExcludeRole) {
+            if (Player == null)
+                return;
+
+            string result = Player.name;
+            List<RoleManager> AllRoles = RoleManager.GetAllRoles(Player);
+            List<SpecificData> SpecificDatas = RoleManager.GetSpecificData(Player);
+            if (ExcludeRole != null && AllRoles != null && AllRoles.Count > 0) {
+                AllRoles.RemoveAll(role => role.RoleId == ExcludeRole.RoleId);
+                AppendName(ExcludeRole.Name, ExcludeRole.Color);
+            }
+
+            AllRoles.ForEach(element => AppendName(element.Name, element.Color));
+
+            if (SpecificDatas != null && SpecificDatas.Count > 0)
+                SpecificDatas.ForEach(element => AppendName(element.Name, element.Color));
+
+            Player.nameText.text = result;
+            void AppendName(string name, Color color) => result += $"\n<color={ColorCreator.ColorToHexaString(color)}>{name}</color>";
         }
     }
 }

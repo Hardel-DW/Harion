@@ -9,7 +9,12 @@ namespace Harion.CustomRoles.Patch {
 
         [HarmonyPostfix]
         public static void Test(PlayerPhysics __instance) {
-            if (__instance.myPlayer == null || !GameUtils.GameStarted || PlayerControlUtils.IsPlayerNull || RoleManager.AllRoles == null || RoleManager.AllRoles.Count == 0)
+            if (__instance.myPlayer == null || PlayerControlUtils.IsPlayerNull)
+                return;
+
+            RoleManager.PlayerNamePositon(__instance.myPlayer);
+
+            if (!GameUtils.GameStarted || RoleManager.AllRoles == null || RoleManager.AllRoles.Count == 0)
                 return;
 
             foreach (RoleManager Role in RoleManager.AllRoles) {

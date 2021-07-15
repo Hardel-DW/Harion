@@ -70,7 +70,7 @@ namespace Harion.Patch {
                 List<PlayerControl> whiteList = PlayerControlUtils.IdListToPlayerControlList(whiteListIds);
                 PlayerControl Player = PlayerControlUtils.FromPlayerId(PlayerId);
 
-                Coroutines.Start(Invisbility.Invisibility(Player, Duration, whiteList));
+                Invisbility.LaunchInvisibility(Player, Duration, whiteList);
                 return false;
             }
 

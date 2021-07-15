@@ -1,4 +1,5 @@
-﻿using Harion.Data;
+﻿using Harion.CustomRoles;
+using Harion.Data;
 using Harion.Utility.Utils;
 using System.Collections.Generic;
 
@@ -15,13 +16,14 @@ namespace Harion.Utility.Ability {
             Player.RpcSetColor((byte) MorphedPlayer.Data.ColorId);
             Player.RpcSetName(MorphedPlayer.Data.PlayerName);
 
+            RoleManager RendererName = RoleManager.GetRoleToDisplay(MorphedPlayer); 
+            RoleManager.AddSpecificNameInformation(Player, RendererName.Color, MorphedPlayer.Data.PlayerName);
+
             if (resetAnim && !Player.inVent)
                 Player.MyPhysics.ResetAnimState();
 
-            if (Invisbility.IsInvisible(Player)) {
-                Player.HatRenderer.BackLayer.enabled = false;
-                Player.HatRenderer.FrontLayer.enabled = false;
-            }
+            if (Invisbility.IsInvisible(Player))
+                Invisbility.RefreshInvisibility(Player);
         }
 
         public static void Unmorph(PlayerControl Player, bool resetAnim = false) {
@@ -36,10 +38,8 @@ namespace Harion.Utility.Ability {
             if (resetAnim && !Player.inVent)
                 Player.MyPhysics.ResetAnimState();
 
-            if (Invisbility.IsInvisible(Player)) {
-                Player.HatRenderer.BackLayer.enabled = false;
-                Player.HatRenderer.FrontLayer.enabled = false;
-            }
+            if (Invisbility.IsInvisible(Player))
+                Invisbility.RefreshInvisibility(Player);
         }
 
         public static bool IsMorphed(PlayerControl Player) => MorphPlayer.ContainsPlayer(Player);

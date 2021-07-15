@@ -121,10 +121,11 @@ namespace Harion.Cooldown {
 
             // Red Cross
             RedCrossObject = new GameObject { layer = 5, name = "Red Cross" };
-            RedCrossObject.transform.localPosition = Vector2.zero;
+            RedCrossObject.transform.localScale = new Vector3(0.5f, 0.5f, 1f);
             RedCrossObject.transform.SetParent(gameObject.transform);
             RedCrossObject.SetActive(false);
 
+            RedCrossObject.transform.localPosition = Vector2.zero;
             CrossRenderer = RedCrossObject.AddComponent<SpriteRenderer>();
             CrossRenderer.sprite = ResourceLoader.RedCross;
 
@@ -315,8 +316,10 @@ namespace Harion.Cooldown {
         }
 
         internal void UpdatePosition() {
-            if (gameObject.transform.localPosition.x > 0f)
+            if (gameObject.transform.localPosition.x > 0f) {
                 gameObject.transform.localPosition = new Vector3((gameObject.transform.localPosition.x + 1.3f) * -1, gameObject.transform.localPosition.y, gameObject.transform.localPosition.z) + new Vector3(PositionOffset.x, PositionOffset.y);
+                RedCrossObject.transform.localPosition = Vector2.zero;
+            }
         }
 
         private int GetAvailableButtonId() {

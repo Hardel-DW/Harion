@@ -21,10 +21,6 @@ namespace Harion {
     public class HarionPlugin : BasePlugin {
         public const string Id = "fr.hardel.api";
         public static ManualLogSource Logger;
-
-        public static CustomOptionHolder HarionHeader;
-        public static CustomToggleOption ShowRoleInName;
-        public static CustomToggleOption DeadSeeAllRoles;
         private GameObject gameObject;
 
         internal static ConfigFile ConfigFile { get; set; }
@@ -65,10 +61,7 @@ namespace Harion {
             ShowExtraRegions = Config.Bind("Preferences", "Show Extra Regions", true, "If the extra regions added by default in Unify should be shown when displaying the regions menu");
 
             // Game Options
-            HarionHeader = CustomOption.AddHolder("<b>Harion Option :</b>");
-            ShowRoleInName = CustomOption.AddToggle("Show role in name", false, HarionHeader);
-            DeadSeeAllRoles = CustomOption.AddToggle("Dead see player role", false, HarionHeader);
-            HarionHeader.HudStringFormat = (option, name, value) => $"\n{name}";
+            GenericGameOptions.DefineGameOptions();
         }
 
         public override bool Unload() {
